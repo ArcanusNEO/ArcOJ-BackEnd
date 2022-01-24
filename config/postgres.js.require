@@ -1,0 +1,7 @@
+module.exports = {
+  user: 'OJMaster',
+  host: 'localhost',
+  database: 'NKOJ-BackEnd-Database',
+  password: 'require',
+  port: 5432
+}

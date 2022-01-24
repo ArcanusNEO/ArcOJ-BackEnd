@@ -1,0 +1,22 @@
+{
+  "name": "arc-back-end",
+  "version": "0.0.0",
+  "private": true,
+  "scripts": {
+    "start": "node ./bin/www"
+  },
+  "dependencies": {
+    "child_process": "^1.0.2",
+    "cookie-parser": "~1.4.6",
+    "debug": "~4.3.3",
+    "ejs": "~3.1.6",
+    "express": "~4.17.2",
+    "fs-extra": "^10.0.0",
+    "http-errors": "^2.0.0",
+    "jsonwebtoken": "^8.5.1",
+    "morgan": "~1.10.0",
+    "nodemailer": "^6.7.2",
+    "pg": "^8.7.1",
+    "string-random": "^0.1.3"
+  }
+}

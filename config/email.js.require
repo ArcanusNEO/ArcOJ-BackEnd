@@ -1,0 +1,16 @@
+module.exports = {
+  transportInfo: {
+    host: 'smtp.88.com',
+    secureConnection: true, // use SSL
+    port: 465,
+    secure: true,
+    auth: {
+      user: 'require@require.require',
+      pass: 'require'
+    }
+  },
+  mailInfo: {
+    from: '"NKOJ-Back-End Team" <require@require.require>',
+    subject: '来自Dev版后端'
+  }
+}
