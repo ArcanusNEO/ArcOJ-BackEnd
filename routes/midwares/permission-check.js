@@ -9,12 +9,9 @@ module.exports = (uid, reqPerms) => {
     let rep = true
     reqPerms.forEach((reqPerm) => {
       let bit = ret.substr(permdef[reqPerm], 1)
-      if (bit !== '1') { rep = false }
+      if (bit !== '1') rep = false
     });
-    if (rep) {
-      return next()
-    } else {
-      return res.sendStatus(hsc.forbidden)
-    }
+    if (rep) return next()
+    else return res.sendStatus(hsc.forbidden)
   }
 }

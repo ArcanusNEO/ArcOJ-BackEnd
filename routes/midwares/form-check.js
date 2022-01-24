@@ -1,13 +1,9 @@
 let crypto = require('../../utils/passwd-crypto')
 
 const nickname = (req, pos, item) => {
-  if (!req[pos][item]) {
-    return false
-  }
+  if (!req[pos][item]) return false
   try {
-    if (!/^[\w]{3,20}$/g.test(req[pos][item])) {
-      throw 'Invalid nickname'
-    }
+    if (!/^[\w]{3,20}$/g.test(req[pos][item])) throw Error('Invalid nickname')
   } catch (err) {
     console.error(err)
     return false
@@ -16,18 +12,12 @@ const nickname = (req, pos, item) => {
 }
 
 const email = (req, pos, item) => {
-  if (!req[pos][item]) {
-    return false
-  }
+  if (!req[pos][item]) return false
   try {
-    if (req[pos][item].indexOf('@') === -1) {
-      req[pos][item] += '@mail.nankai.edu.cn'
-    }
+    if (req[pos][item].indexOf('@') === -1) req[pos][item] += '@mail.nankai.edu.cn'
     req[pos][item] = req[pos][item].toLowerCase()
     if (!/^[0-9a-z_-]+@[0-9a-z_-]+(\.[0-9a-z_-]+)+$/igs.test(req[pos][item])
-      || !/@(mail\.)?nankai\.edu\.cn$/igs.test(req[pos][item])) {
-      throw 'Invalid email address'
-    }
+      || !/@(mail\.)?nankai\.edu\.cn$/igs.test(req[pos][item])) throw Error('Invalid email address')
   } catch (err) {
     console.error(err)
     return false
@@ -38,14 +28,10 @@ const email = (req, pos, item) => {
 const username = email
 
 const password = (req, pos, item) => {
-  if (!req[pos][item]) {
-    return false
-  }
+  if (!req[pos][item]) return false
   try {
     req[pos][item] = crypto.decrypt(req[pos][item])
-    if (!/^[\w-\.~!@#$\^&\*\+=:'",<>\?/]{6,20}$/g.test(req[pos][item])) {
-      throw 'Invalid password'
-    }
+    if (!/^[\w-\.~!@#$\^&\*\+=:'",<>\?/]{6,20}$/g.test(req[pos][item])) throw Error('Invalid password')
   } catch (err) {
     console.error(err)
     return false
