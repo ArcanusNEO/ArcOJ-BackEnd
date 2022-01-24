@@ -83,10 +83,9 @@ const judge = async (params) => {
 
     let acCount = 0
     if (json.detail) {
-      json.detail.forEach(function (i) {
+      json.detail.forEach((i) => {
         i.extra = i.extra || json.extra
-        if (i.status === 0 || i.status === 1)
-          acCount += 1
+        if (i.status === 0 || i.status === 1) acCount += 1
       })
     }
     let score = parseInt(acCount * 100.0 / cases)
@@ -96,7 +95,7 @@ const judge = async (params) => {
   } catch (err) {
     console.error(err)
     let sqlStr = 'UPDATE "solution" SET "status_id" = $1 WHERE "sid" = $7'
-    await db.query(sqlStr, [jsc.msgCode.CE, sid]).then(() => { }).catch((e) => { console.error(e) })
+    await db.query(sqlStr, [jsc.msgCode.CE, sid]).then(() => { ; }).catch((e) => { console.error(e) })
     return err
   }
 }
