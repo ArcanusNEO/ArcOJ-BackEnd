@@ -2,7 +2,6 @@ const { SOLUTION_PATH, DATA_BASE, PROBLEM_DATA_PATH, PROBLEM_SPJ_PATH, PROBLEM_P
 const fs = require('fs-extra')
 const defalutConfig = require('../config/judge-config-default')
 const db = require('./database')
-const languageExtension = require('../config/lang-ext')
 const jsc = require('../config/judge-status-code')
 const { spawn } = require('./spawn')
 

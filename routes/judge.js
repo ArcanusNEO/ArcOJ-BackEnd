@@ -3,14 +3,10 @@ let router = express.Router()
 let hsc = require('../config/http-status-code')
 let db = require('../utils/database')
 let lc = require('./midwares/login-check')
-let mc = require('./midwares/member-check')
 let pc = require('./midwares/permission-check')
-let tokenUtils = require('../utils/token')
-let fc = require('./midwares/form-check')
 let languageExtension = require('../config/lang-ext')
 let jsc = require('../config/judge-status-code')
 let { judge } = require('../utils/judge')
-let fs = require('fs-extra')
 
 router.post('/', lc,
   async (req, res, next) => {
