@@ -17,7 +17,7 @@ router.get('/id/:psid(\\d+)', lc,
     return (mc['problemset'](req.tokenAcc.uid, req.params.psid)(req, res, next))
   },
   async (req, res) => {
-    let query = 'SELECT "problemset"."tittle" AS "name", "problemset"."description" AS "description", "private", "during", "course"."tittle" AS "courseName" FROM "problemset" LEFT JOIN "course" ON "problemset"."cid" = "course"."cid" WHERE "psid" = $1 AND "course"."visiable" = TRUE'
+    let query = 'SELECT "problemset"."title" AS "name", "problemset"."description" AS "description", "private", "during", "course"."title" AS "courseName" FROM "problemset" LEFT JOIN "course" ON "problemset"."cid" = "course"."cid" WHERE "psid" = $1 AND "course"."visiable" = TRUE'
     let ret = (await db.query(query, req.params.psid)).rows[0]
     if (ret) return res.status(hsc.ok).json(ret)
     else return res.sendStatus(hsc.unauthorized)

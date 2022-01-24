@@ -106,7 +106,7 @@ ALTER SEQUENCE "public"."user_uid_seq" OWNER TO "OJMaster";
 DROP TABLE IF EXISTS "public"."course";
 CREATE TABLE "public"."course" (
   "cid" int4 NOT NULL DEFAULT nextval('course_cid_seq'::regclass),
-  "tittle" text COLLATE "pg_catalog"."default" NOT NULL,
+  "title" text COLLATE "pg_catalog"."default" NOT NULL,
   "description" text COLLATE "pg_catalog"."default",
   "owner_id" int4 NOT NULL,
   "visiable" bool NOT NULL DEFAULT false,

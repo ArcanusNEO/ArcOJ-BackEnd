@@ -17,7 +17,7 @@ router.get('/id/:cid(\\d+)', lc,
     return (mc['course'](req.tokenAcc.uid, req.params.cid)(req, res, next))
   },
   async (req, res) => {
-    let query = 'SELECT "tittle" AS "name", "teacher" AS "teachers", "number", "description", "semester" FROM "course" WHERE "cid" = $1 AND "visiable" = TRUE'
+    let query = 'SELECT "title" AS "name", "teacher" AS "teachers", "number", "description", "semester" FROM "course" WHERE "cid" = $1 AND "visiable" = TRUE'
     let ret = (await db.query(query, req.params.cid)).rows[0]
     if (ret) return res.status(hsc.ok).json(ret)
     else return res.sendStatus(hsc.unauthorized)
