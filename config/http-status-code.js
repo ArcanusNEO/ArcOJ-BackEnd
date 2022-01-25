@@ -18,5 +18,8 @@ module.exports = {
   locked: 423,
   tooManyReq: 429,
   loginTimeOut: 440,
-  illegal: 451
+  illegal: 451,
+
+  internalSrvErr: 500,
+  notImplemented: 501
 }
