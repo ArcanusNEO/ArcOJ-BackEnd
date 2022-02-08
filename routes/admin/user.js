@@ -31,7 +31,7 @@ router.get('/id/:uid(\\d+)', lc,
   },
   async (req, res) => {
     let query = 'SELECT * FROM "user" WHERE "uid" = $1'
-    let ret = (await db.query(query, req.params.uid)).rows[0]
+    let ret = (await db.query(query, [req.params.uid])).rows[0]
     if (ret) return res.status(hsc.ok).json(ret)
     else return res.sendStatus(hsc.notFound)
   })
