@@ -9,11 +9,10 @@ let tokenUtils = require('../utils/token')
 let fc = require('./midwares/form-check')
 
 router.get('/', async (req, res) => {
-  let sqlStr = 'SELECT "during" FROM "problemset" WHERE "psid" = $1 AND NOW()::TIMESTAMP <@ "during" LIMIT 1'
-  let ret = (await db.query(sqlStr, [1])).rows[0]
-  if (ret) res.status(hsc.ok).json({ now: Date.now(), during: ret['during'] })
-  else res.sendStatus(hsc.forbidden)
-  // hello
+  let query = 'SELECT * FROM "user" WHERE "uid" = 1'
+  let ret = (await db.query(query, req.params.uid)).rows[0]
+  if (ret) return res.status(hsc.ok).json(ret)
+  else return res.sendStatus(hsc.notFound)
 })
 
 module.exports = router
