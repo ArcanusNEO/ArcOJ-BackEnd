@@ -1,7 +1,6 @@
 let express = require('express')
 let router = express.Router()
 let hsc = require('../config/http-status-code')
-let tokenUtils = require('../utils/token')
 let lc = require('./midwares/login-check')
 
 router.get('/', lc, (req, res) => {
