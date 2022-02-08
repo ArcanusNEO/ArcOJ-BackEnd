@@ -9,7 +9,12 @@ let email = require('../utils/email')
 router.post('/', fc(['body'], ['email']), async (req, res) => {
   let captcha = sr(5)
   tokenUtils.write(res, 'ec', { captcha: captcha })
-  await email(req.body['email'], `您的验证码是：\n${captcha}`)
+  try {
+    await email(req.body['email'], `您的验证码是：\n${captcha}`)
+  } catch (err) {
+    console.error(err)
+    return res.sendStatus(hsc.internalSrvErr)
+  }
   return res.sendStatus(hsc.ok)
 })
 
