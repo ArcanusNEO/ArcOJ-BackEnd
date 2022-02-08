@@ -21,7 +21,7 @@ router.get('/', lc,
       queryStr += ` AND "user"."${key}" = $${++counter}`
     }
     if (limit) queryStr += ` LIMIT $${++counter}`
-    param.push(limit)
+    param.push(parseInt(limit))
     let ret = (await db.query(queryStr, param)).rows
     return res.status(hsc.ok).json(ret)
   })
