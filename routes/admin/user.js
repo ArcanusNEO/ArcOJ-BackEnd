@@ -14,14 +14,12 @@ router.get('/', lc,
     let queryStr = 'SELECT * FROM "user" INNER JOIN "group" ON "user"."gid" = "group"."gid" WHERE NOT "user"."removed"'
     let allParams = { uid, gid, nickname, email, qq, tel, realname, school, words }
     let param = []
-    let counter = 0
     for (let key in allParams) {
-      if (!key) continue
-      param.push(key)
-      queryStr += ` AND "user"."${key}" = $${++counter}`
+      if (!allParams[key]) continue
+      console.log(allParams[key])
+      queryStr += ` AND "user"."${key}" = $${param.push(allParams[key])}`
     }
-    if (limit) queryStr += ` LIMIT $${++counter}`
-    param.push(parseInt(limit))
+    if (parseInt(limit) > 0) queryStr += ` LIMIT $${param.push(parseInt(limit))}`
     let ret = (await db.query(queryStr, param)).rows
     return res.status(hsc.ok).json(ret)
   })
