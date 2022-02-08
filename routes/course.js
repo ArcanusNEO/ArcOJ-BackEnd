@@ -18,7 +18,7 @@ router.get('/id/:cid(\\d+)', lc,
   },
   async (req, res) => {
     let query = 'SELECT "title" AS "name", "teacher" AS "teachers", "number", "description", "semester" FROM "course" WHERE "cid" = $1 AND "visiable" = TRUE'
-    let ret = (await db.query(query, req.params.cid)).rows[0]
+    let ret = (await db.query(query, [req.params.cid])).rows[0]
     if (ret) return res.status(hsc.ok).json(ret)
     else return res.sendStatus(hsc.unauthorized)
   })
