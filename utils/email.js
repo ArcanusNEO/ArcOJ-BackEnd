@@ -9,11 +9,11 @@ let sendEmail = async (address, content) => {
   try {
     let ret = await transporter.sendMail(info.mailInfo)
     console.log("邮件成功发送: %s", ret.messageId)
-    return true
   } catch (err) {
     console.error(err)
     return false
   }
+  return true
 }
 
 module.exports = sendEmail
