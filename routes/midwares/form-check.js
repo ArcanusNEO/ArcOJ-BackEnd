@@ -3,7 +3,7 @@ let crypto = require('../../utils/passwd-crypto')
 const nickname = (req, pos, item) => {
   if (!req[pos][item]) return false
   try {
-    if (!/^[\w]{3,20}$/g.test(req[pos][item])) throw Error('Invalid nickname')
+    if (!/^.{3,20}$/g.test(req[pos][item])) throw Error('Invalid nickname')
   } catch (err) {
     console.error(err)
     return false
