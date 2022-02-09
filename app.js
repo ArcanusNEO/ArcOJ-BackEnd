@@ -8,7 +8,7 @@ let api = require('./routes/api')
 
 let app = express()
 
-app.set('trust proxy', 'loopback')
+app.set('trust proxy', true)
 
 app.all('*', (req, res, next) => {
   res.header("Server", "Microsoft-IIS/7.0")
