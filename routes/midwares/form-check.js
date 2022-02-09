@@ -1,4 +1,5 @@
 let crypto = require('../../utils/passwd-crypto')
+let hsc = require('../../config/http-status-code')
 
 const nickname = (req, pos, item) => {
   if (!req[pos][item]) return false
@@ -95,7 +96,7 @@ const tel = (req, pos, item) => {
   return true
 }
 
-module.exports = (poss, items, errCode, errMsg) => {
+module.exports = (poss, items, errCode = hsc.parseErr, errMsg = { ok: false }) => {
   return (req, res, next) => {
     let rep = true
     poss.forEach((pos) => {

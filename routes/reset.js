@@ -61,9 +61,9 @@ router.post('/profile', lc,
     let param = []
     for (let key in req.items)
       query += `, "${key}" = $${param.push(req.body[key])}`
-    query += ` WHERE "uid" = $${param.push(req.tokenAcc.uid)}`
-    await db.query(query, param)
-    if (!ret) return res.sendStatus(hsc.notFound)
+    query += ` WHERE "uid" = $${param.push(req.tokenAcc.uid)} RETURNING "nickname", "qq", "tel", "realname", "school", "words"`
+    ret = (await db.query(query, param)).rows[0]
+    if (!ret) return res.sendStatus(hsc.forbidden)
     return res.status(hsc.ok).json(ret)
   })
 
