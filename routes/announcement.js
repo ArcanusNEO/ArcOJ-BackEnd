@@ -8,7 +8,7 @@ let mc = require('./midwares/member-check')
 router.get('/id/:id(\\d+)', lc,
   async (req, res, next) => {
     let mid = req.params.id
-    let query = 'SELECT "cid", "psid", "mid" AS "id", "title", "content", "when" AS "time" FROM "message" WHERE "from_del" = FALSE AND "to" IS NULL AND "mid" = $1'
+    let query = 'SELECT "cid", "psid", "mid" AS "id", "title", "content", "when" AS "time" FROM "message" WHERE NOT "from_del" AND "to" IS NULL AND "mid" = $1'
     let ret = (await db.query(query, [mid])).rows[0]
     if (ret) {
       req.ann = ret
