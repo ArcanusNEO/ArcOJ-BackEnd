@@ -1,4 +1,4 @@
-const { SOLUTION_PATH, DATA_BASE, PROBLEM_DATA_PATH, PROBLEM_SPJ_PATH, PROBLEM_PATH } = require('../config/basic')
+const dataPath = require('../config/basic')
 const fs = require('fs-extra')
 const defalutConfig = require('../config/judge-config-default')
 const db = require('./database')
@@ -6,45 +6,45 @@ const jsc = require('../config/judge-status-code')
 const { spawn } = require('./spawn')
 
 const getSolutionStructure = async (sid) => {
-  const PATH_SOLUTION = `${SOLUTION_PATH}/${sid}`
-  await fs.ensureDir(PATH_SOLUTION)
-  const PATH_TEMP = `${PATH_SOLUTION}/temp`
-  const PATH_EXEC_OUT = `${PATH_SOLUTION}/execout`
+  const pathSolution = `${dataPath.solution}/${sid}`
+  await fs.ensureDir(pathSolution)
+  const pathTemp = `${pathSolution}/temp`
+  const pathExecOut = `${pathSolution}/execout`
 
-  const FILE_RESULT = `${PATH_TEMP}/result`
-  const FILE_TIME = `${PATH_TEMP}/time`
-  const FILE_MEMORY = `${PATH_TEMP}/memory`
-  const FILE_DETAIL = `${PATH_TEMP}/detail`
-  const FILE_COMPILE_INFO = `${PATH_SOLUTION}/main.cmpinfo`
-  const FILE_CODE_BASE = `${PATH_SOLUTION}/main.`
+  const fileResult = `${pathTemp}/result`
+  const fileTime = `${pathTemp}/time`
+  const fileMemory = `${pathTemp}/memory`
+  const fileDetail = `${pathTemp}/detail`
+  const fileCompileInfo = `${pathSolution}/main.cmpinfo`
+  const fileCodeBase = `${pathSolution}/main.`
   return {
     path: {
-      solution: PATH_SOLUTION,
-      temp: PATH_TEMP,
-      exec_out: PATH_EXEC_OUT
+      solution: pathSolution,
+      temp: pathTemp,
+      exec_out: pathExecOut
     },
     file: {
-      result: FILE_RESULT,
-      time: FILE_TIME,
-      memory: FILE_MEMORY,
-      detail: FILE_DETAIL,
-      compile_info: FILE_COMPILE_INFO,
-      code_base: FILE_CODE_BASE
+      result: fileResult,
+      time: fileTime,
+      memory: fileMemory,
+      detail: fileDetail,
+      compile_info: fileCompileInfo,
+      code_base: fileCodeBase
     }
   }
 }
 
 const getProblemStructure = (pid) => {
-  const PATH_DATA = `${PROBLEM_DATA_PATH}/${pid}`
-  const PATH_SPJ = `${PROBLEM_SPJ_PATH}/${pid}`
-  const FILE_MD = `${PROBLEM_PATH}/${pid}.md`
+  const pathData = `${dataPath.problemData}/${pid}`
+  const pathSpj = `${dataPath.problemSpj}/${pid}`
+  const fileMd = `${dataPath.problem}/${pid}.md`
   return {
     path: {
-      data: PATH_DATA,
-      spj: PATH_SPJ
+      data: pathData,
+      spj: pathSpj
     },
     file: {
-      md: FILE_MD
+      md: fileMd
     }
   }
 }
@@ -94,7 +94,11 @@ const judge = async (params) => {
   } catch (err) {
     console.error(err)
     let sqlStr = 'UPDATE "solution" SET "status_id" = $1 WHERE "sid" = $7'
-    await db.query(sqlStr, [jsc.msgCode.CE, sid]).then(() => { ; }).catch((e) => { console.error(e) })
+    try {
+      await db.query(sqlStr, [jsc.msgCode.CE, sid])
+    } catch (e) {
+      console.error(e)
+    }
     return err
   }
 }
