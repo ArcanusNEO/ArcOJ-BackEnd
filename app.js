@@ -8,6 +8,8 @@ let api = require('./routes/api')
 
 let app = express()
 
+app.set('trust proxy', 'loopback')
+
 app.all('*', (req, res, next) => {
   res.header("Server", "Microsoft-IIS/7.0")
   res.header("X-AspNet-Version", "4.0.30319")
