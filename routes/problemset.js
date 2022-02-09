@@ -16,6 +16,7 @@ const getAll = (property) => {
     return res.status(hsc.ok).json((await db.query(query, param)).rows)
   }
 }
+
 router.get('/id/:psid(\\d+)', lc,
   async (req, res, next) => {
     return (mc['problemset'](req.tokenAcc.uid, req.params.psid)(req, res, next))
