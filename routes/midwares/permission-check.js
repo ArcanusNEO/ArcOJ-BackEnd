@@ -8,7 +8,7 @@ module.exports = (uid, reqPerms) => {
     let ret = (await db.query(query, [uid])).rows[0]['perm']
     let rep = true
     console.log(ret)
-    for (let reqPerm in reqPerms) {
+    for (let reqPerm of reqPerms) {
       let bit = ret.substr(permdef[reqPerm], 1)
       console.log(reqPerm, bit)
       if (bit !== '1') {

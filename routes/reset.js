@@ -50,7 +50,7 @@ router.post('/profile', lc,
     console.log(1)
     let options = ['nickname', 'qq', 'tel', 'realname', 'school', 'words']
     let items = []
-    for (let key in options)
+    for (let key of options)
       if (req.body[key]) items.push(key)
     req.items = items
     return fc(['body'], items)(req, res, next)
@@ -62,7 +62,7 @@ router.post('/profile', lc,
     if (!ret || ret.removed) return res.sendStatus(hsc.forbidden)
     query = 'UPDATE "user" SET "removed" = FALSE'
     let param = []
-    for (let key in req.items)
+    for (let key of req.items)
       query += `, "${key}" = $${param.push(req.body[key])}`
     query += ` WHERE "uid" = $${param.push(req.tokenAcc.uid)} RETURNING "nickname", "qq", "tel", "realname", "school", "words"`
     ret = (await db.query(query, param)).rows[0]
