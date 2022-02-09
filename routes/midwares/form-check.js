@@ -3,7 +3,41 @@ let crypto = require('../../utils/passwd-crypto')
 const nickname = (req, pos, item) => {
   if (!req[pos][item]) return false
   try {
-    if (!/^.{1,20}$/g.test(req[pos][item])) throw Error('Invalid nickname')
+    if (!/^.{1,11}$/g.test(req[pos][item])) throw Error('Invalid nickname')
+  } catch (err) {
+    console.error(err)
+    return false
+  }
+  return true
+}
+
+const realname = (req, pos, item) => {
+  if (!req[pos][item]) return false
+  try {
+    if (!/^.{1,40}$/g.test(req[pos][item])) throw Error('Invalid realname')
+  } catch (err) {
+    console.error(err)
+    return false
+  }
+  return true
+}
+
+const words = (req, pos, item) => {
+  if (!req[pos][item]) return false
+  try {
+    if (!/^.{1,140}$/g.test(req[pos][item])) throw Error('Invalid words')
+  } catch (err) {
+    console.error(err)
+    return false
+  }
+  return true
+}
+
+
+const school = (req, pos, item) => {
+  if (!req[pos][item]) return false
+  try {
+    if (!/^.{1,50}$/g.test(req[pos][item])) throw Error('Invalid school name')
   } catch (err) {
     console.error(err)
     return false
@@ -50,6 +84,17 @@ const qq = (req, pos, item) => {
   return true
 }
 
+const tel = (req, pos, item) => {
+  if (!req[pos][item]) return false
+  try {
+    if (!/^(\d{11}|(\d{2,4}-)?\d{7,8}(-\d{1,4})?)$/.test(req[pos][item])) throw Error('Invalid Telephone number')
+  } catch (err) {
+    console.error(err)
+    return false
+  }
+  return true
+}
+
 module.exports = (poss, items, errCode, errMsg) => {
   return (req, res, next) => {
     let rep = true
@@ -74,6 +119,22 @@ module.exports = (poss, items, errCode, errMsg) => {
 
           case 'qq':
             rep &= qq(req, pos, item)
+            break
+
+          case 'tel':
+            rep &= tel(req, pos, item)
+            break
+
+          case 'realname':
+            rep &= realname(req, pos, item)
+            break
+
+          case 'school':
+            rep &= school(req, pos, item)
+            break
+
+          case 'words':
+            rep &= words(req, pos, item)
             break
         }
       })
