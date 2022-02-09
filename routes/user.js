@@ -2,6 +2,7 @@ let express = require('express')
 let router = express.Router()
 let hsc = require('../config/http-status-code')
 let lc = require('./midwares/login-check')
+let db = require('../utils/database')
 
 // 出于兼容目的保留
 router.get('/', lc, (req, res) => {
