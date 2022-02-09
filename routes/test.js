@@ -12,6 +12,7 @@ router.get('/', async (req, res) => {
   let uid = 3, ret = {}
   let cid = parseInt(req.query.cid)
   let param = []
+  let property = 'assignment'
   let query = `SELECT "problemset"."psid" AS "id", "title" AS "name" FROM "problemset_user" INNER JOIN "problemset" ON "problemset"."psid" = "problemset_user"."psid" WHERE "uid" = $${param.push(uid)} AND "type" = '${property}'`
   if (cid > 0) query += ` AND "cid" = $${param.push(cid)}`
   query += ' ORDER BY "problemset"."psid" DESC'
