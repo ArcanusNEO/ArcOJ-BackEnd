@@ -26,8 +26,24 @@ const getCount = (psid) => {
 const getList = (psid) => {
   psid = parseInt(psid)
   return async (req, res) => {
-    let limit = req.query.limit, offset = req.query.offset
-    //TODO
+    let { page, item } = req.query
+    page = parseInt(page)
+    item = parseInt(item)
+    let limit = item, offset = (page - 1) * item
+    let query = 'SELECT "pid", "title" AS "name" FROM "problem"'
+    let param = []
+    if (psid > 0) query += ` WHERE "psid" = $${param.push(psid)}`
+    else query += ' WHERE "psid" ISNULL'
+    query += ` ORDER BY "pid" DESC`
+    if (limit > 0) {
+      query += ` LIMIT $${param.push(limit)}`
+      if (offset >= 0) query += ` OFFSET $${param.push(offset)}`
+    }
+    let ret
+    if (param.length == 0) ret = (await db.query(query)).rows
+    else ret = (await db.query(query, param)).rows
+    if (ret.length > 0) return res.status(hsc.ok).json(ret)
+    return res.sendStatus(hsc.notFound)
   }
 }
 
