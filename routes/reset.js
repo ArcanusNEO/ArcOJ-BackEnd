@@ -5,9 +5,11 @@ let fc = require('./midwares/form-check')
 let tokenUtils = require('../utils/token')
 let db = require('../utils/database')
 let md5 = require('../utils/md5')
-let salt = require('../config/secret')
+let salt = require('../config/salt')
+let lc = require('./midwares/login-check')
+let pc = require('./midwares/permission-check')
 
-router.post('/', fc(['body'], ['username', 'password']), async (req, res) => {
+router.post('/password', fc(['body'], ['username', 'password']), async (req, res) => {
   try {
     let md5C = tokenUtils.get(req, 'ec')['md5C']
     tokenUtils.remove(res, 'ec')
@@ -38,5 +40,27 @@ router.post('/', fc(['body'], ['username', 'password']), async (req, res) => {
     return res.status(hsc.captchaMismatch).json({ ok: false })
   }
 })
+
+router.post('/profile', lc,
+  async (req, res, next) => {
+    return pc(req.tokenAcc.uid, 'changeProfile')(req, res, next)
+  },
+  (req, res, next) => {
+    let options = ['nickname', 'qq', 'tel', 'realname', 'school', 'words']
+    let items = []
+    for (let key in options)
+      if (req.body[key]) items.push(key)
+    req.items = items
+    return fc(['body'], items)(req, res, next)
+  },
+  async (req, res) => {
+    let query = 'SELECT * FROM "problem" WHERE "pid" = $1 LIMIT 1'
+    for (let key in req.items) {
+
+    }
+    let ret = (await db.query(query, [pid])).rows[0]
+    if (!ret) return res.sendStatus(hsc.notFound)
+    return res.status(hsc.ok).json(ret)
+  })
 
 module.exports = router

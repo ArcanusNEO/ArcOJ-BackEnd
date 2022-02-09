@@ -3,7 +3,7 @@ let crypto = require('../../utils/passwd-crypto')
 const nickname = (req, pos, item) => {
   if (!req[pos][item]) return false
   try {
-    if (!/^.{3,20}$/g.test(req[pos][item])) throw Error('Invalid nickname')
+    if (!/^.{1,20}$/g.test(req[pos][item])) throw Error('Invalid nickname')
   } catch (err) {
     console.error(err)
     return false
@@ -39,6 +39,17 @@ const password = (req, pos, item) => {
   return true
 }
 
+const qq = (req, pos, item) => {
+  if (!req[pos][item]) return false
+  try {
+    if (!/^[1-9]\d{4,11}$/.test(req[pos][item])) throw Error('Invalid QQ number')
+  } catch (err) {
+    console.error(err)
+    return false
+  }
+  return true
+}
+
 module.exports = (poss, items, errCode, errMsg) => {
   return (req, res, next) => {
     let rep = true
@@ -59,6 +70,10 @@ module.exports = (poss, items, errCode, errMsg) => {
 
           case 'nickname':
             rep &= nickname(req, pos, item)
+            break
+
+          case 'qq':
+            rep &= qq(req, pos, item)
             break
         }
       })

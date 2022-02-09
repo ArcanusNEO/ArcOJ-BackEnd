@@ -6,7 +6,7 @@ let sr = require('string-random')
 let tokenUtils = require('../utils/token')
 let email = require('../utils/email')
 let md5 = require('../utils/md5')
-let salt = require('../config/secret')
+let salt = require('../config/salt')
 
 router.post('/', fc(['body'], ['email']), async (req, res) => {
   let captcha = sr(5)

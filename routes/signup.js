@@ -5,7 +5,7 @@ let tokenUtils = require('../utils/token')
 let fc = require('./midwares/form-check')
 let db = require('../utils/database')
 let md5 = require('../utils/md5')
-let salt = require('../config/secret')
+let salt = require('../config/salt')
 
 router.post('/', fc(['body'], ['password', 'username', 'nickname'], hsc.parseErr, { ok: false }), async (req, res) => {
   try {
