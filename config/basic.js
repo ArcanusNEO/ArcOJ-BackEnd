@@ -18,6 +18,5 @@ module.exports = {
   TEMP_PATH: path.resolve(DATA_BASE, TEMP_PATH),
   CONTEST_PATH: path.resolve(DATA_BASE, CONTEST_PATH),
   SOLUTION_PATH: path.resolve(DATA_BASE, SOLUTION_PATH),
-  FRONT_END_PATH: path.resolve(DATA_BASE, FRONT_END_PATH),
   BACK_END_PATH: path.resolve(__dirname, '..')
 }
