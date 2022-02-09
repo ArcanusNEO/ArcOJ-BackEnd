@@ -43,11 +43,9 @@ router.post('/password', fc(['body'], ['username', 'password']), async (req, res
 
 router.post('/profile', lc,
   async (req, res, next) => {
-    console.log(0)
     return pc(req.tokenAcc.uid, ['changeProfile'])(req, res, next)
   },
   (req, res, next) => {
-    console.log(1)
     let options = ['nickname', 'qq', 'tel', 'realname', 'school', 'words']
     let items = []
     for (let key of options)
@@ -56,7 +54,6 @@ router.post('/profile', lc,
     return fc(['body'], items)(req, res, next)
   },
   async (req, res) => {
-    console.log(2)
     let query = 'SELECT "removed" FROM "user" WHERE "uid" = $1'
     let ret = (await db.query(query, [req.tokenAcc.uid])).rows[0]
     if (!ret || ret.removed) return res.sendStatus(hsc.forbidden)
