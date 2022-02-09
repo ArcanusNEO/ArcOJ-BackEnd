@@ -4,7 +4,7 @@ const privateKey = require('../config/password-private-key')
 
 function encrypt(plain) {
   try {
-    const buffer = Buffer.from(plain, 'utf8');
+    const buffer = Buffer.from(plain, 'utf8')
     return crypto.publicEncrypt({
       key: publicKey,
       padding: crypto.constants.RSA_PKCS1_PADDING
