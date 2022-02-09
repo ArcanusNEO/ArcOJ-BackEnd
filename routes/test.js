@@ -9,8 +9,8 @@ let tokenUtils = require('../utils/token')
 let fc = require('./midwares/form-check')
 
 router.get('/', async (req, res) => {
-  let uid = req.tokenAcc.uid, ret = {}
-  let cid = parseInt(req.query.cid)
+  let uid = 3, ret = {}
+  let cid = 1
   let property = 'assignment'
   let param = []
   let query = `SELECT "problemset"."psid" AS "id", "title" AS "name" FROM "problemset_user" INNER JOIN "problemset" ON "problemset"."psid" = "problemset_user"."psid" WHERE "uid" = $${param.push(uid)} AND "type" = '${property}'`
