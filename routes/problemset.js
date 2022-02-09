@@ -25,7 +25,7 @@ router.get('/id/:psid(\\d+)', lc,
     let query = 'SELECT "problemset"."title" AS "name", "problemset"."description" AS "description", "private", "during", "course"."title" AS "courseName" FROM "problemset" LEFT JOIN "course" ON "problemset"."cid" = "course"."cid" WHERE "psid" = $1 AND "course"."visiable" = TRUE'
     let ret = (await db.query(query, [req.params.psid])).rows[0]
     if (ret) return res.status(hsc.ok).json(ret)
-    else return res.sendStatus(hsc.unauthorized)
+    else return res.sendStatus(hsc.notFound)
   })
 
 module.exports = { getAll, router }
