@@ -10,7 +10,7 @@ let { judge } = require('../utils/judge')
 
 router.post('/', lc,
   async (req, res, next) => {
-    return pc(req.tokenAcc.uid, 'submitCode')(req, res, next)
+    return pc(req.tokenAcc.uid, ['submitCode'])(req, res, next)
   },
   async (req, res) => {
     let { pid, lang, code, share } = req.body

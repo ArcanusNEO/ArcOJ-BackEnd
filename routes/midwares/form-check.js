@@ -99,8 +99,10 @@ const tel = (req, pos, item) => {
 module.exports = (poss, items, errCode = hsc.parseErr, errMsg = { ok: false }) => {
   return (req, res, next) => {
     let rep = true
-    poss.forEach((pos) => {
-      items.forEach((item) => {
+    for (let pos in poss) {
+      if (!rep) break
+      for (let item in items) {
+        if (!rep) break
         switch (item) {
           case 'username':
             rep &= username(req, pos, item)
@@ -138,8 +140,8 @@ module.exports = (poss, items, errCode = hsc.parseErr, errMsg = { ok: false }) =
             rep &= words(req, pos, item)
             break
         }
-      })
-    })
+      }
+    }
     if (rep) return next()
     return res.status(errCode).json(errMsg)
   }

@@ -43,7 +43,7 @@ router.post('/password', fc(['body'], ['username', 'password']), async (req, res
 
 router.post('/profile', lc,
   async (req, res, next) => {
-    return pc(req.tokenAcc.uid, 'changeProfile')(req, res, next)
+    return pc(req.tokenAcc.uid, ['changeProfile'])(req, res, next)
   },
   (req, res, next) => {
     let options = ['nickname', 'qq', 'tel', 'realname', 'school', 'words']

@@ -7,7 +7,7 @@ let pc = require('../midwares/permission-check')
 
 router.get('/', lc,
   async (req, res, next) => {
-    return pc(req.tokenAcc.uid, 'master')(req, res, next)
+    return pc(req.tokenAcc.uid, ['master'])(req, res, next)
   },
   async (req, res) => {
     let { uid, gid, nickname, email, qq, tel, realname, school, words, limit } = req.query
@@ -27,7 +27,7 @@ router.get('/', lc,
 
 router.get('/id/:uid(\\d+)', lc,
   async (req, res, next) => {
-    return pc(req.tokenAcc.uid, 'master')(req, res, next)
+    return pc(req.tokenAcc.uid, ['master'])(req, res, next)
   },
   async (req, res) => {
     let query = 'SELECT * FROM "user" WHERE "uid" = $1'

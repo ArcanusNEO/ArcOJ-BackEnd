@@ -7,7 +7,7 @@ let db = require('../../utils/database')
 
 router.get('/', lc,
   async (req, res, next) => {
-    return (pc(req.tokenAcc.uid, 'editCourse')(req, res, next))
+    return (pc(req.tokenAcc.uid, ['editCourse'])(req, res, next))
   },
   async (req, res) => {
     let query = 'SELECT "course"."title" AS "name", "course"."cid" AS "id" FROM "course" INNER JOIN "course_maintainer" ON "course"."cid" = "course_maintainer"."cid" WHERE "course_maintainer"."uid" = $1 ORDER BY "course"."cid" DESC'
