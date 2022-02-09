@@ -9,17 +9,14 @@ let tokenUtils = require('../utils/token')
 let fc = require('./midwares/form-check')
 
 router.get('/', async (req, res) => {
-  let { uid, gid, nickname, email, qq, tel, realname, school, words, limit } = req.query
-  let queryStr = 'SELECT * FROM "user" INNER JOIN "group" ON "user"."gid" = "group"."gid" WHERE NOT "user"."removed"'
-  let allParams = { uid, gid, nickname, email, qq, tel, realname, school, words }
+  let uid = req.tokenAcc.uid, ret = {}
+  let cid = parseInt(req.query.cid)
+  let property = 'assignment'
   let param = []
-  for (let key in allParams) {
-    if (!allParams[key]) continue
-    console.log(allParams[key])
-    queryStr += ` AND "user"."${key}" = $${param.push(allParams[key])}`
-  }
-  if (parseInt(limit) > 0) queryStr += ` LIMIT $${param.push(parseInt(limit))}`
-  let ret = (await db.query(queryStr, param)).rows
+  let query = `SELECT "problemset"."psid" AS "id", "title" AS "name" FROM "problemset_user" INNER JOIN "problemset" ON "problemset"."psid" = "problemset_user"."psid" WHERE "uid" = $${param.push(uid)} AND "type" = '${property}'`
+  if (cid > 0) query += ` AND "cid" = '$${param.push(cid)}'`
+  query += ' ORDER BY "problemset"."psid" DESC'
+  ret[property] = (await db.query(query, param)).rows
   return res.status(hsc.ok).json(ret)
 })
 
