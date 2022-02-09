@@ -4,12 +4,14 @@ let hsc = require('../config/http-status-code')
 let tokenUtils = require('../utils/token')
 let fc = require('./midwares/form-check')
 let db = require('../utils/database')
+let md5 = require('../utils/md5')
+let salt = require('../config/secret')
 
 router.post('/', fc(['body'], ['password', 'username', 'nickname'], hsc.parseErr, { ok: false }), async (req, res) => {
   try {
-    let captcha = tokenUtils.get(req, 'ec')['captcha']
+    let md5C = tokenUtils.get(req, 'ec')['md5C']
     tokenUtils.remove(res, 'ec')
-    if (captcha !== req.body['emailCaptcha']) throw Error('Captcha is incorrect')
+    if (md5C !== md5(req.body['emailCaptcha'] + salt)) throw Error('Captcha is incorrect')
     let uid, username = req.body['username'], nickname = req.body['nickname'], password = req.body['password']
     let sqlStr = 'SELECT "uid" FROM "user" WHERE "email" = $1 LIMIT 1'
     let tot = await db.query(sqlStr, [username])
