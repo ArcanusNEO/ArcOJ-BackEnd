@@ -11,7 +11,7 @@ router.post('/', fc(['body'], ['username', 'password']), async (req, res) => {
     tokenUtils.remove(res, 'ec')
     if (captcha !== req.body['emailCaptcha']) throw Error('Captcha is incorrect')
     let username = req.body['username'], password = req.body['password']
-    let sqlStr = 'SELECT "uid", "gid", "nickname" FROM "user" WHERE "email" = $1 AND "removed" = false LIMIT 1'
+    let sqlStr = 'SELECT "uid", "gid", "nickname" FROM "user" WHERE "email" = $1 AND NOT "removed" LIMIT 1'
     let sqlRes = await db.query(sqlStr, [username])
     if (!sqlRes.rows[0]) throw Error('No such user')
     let uid = sqlRes.rows[0]['uid'], permission = sqlRes.rows[0]['gid'], nickname = sqlRes.rows[0]['nickname']

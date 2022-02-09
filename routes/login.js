@@ -17,7 +17,7 @@ router.post('/', fc(['body'], ['username', 'password'], hsc.parseErr, { ok: fals
   } catch (err) {
     tokenUtils.remove(res, 'acc')
     //访问数据库验证密码并获取用户信息
-    let sqlStr = 'SELECT "uid", "gid", "nickname" FROM "user" WHERE "email" = $1 AND "password" = "hash_password"($2) AND "removed" = false LIMIT 1'
+    let sqlStr = 'SELECT "uid", "gid", "nickname" FROM "user" WHERE "email" = $1 AND "password" = "hash_password"($2) AND NOT "removed" LIMIT 1'
     let username = req.body.username, password = req.body.password
     let dbRes = await db.query(sqlStr, [username, password])
     if (!dbRes.rows[0]) return res.status(hsc.passwdMismatch).json({ ok: false })
