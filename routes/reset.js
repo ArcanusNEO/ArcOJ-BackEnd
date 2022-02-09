@@ -54,11 +54,15 @@ router.post('/profile', lc,
     return fc(['body'], items)(req, res, next)
   },
   async (req, res) => {
-    let query = 'SELECT * FROM "problem" WHERE "pid" = $1 LIMIT 1'
-    for (let key in req.items) {
-
-    }
-    let ret = (await db.query(query, [pid])).rows[0]
+    let query = 'SELECT "removed" FROM "user" WHERE "uid" = $1'
+    let ret = (await db.query(query, [req.tokenAcc.uid])).rows[0]
+    if (!ret || ret.removed) return res.sendStatus(hsc.forbidden)
+    query = 'UPDATE "user" SET "removed" = FALSE'
+    let param = []
+    for (let key in req.items)
+      query += `, "${key}" = $${param.push(req.body[key])}`
+    query += ` WHERE "uid" = $${param.push(req.tokenAcc.uid)}`
+    await db.query(query, param)
     if (!ret) return res.sendStatus(hsc.notFound)
     return res.status(hsc.ok).json(ret)
   })
