@@ -99,9 +99,9 @@ const tel = (req, pos, item) => {
 module.exports = (poss, items, errCode = hsc.parseErr, errMsg = { ok: false }) => {
   return (req, res, next) => {
     let rep = true
-    for (let pos in poss) {
+    for (let pos of poss) {
       if (!rep) break
-      for (let item in items) {
+      for (let item of items) {
         if (!rep) break
         switch (item) {
           case 'username':
