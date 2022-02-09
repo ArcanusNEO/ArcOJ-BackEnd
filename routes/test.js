@@ -10,8 +10,7 @@ let fc = require('./midwares/form-check')
 
 router.get('/', async (req, res) => {
   let uid = 3, ret = {}
-  let cid = 1
-  let property = 'assignment'
+  let cid = parseInt(req.query.cid)
   let param = []
   let query = `SELECT "problemset"."psid" AS "id", "title" AS "name" FROM "problemset_user" INNER JOIN "problemset" ON "problemset"."psid" = "problemset_user"."psid" WHERE "uid" = $${param.push(uid)} AND "type" = '${property}'`
   if (cid > 0) query += ` AND "cid" = $${param.push(cid)}`
