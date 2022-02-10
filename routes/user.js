@@ -26,7 +26,7 @@ router.get('/id/:uid(\\d+)', lc,
     let query = 'SELECT "group"."title" AS "identity", "user"."nickname", "user"."qq", "user"."tel", "user"."realname", "user"."school", "user"."words" FROM "user" INNER JOIN "group" ON "user"."gid" = "group"."gid" WHERE "user"."uid" = $1 AND NOT "user"."removed"'
     let ret = (await db.query(query, [req.params.uid])).rows[0]
     if (ret) return res.status(hsc.ok).json(ret)
-    else return res.sendStatus(hsc.notFound)
+    return res.sendStatus(hsc.notFound)
   })
 
 module.exports = router

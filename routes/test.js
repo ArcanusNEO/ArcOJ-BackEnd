@@ -12,7 +12,7 @@ router.get('/', async (req, res) => {
   let query = 'SELECT "uid" FROM "user" WHERE "email" = $1 LIMIT 1'
   let ret = (await db.query(query, [req.query.email])).rows[0]
   if (ret) return res.status(hsc.ok).json(ret)
-  else return res.sendStatus(hsc.unauthorized)
+  return res.sendStatus(hsc.unauthorized)
 })
 
 module.exports = router

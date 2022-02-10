@@ -14,7 +14,7 @@ router.post('/', fc(['body'], ['email']), async (req, res) => {
   tokenUtils.write(res, 'ec', { md5C: md5C })
   let ret = await email(req.body['email'], `您的验证码是：\n${captcha}`)
   if (ret) return res.sendStatus(hsc.ok)
-  else return res.sendStatus(hsc.internalSrvErr)
+  return res.sendStatus(hsc.internalSrvErr)
 })
 
 module.exports = router
