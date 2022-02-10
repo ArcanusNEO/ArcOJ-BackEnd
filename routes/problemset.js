@@ -7,25 +7,43 @@ let mc = require('./midwares/member-check')
 
 const getAll = (property) => {
   return async (req, res) => {
-    let uid = req.tokenAcc.uid
-    let cid = parseInt(req.query.cid)
-    let param = []
-    let query = `SELECT "problemset"."psid" AS "id", "title" AS "name", "during" FROM "problemset_user" INNER JOIN "problemset" ON "problemset"."psid" = "problemset_user"."psid" WHERE "uid" = $${param.push(uid)} AND "type" = '${property}'`
-    if (cid > 0) query += ` AND "cid" = $${param.push(cid)}`
-    query += ' ORDER BY "problemset"."psid" DESC'
-    return res.status(hsc.ok).json((await db.query(query, param)).rows)
+    let uid = req.tokenAcc.uid, param = []
+    let query = `SELECT "problemset"."psid" AS "id", "title" AS "name", LOWER("during")::TIMESTAMPTZ AS "begin", UPPER("during")::TIMESTAMPTZ AS "end" FROM "problemset_user" INNER JOIN "problemset" ON "problemset"."psid" = "problemset_user"."psid" WHERE "uid" = $${param.push(uid)} AND "type" = '${property}' ORDER BY "problemset"."psid" DESC`
+    let ret = (await db.query(query, param)).rows
+    if (ret.length > 0) return res.status(hsc.ok).json(ret)
+    return res.sendStatus(hsc.notFound)
   }
 }
 
-const getBanner = (property) => {
+const get = (property) => {
   return async (req, res) => {
     let uid = req.tokenAcc.uid
-    let cid = parseInt(req.query.cid)
+    let cid = parseInt(req.params.cid)
     let param = []
-    let query = `SELECT "problemset"."psid" AS "id", "problemset"."title" AS "name", UPPER("problemset"."during")::TIMESTAMPTZ AS "deadline", "course"."title" AS "courseName" FROM "problemset" INNER JOIN "problemset_user" ON "problemset"."psid" = "problemset_user"."psid" LEFT JOIN "course" ON "problemset"."cid" = "course"."cid" WHERE NOW()::TIMESTAMPTZ <@ "problemset"."during" AND "problemset_user"."uid" = $${param.push(uid)} AND "problemset"."type" = '${property}'`
-    if (cid > 0) query += ` AND "problemset"."cid" = $${param.push(cid)}`
-    query += ' ORDER BY "deadline" ASC'
-    return res.status(hsc.ok).json((await db.query(query, param)).rows)
+    let query = `SELECT "problemset"."psid" AS "id", "title" AS "name", LOWER("during")::TIMESTAMPTZ AS "begin", UPPER("during")::TIMESTAMPTZ AS "end" FROM "problemset_user" INNER JOIN "problemset" ON "problemset"."psid" = "problemset_user"."psid" WHERE "uid" = $${param.push(uid)} AND "type" = '${property}'`
+    if (cid > 0) query += ` AND "cid" = $${param.push(cid)}`
+    else query += ' AND "cid" ISNULL'
+    query += ' ORDER BY "problemset"."psid" DESC'
+    let ret = (await db.query(query, param)).rows
+    if (ret.length > 0) return res.status(hsc.ok).json(ret)
+    return res.sendStatus(hsc.notFound)
+  }
+}
+
+const getOpen = (property) => {
+  return async (req, res) => {
+    let uid = req.tokenAcc.uid
+    let cid = parseInt(req.params.cid)
+    let param = []
+    let query = 'SELECT "problemset"."psid" AS "id", "problemset"."title" AS "name", LOWER("during")::TIMESTAMPTZ AS "begin", UPPER("during")::TIMESTAMPTZ AS "end"'
+    if (cid > 0) query += ', "course"."title" AS "courseName"'
+    query += ' FROM "problemset" INNER JOIN "problemset_user" ON "problemset"."psid" = "problemset_user"."psid"'
+    if (cid > 0) query += ` INNER JOIN "course" ON "problemset"."cid" = "course"."cid" WHERE "problemset"."cid" = $${param.push(cid)}`
+    else query += ' WHERE "problemset"."cid" ISNULL'
+    query += ` AND NOW()::TIMESTAMPTZ <@ "problemset"."during" AND "problemset_user"."uid" = $${param.push(uid)} AND "problemset"."type" = '${property}' ORDER BY "end" ASC`
+    let ret = (await db.query(query, param)).rows
+    if (ret.length > 0) return res.status(hsc.ok).json(ret)
+    return res.sendStatus(hsc.notFound)
   }
 }
 
@@ -34,10 +52,10 @@ router.get('/id/:psid(\\d+)', lc,
     return (mc['problemset'](req.tokenAcc.uid, req.params.psid)(req, res, next))
   },
   async (req, res) => {
-    let query = 'SELECT "problemset"."title" AS "name", "problemset"."description" AS "description", "private", "during", "course"."title" AS "courseName" FROM "problemset" LEFT JOIN "course" ON "problemset"."cid" = "course"."cid" WHERE "psid" = $1 AND "course"."visiable"'
+    let query = 'SELECT "problemset"."title" AS "name", "problemset"."description" AS "description", "private", LOWER("during")::TIMESTAMPTZ AS "begin", UPPER("during")::TIMESTAMPTZ AS "end", "course"."title" AS "courseName" FROM "problemset" LEFT JOIN "course" ON "problemset"."cid" = "course"."cid" WHERE "psid" = $1'
     let ret = (await db.query(query, [req.params.psid])).rows[0]
     if (ret) return res.status(hsc.ok).json(ret)
-    else return res.sendStatus(hsc.notFound)
+    return res.sendStatus(hsc.notFound)
   })
 
-module.exports = { getAll, router }
+module.exports = { getAll, getOpenItem, router }

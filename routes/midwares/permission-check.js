@@ -15,6 +15,6 @@ module.exports = (uid, reqPerms) => {
       }
     }
     if (rep) return next()
-    else return res.sendStatus(hsc.forbidden)
+    return res.sendStatus(hsc.forbidden)
   }
 }
