@@ -42,7 +42,7 @@ router.get('/id/:psid(\\d+)', lc,
     return (mc['problemset'](req.tokenAcc.uid, req.params.psid)(req, res, next))
   },
   async (req, res) => {
-    let query = 'SELECT "problemset"."title" AS "name", "problemset"."description" AS "description", "private", LOWER("during")::TIMESTAMPTZ AS "begin", UPPER("during")::TIMESTAMPTZ AS "end", "course"."title" AS "courseName" FROM "problemset" LEFT JOIN "course" ON "problemset"."cid" = "course"."cid" WHERE "psid" = $1'
+    let query = 'SELECT "problemset"."title" AS "name", "problemset"."description" AS "description", "private", LOWER("during")::TIMESTAMPTZ AS "begin", UPPER("during")::TIMESTAMPTZ AS "end", "course"."title" AS "courseName", NOW()::TIMESTAMPTZ <@ "problemset"."during" AS "open" FROM "problemset" LEFT JOIN "course" ON "problemset"."cid" = "course"."cid" WHERE "psid" = $1'
     let ret = (await db.query(query, [req.params.psid])).rows[0]
     return res.status(hsc.ok).json(ret)
   })
