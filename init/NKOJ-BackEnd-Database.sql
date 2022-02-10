@@ -336,15 +336,6 @@ END;
 $BODY$ LANGUAGE plpgsql VOLATILE COST 100;
 ALTER FUNCTION "public"."ac_counter"() OWNER TO "OJMaster";
 -- ----------------------------
--- Function structure for hash_password
--- ----------------------------
-DROP FUNCTION IF EXISTS "public"."hash_password"("pwd" text);
-CREATE OR REPLACE FUNCTION "public"."hash_password"("pwd" text) RETURNS "pg_catalog"."text" AS $BODY$
-SELECT md5('not production' || pwd)::text;
-$BODY$ LANGUAGE sql VOLATILE COST 100;
-ALTER FUNCTION "public"."hash_password"("pwd" text) OWNER TO "OJMaster";
-COMMENT ON FUNCTION "public"."hash_password"("pwd" text) IS 'save password in MD5 from and salt added';
--- ----------------------------
 -- Function structure for submit_counter
 -- ----------------------------
 DROP FUNCTION IF EXISTS "public"."submit_counter"();
