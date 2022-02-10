@@ -14,6 +14,9 @@ const getCount = (psid) => {
     if (psid > 0) {
       query = 'SELECT COUNT(*) FROM "problem" WHERE "psid" = $1'
       total = parseInt((await db.query(query, [psid])).rows[0].count)
+    } else if (psid === 0) {
+      query = 'SELECT COUNT(*) FROM "problem"'
+      total = parseInt((await db.query(query)).rows[0].count)
     } else {
       query = 'SELECT COUNT(*) FROM "problem" WHERE "psid" ISNULL'
       total = parseInt((await db.query(query)).rows[0].count)
@@ -32,6 +35,7 @@ const getList = (psid) => {
     let query = 'SELECT "pid", "title" AS "name" FROM "problem"'
     let param = []
     if (psid > 0) query += ` WHERE "psid" = $${param.push(psid)}`
+    else if (psid === 0) { /* all */ }
     else query += ' WHERE "psid" ISNULL'
     query += ` ORDER BY "pid" DESC`
     if (limit > 0) {
@@ -45,7 +49,7 @@ const getList = (psid) => {
   }
 }
 
-router.get('/total', lc, getCount(undefined))
+router.get('/global/total', lc, getCount(undefined))
 router.get('/contest(s)?/:id(\\d+)/total', lc,
   async (req, res, next) => {
     return (mc['problemset'](req.tokenAcc.uid, req.params.id)(req, res, next))
@@ -61,7 +65,7 @@ router.get('/assignment(s)?/:id(\\d+)/total', lc,
     return getCount(req.params.id)(req, res)
   })
 
-router.get('/', lc, getList(undefined))
+router.get('/global', lc, getList(undefined))
 router.get('/contest(s)?/:id(\\d+)', lc,
   async (req, res, next) => {
     return (mc['problemset'](req.tokenAcc.uid, req.params.id)(req, res, next))
