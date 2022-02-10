@@ -14,7 +14,7 @@ router.get('/id/:id(\\d+)', lc,
       req.ann = ret
       return next()
     }
-    return res.sendStatus(hsc.notFound)
+    return res.sendStatus(hsc.unauthorized)
   },
   async (req, res, next) => {
     if (ret.ann.cid) return (mc['course'](req.tokenAcc.uid, ret.ann.cid)(req, res, next))
@@ -37,8 +37,7 @@ const getMsgInSection = (idName) => {
       let query = `SELECT "mid" AS "id", "title", "content", "when" AS "time" FROM "message" WHERE "from_del" = FALSE AND "to" IS NULL AND "${idName}" = $1 ORDER BY "when" DESC`
       ret = (await db.query(query, [id])).rows
     }
-    if (ret.length > 0) return res.status(hsc.ok).json(ret)
-    return res.sendStatus(hsc.notFound)
+    return res.status(hsc.ok).json(ret)
   }
 }
 
@@ -69,8 +68,7 @@ router.get('/global', lc, async (req, res) => {
     let query = 'SELECT "mid" AS "id", "title", "content", "when" AS "time" FROM "message" WHERE "from_del" = FALSE AND "to" IS NULL AND "cid" IS NULL AND "psid" IS NULL ORDER BY "when" DESC'
     ret = (await db.query(query)).rows
   }
-  if (ret.length > 0) return res.status(hsc.ok).json(ret)
-  return res.sendStatus(hsc.notFound)
+  return res.status(hsc.ok).json(ret)
 })
 
 module.exports = router

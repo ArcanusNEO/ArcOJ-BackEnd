@@ -18,8 +18,7 @@ const getCount = (psid) => {
       query = 'SELECT COUNT(*) FROM "problem" WHERE "psid" ISNULL'
       total = parseInt((await db.query(query)).rows[0].count)
     }
-    if (total >= 0) return res.status(hsc.ok).json(total)
-    return res.sendStatus(hsc.notFound)
+    return res.status(hsc.ok).json(total)
   }
 }
 
@@ -42,8 +41,7 @@ const getList = (psid) => {
     let ret
     if (param.length == 0) ret = (await db.query(query)).rows
     else ret = (await db.query(query, param)).rows
-    if (ret.length > 0) return res.status(hsc.ok).json(ret)
-    return res.sendStatus(hsc.notFound)
+    return res.status(hsc.ok).json(ret)
   }
 }
 
@@ -84,7 +82,7 @@ router.get('/id/:pid(\\d+)', lc,
     let pid = req.params.pid
     let query = 'SELECT * FROM "problem" WHERE "pid" = $1 LIMIT 1'
     let ret = (await db.query(query, [pid])).rows[0]
-    if (!ret) return res.sendStatus(hsc.notFound)
+    if (!ret) return res.sendStatus(hsc.unauthorized)
     ret.psid = parseInt(ret.psid)
     req.ret = ret
     return next()
@@ -99,7 +97,7 @@ router.get('/id/:pid(\\d+)', lc,
       req.ret.content = await fs.readFile(problem)
     } catch (err) {
       console.error(err)
-      return res.sendStatus(hsc.notFound)
+      return res.sendStatus(hsc.unauthorized)
     }
     return res.status(hsc.ok).json(req.ret)
   }

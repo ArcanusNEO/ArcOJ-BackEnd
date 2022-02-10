@@ -10,8 +10,7 @@ const getAll = (property) => {
     let uid = req.tokenAcc.uid, param = []
     let query = `SELECT "problemset"."psid" AS "id", "title" AS "name", LOWER("during")::TIMESTAMPTZ AS "begin", UPPER("during")::TIMESTAMPTZ AS "end" FROM "problemset_user" INNER JOIN "problemset" ON "problemset"."psid" = "problemset_user"."psid" WHERE "uid" = $${param.push(uid)} AND "type" = '${property}' ORDER BY "problemset"."psid" DESC`
     let ret = (await db.query(query, param)).rows
-    if (ret.length > 0) return res.status(hsc.ok).json(ret)
-    return res.sendStatus(hsc.notFound)
+    return res.status(hsc.ok).json(ret)
   }
 }
 
@@ -25,8 +24,7 @@ const get = (property) => {
     else query += ' AND "cid" ISNULL'
     query += ' ORDER BY "problemset"."psid" DESC'
     let ret = (await db.query(query, param)).rows
-    if (ret.length > 0) return res.status(hsc.ok).json(ret)
-    return res.sendStatus(hsc.notFound)
+    return res.status(hsc.ok).json(ret)
   }
 }
 
@@ -42,8 +40,7 @@ const getOpen = (property) => {
     else query += ' WHERE "problemset"."cid" ISNULL'
     query += ` AND NOW()::TIMESTAMPTZ <@ "problemset"."during" AND "problemset_user"."uid" = $${param.push(uid)} AND "problemset"."type" = '${property}' ORDER BY "end" ASC`
     let ret = (await db.query(query, param)).rows
-    if (ret.length > 0) return res.status(hsc.ok).json(ret)
-    return res.sendStatus(hsc.notFound)
+    return res.status(hsc.ok).json(ret)
   }
 }
 
@@ -54,8 +51,7 @@ router.get('/id/:psid(\\d+)', lc,
   async (req, res) => {
     let query = 'SELECT "problemset"."title" AS "name", "problemset"."description" AS "description", "private", LOWER("during")::TIMESTAMPTZ AS "begin", UPPER("during")::TIMESTAMPTZ AS "end", "course"."title" AS "courseName" FROM "problemset" LEFT JOIN "course" ON "problemset"."cid" = "course"."cid" WHERE "psid" = $1'
     let ret = (await db.query(query, [req.params.psid])).rows[0]
-    if (ret) return res.status(hsc.ok).json(ret)
-    return res.sendStatus(hsc.notFound)
+    return res.status(hsc.ok).json(ret)
   })
 
 module.exports = { getAll, get, getOpen, router }

@@ -17,7 +17,7 @@ router.post('/', lc,
     let uid = req.tokenAcc.uid
     let sqlStr = 'SELECT * FROM "problem" WHERE "pid" = $1 LIMIT 1'
     let ret = (await db.query(sqlStr, [pid])).rows[0]
-    if (!ret) return res.sendStatus(hsc.notFound)
+    if (!ret) return res.sendStatus(hsc.unauthorized)
     let { psid, cases } = ret
     let specialJudge = ret['special_judge'], detailJudge = ret['detail_judge'], timeLimit = ret['time_limit'], memoryLimit = ret['memory_limit']
     if (psid) {

@@ -9,8 +9,7 @@ router.get('/', lc, async (req, res) => {
   let uid = req.tokenAcc.uid
   let query = 'SELECT "course"."cid" AS "id", "title" AS "name" FROM "course_user" INNER JOIN "course" ON "course"."cid" = "course_user"."cid" WHERE "uid" = $1 AND "visiable" ORDER BY "course"."cid" DESC'
   let ret = (await db.query(query, [uid])).rows
-  if (rows.length > 0) return res.status(hsc.ok).json(ret)
-  return res.sendStatus(hsc.notFound)
+  return res.status(hsc.ok).json(ret)
 })
 
 router.get('/id/:cid(\\d+)', lc,
