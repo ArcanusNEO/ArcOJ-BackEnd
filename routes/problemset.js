@@ -58,4 +58,4 @@ router.get('/id/:psid(\\d+)', lc,
     return res.sendStatus(hsc.notFound)
   })
 
-module.exports = { getAll, getOpenItem, router }
+module.exports = { getAll, get, getOpen, router }
