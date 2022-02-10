@@ -10,8 +10,8 @@ let extId = {
 let idExt = {
   [0]: 'c',
   [1]: 'cpp',
-  [2]: 'js',
-  [3]: 'py',
+  [2]: 'py',
+  [3]: 'js',
   [4]: 'go',
   [5]: 'txt',
   [6]: 'pypy3'
@@ -19,8 +19,8 @@ let idExt = {
 let langExt = {
   'c': 'c',
   'c++': 'cpp',
-  'python': 'js',
-  'javascript': 'py',
+  'python': 'py',
+  'javascript': 'js',
   'go': 'go',
   'text': 'txt',
   'pypy3': 'pypy3'
