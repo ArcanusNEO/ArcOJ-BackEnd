@@ -296,7 +296,7 @@ VALUES (
     NULL,
     NULL,
     NULL,
-    '2021-09-12 09:26:50.837181',
+    '2021-09-12 09:26:50.837181+08',
     'f'
   );
 INSERT INTO "public"."user"
@@ -311,7 +311,7 @@ VALUES (
     NULL,
     NULL,
     NULL,
-    '2021-09-12 09:26:50.837181',
+    '2021-09-12 09:26:50.837181+08',
     'f'
   );
 COMMIT;
@@ -446,6 +446,12 @@ INSERT ON "public"."solution" FOR EACH ROW EXECUTE PROCEDURE "public"."submit_co
 -- ----------------------------
 ALTER TABLE "public"."solution"
 ADD CONSTRAINT "solution_pkey" PRIMARY KEY ("sid");
+-- ----------------------------
+-- Indexes structure for table user
+-- ----------------------------
+CREATE INDEX "user_email_idx" ON "public"."user" USING hash (
+  "email" COLLATE "pg_catalog"."default" "pg_catalog"."text_ops"
+);
 -- ----------------------------
 -- Uniques structure for table user
 -- ----------------------------
