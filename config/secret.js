@@ -1,2 +1,2 @@
-module.exports = 'something secret'
+module.exports = 'not production'
 // salt for password in database
