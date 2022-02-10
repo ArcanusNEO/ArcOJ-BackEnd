@@ -1,18 +1,18 @@
 /*
  Navicat Premium Data Transfer
  
- Source Server         : 本地PostgreSQL
+ Source Server         : NKOJ-BackEnd-Database
  Source Server Type    : PostgreSQL
- Source Server Version : 130003
+ Source Server Version : 130004
  Source Host           : localhost:5432
  Source Catalog        : NKOJ-BackEnd-Database
  Source Schema         : public
  
  Target Server Type    : PostgreSQL
- Target Server Version : 130003
+ Target Server Version : 130004
  File Encoding         : 65001
  
- Date: 12/09/2021 19:57:05
+ Date: 10/02/2022 19:58:01
  */
 -- ----------------------------
 -- Sequence structure for contest_cid_seq
@@ -167,6 +167,7 @@ CREATE TABLE "public"."problem" (
   "pid" int4 NOT NULL DEFAULT nextval('problem_pid_seq'::regclass),
   "psid" int4,
   "title" text COLLATE "pg_catalog"."default" NOT NULL,
+  "extra" text COLLATE "pg_catalog"."default",
   "submit_ac" int4 NOT NULL,
   "submit_all" int4 NOT NULL,
   "special_judge" int4 NOT NULL,
