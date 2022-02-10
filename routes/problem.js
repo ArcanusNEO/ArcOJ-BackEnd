@@ -46,14 +46,14 @@ const getList = (psid) => {
 }
 
 router.get('/total', lc, getCount(undefined))
-router.get('/contest/:id(\\d+)/total', lc,
+router.get('/contest(s)?/:id(\\d+)/total', lc,
   async (req, res, next) => {
     return (mc['problemset'](req.tokenAcc.uid, req.params.id)(req, res, next))
   },
   async (req, res) => {
     return getCount(req.params.id)(req, res)
   })
-router.get('/assignment/:id(\\d+)/total', lc,
+router.get('/assignment(s)?/:id(\\d+)/total', lc,
   async (req, res, next) => {
     return (mc['problemset'](req.tokenAcc.uid, req.params.id)(req, res, next))
   },
@@ -62,14 +62,14 @@ router.get('/assignment/:id(\\d+)/total', lc,
   })
 
 router.get('/', lc, getList(undefined))
-router.get('/contest/:id(\\d+)', lc,
+router.get('/contest(s)?/:id(\\d+)', lc,
   async (req, res, next) => {
     return (mc['problemset'](req.tokenAcc.uid, req.params.id)(req, res, next))
   },
   async (req, res) => {
     return getList(req.params.id)(req, res)
   })
-router.get('/assignment/:id(\\d+)', lc,
+router.get('/assignment(s)?/:id(\\d+)', lc,
   async (req, res, next) => {
     return (mc['problemset'](req.tokenAcc.uid, req.params.id)(req, res, next))
   },

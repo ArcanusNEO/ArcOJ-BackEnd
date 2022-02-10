@@ -41,19 +41,19 @@ const getMsgInSection = (idName) => {
   }
 }
 
-router.get('/course/:id(\\d+)', lc,
+router.get('/course(s)?/:id(\\d+)', lc,
   async (req, res, next) => {
     return (mc['course'](req.tokenAcc.uid, req.params.id)(req, res, next))
   },
   getMsgInSection('cid'))
 
-router.get('/contest/:id(\\d+)', lc,
+router.get('/contest(s)?/:id(\\d+)', lc,
   async (req, res, next) => {
     return (mc['problemset'](req.tokenAcc.uid, req.params.id)(req, res, next))
   },
   getMsgInSection('psid'))
 
-router.get('/assignment/:id(\\d+)', lc,
+router.get('/assignment(s)?/:id(\\d+)', lc,
   async (req, res, next) => {
     return (mc['problemset'](req.tokenAcc.uid, req.params.id)(req, res, next))
   },
