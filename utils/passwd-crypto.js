@@ -1,6 +1,8 @@
 const crypto = require('crypto')
 const publicKey = require('../config/password-public-key')
 const privateKey = require('../config/password-private-key')
+const secret = require('../config/secret')
+const md5 = require('./md5')
 
 function encrypt(plain) {
   try {
@@ -27,4 +29,8 @@ function decrypt(cipher) {
   }
 }
 
-module.exports = { encrypt, decrypt }
+const hashPassword = (passwd) => {
+  return md5(secret + passwd)
+}
+
+module.exports = { encrypt, decrypt, hashPassword }
