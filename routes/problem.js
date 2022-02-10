@@ -37,7 +37,7 @@ const getList = (psid) => {
     if (psid > 0) query += ` WHERE "psid" = $${param.push(psid)}`
     else if (psid === 0) { /* all */ }
     else query += ' WHERE "psid" ISNULL'
-    query += ` ORDER BY "pid" DESC`
+    query += ` ORDER BY "title" ASC`
     if (limit > 0) {
       query += ` LIMIT $${param.push(limit)}`
       if (offset >= 0) query += ` OFFSET $${param.push(offset)}`
