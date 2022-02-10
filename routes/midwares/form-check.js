@@ -67,6 +67,7 @@ const password = (req, pos, item) => {
   try {
     req[pos][item] = crypto.decrypt(req[pos][item])
     if (!/^[\w-\.~!@#$\^&\*\+=:'",<>\?/]{6,20}$/g.test(req[pos][item])) throw Error('Invalid password')
+    req[pos][item] = crypto.hashPassword(req[pos][item])
   } catch (err) {
     console.error(err)
     return false

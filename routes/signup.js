@@ -16,7 +16,7 @@ router.post('/', fc(['body'], ['password', 'username', 'nickname'], hsc.parseErr
     let sqlStr = 'SELECT "uid" FROM "user" WHERE "email" = $1 LIMIT 1'
     let tot = await db.query(sqlStr, [username])
     if (tot.rows[0]) return res.status(hsc.resOccupied).json({ ok: false })
-    sqlStr = 'INSERT INTO "user" ("gid", "nickname", "email", "password", "signup_time") VALUES (3, $1, $2, "hash_password"($3), NOW()::TIMESTAMPTZ) RETURNING "uid"'
+    sqlStr = 'INSERT INTO "user" ("gid", "nickname", "email", "password", "signup_time") VALUES (3, $1, $2, $3, NOW()::TIMESTAMPTZ) RETURNING "uid"'
     let sqlRes = await db.query(sqlStr, [nickname, username, password])
     uid = sqlRes.rows[0]['uid']
     let account = {

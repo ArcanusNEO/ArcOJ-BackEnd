@@ -22,7 +22,7 @@ router.post('/password', fc(['body'], ['username', 'password']), async (req, res
     //权限映射
     let permMap = [-1, 2, 1, 0]
     permission = permMap[permission]
-    sqlStr = 'UPDATE "user" SET "password" = "hash_password"($1) WHERE "uid" = $2'
+    sqlStr = 'UPDATE "user" SET "password" = $1 WHERE "uid" = $2'
     await db.query(sqlStr, [password, uid])
     let account = {
       uid: uid,
