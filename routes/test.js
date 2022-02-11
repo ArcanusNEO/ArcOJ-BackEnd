@@ -1,18 +1,22 @@
 let express = require('express')
 let router = express.Router()
 let hsc = require('../config/http-status-code')
-let db = require('../utils/database')
-let lc = require('./midwares/login-check')
-let mc = require('./midwares/member-check')
-let pc = require('./midwares/permission-check')
-let tokenUtils = require('../utils/token')
-let fc = require('./midwares/form-check')
+let fileUpload = require('express-fileupload')
+let fs = require('fs-extra')
+let dirs = require('../config/basic')
 
-router.get('/', async (req, res) => {
-  let query = 'SELECT "uid" FROM "user" WHERE "email" = $1 LIMIT 1'
-  let ret = (await db.query(query, [req.query.email])).rows[0]
-  if (ret) return res.status(hsc.ok).json(ret)
-  return res.sendStatus(hsc.unauthorized)
+router.use(fileUpload({
+  abortOnLimit: true,
+  useTempFiles: true,
+  tempFileDir: '/tmp/',
+  limits: { fileSize: 10 * 1024 * 1024 }
+}))
+
+router.post('/', async (req, res) => {
+  if (!req.files || Object.keys(req.files).length === 0) return res.sendStatus(hsc.badReq)
+  await fs.ensureDir(dirs.public)
+  await req.files.sampleFile.mv(dirs.public)
+  return res.sendStatus(hsc.ok)
 })
 
 module.exports = router
