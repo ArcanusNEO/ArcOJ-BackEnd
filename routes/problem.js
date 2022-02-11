@@ -43,8 +43,13 @@ const getList = (psid) => {
       query += ` LIMIT $${param.push(limit)}`
       if (offset >= 0) query += ` OFFSET $${param.push(offset)}`
     }
-    let ret
-    ret = (await db.query(query, param)).rows
+    let ret = (await db.query(query, param)).rows
+    for (let each of ret) {
+      each.score = parseInt(each.score)
+      if (each.score >= 100) each.status = 2 // 已通过
+      else if (each.score >= 0) each.status = 1 // 已提交
+      else each.status = 0 // 未提交
+    }
     return res.status(hsc.ok).json(ret)
   }
 }
