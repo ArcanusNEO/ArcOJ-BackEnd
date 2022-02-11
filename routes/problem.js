@@ -38,16 +38,17 @@ const getList = (psid) => {
     if (psid > 0) query += ` WHERE "problem"."psid" = $${param.push(psid)}`
     else if (psid === 0) { /* all */ }
     else query += ' WHERE "problem"."psid" ISNULL'
-    query += ` AND "solution"."uid" = $${param.push(uid)} GROUP BY "problem"."pid", "problem"."title" ORDER BY "problem"."title" ASC`
+    query += ` AND ("solution"."uid" = $${param.push(uid)} OR "solution"."uid" ISNULL) GROUP BY "problem"."pid", "problem"."title" ORDER BY "problem"."title" ASC`
     if (limit > 0) {
       query += ` LIMIT $${param.push(limit)}`
       if (offset >= 0) query += ` OFFSET $${param.push(offset)}`
     }
     let ret = (await db.query(query, param)).rows
     for (let each of ret) {
-      each.score = parseInt(each.score)
-      if (each.score >= 100) each.status = 2 // 已通过
-      else if (each.score >= 0) each.status = 1 // 已提交
+      let score = parseInt(each.score)
+      delete each.score
+      if (score >= 100) each.status = 2 // 已通过
+      else if (score >= 0) each.status = 1 // 已提交
       else each.status = 0 // 未提交
     }
     return res.status(hsc.ok).json(ret)
