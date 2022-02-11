@@ -31,20 +31,20 @@ const getList = (psid) => {
     let { page, item } = req.query
     page = parseInt(page)
     item = parseInt(item)
+    let uid = req.tokenAcc.uid
     let limit = item, offset = (page - 1) * item
-    let query = 'SELECT "pid", "title" AS "name" FROM "problem"'
+    let query = 'SELECT "problem"."pid", "problem"."title" AS "name", MAX("solution"."score") AS "score" FROM "problem" LEFT JOIN "solution" ON "problem"."pid" = "solution"."pid"'
     let param = []
-    if (psid > 0) query += ` WHERE "psid" = $${param.push(psid)}`
+    if (psid > 0) query += ` WHERE "problem"."psid" = $${param.push(psid)}`
     else if (psid === 0) { /* all */ }
-    else query += ' WHERE "psid" ISNULL'
-    query += ` ORDER BY "title" ASC`
+    else query += ' WHERE "problem"."psid" ISNULL'
+    query += ` AND "solution"."uid" = $${param.push(uid)} ORDER BY "problem"."title" ASC`
     if (limit > 0) {
       query += ` LIMIT $${param.push(limit)}`
       if (offset >= 0) query += ` OFFSET $${param.push(offset)}`
     }
     let ret
-    if (param.length == 0) ret = (await db.query(query)).rows
-    else ret = (await db.query(query, param)).rows
+    ret = (await db.query(query, param)).rows
     return res.status(hsc.ok).json(ret)
   }
 }
