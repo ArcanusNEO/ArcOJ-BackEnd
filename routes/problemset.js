@@ -37,14 +37,15 @@ const getOpen = (property) => {
   }
 }
 
+const getDetail = async (req, res) => {
+  let query = 'SELECT "problemset"."title" AS "name", "problemset"."description" AS "description", "problemset"."type", "problemset"."private", LOWER("problemset"."during")::TIMESTAMPTZ AS "begin", UPPER("problemset"."during")::TIMESTAMPTZ AS "end", "course"."title" AS "courseName", NOW()::TIMESTAMPTZ <@ "problemset"."during" AS "open" FROM "problemset" LEFT JOIN "course" ON "problemset"."cid" = "course"."cid" WHERE "psid" = $1'
+  let ret = (await db.query(query, [req.params.psid])).rows[0]
+  return res.status(hsc.ok).json(ret)
+}
+
 router.get('/id/:psid(\\d+)', lc,
   async (req, res, next) => {
     return (mc['problemset'](req.tokenAcc.uid, req.params.psid)(req, res, next))
-  },
-  async (req, res) => {
-    let query = 'SELECT "problemset"."title" AS "name", "problemset"."description" AS "description", "problemset"."type", "problemset"."private", LOWER("problemset"."during")::TIMESTAMPTZ AS "begin", UPPER("problemset"."during")::TIMESTAMPTZ AS "end", "course"."title" AS "courseName", NOW()::TIMESTAMPTZ <@ "problemset"."during" AS "open" FROM "problemset" LEFT JOIN "course" ON "problemset"."cid" = "course"."cid" WHERE "psid" = $1'
-    let ret = (await db.query(query, [req.params.psid])).rows[0]
-    return res.status(hsc.ok).json(ret)
-  })
+  }, getDetail)
 
-module.exports = { get, getOpen, router }
+module.exports = { get, getOpen, getDetail, router }
