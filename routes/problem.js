@@ -38,7 +38,7 @@ const getList = (psid) => {
     if (psid > 0) query += ` WHERE "problem"."psid" = $${param.push(psid)}`
     else if (psid === 0) { /* all */ }
     else query += ' WHERE "problem"."psid" ISNULL'
-    query += ` AND "solution"."uid" = $${param.push(uid)} ORDER BY "problem"."title" ASC`
+    query += ` AND "solution"."uid" = $${param.push(uid)} GROUP BY "problem"."pid", "problem"."title" ORDER BY "problem"."title" ASC`
     if (limit > 0) {
       query += ` LIMIT $${param.push(limit)}`
       if (offset >= 0) query += ` OFFSET $${param.push(offset)}`
