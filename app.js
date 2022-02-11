@@ -8,7 +8,7 @@ let api = require('./routes/api')
 
 let app = express()
 
-app.set('trust proxy', true)
+app.set('trust proxy', true) // nginx反向代理正确显示ip
 
 app.all('*', (req, res, next) => {
   res.header("Server", "Microsoft-IIS/7.0")
