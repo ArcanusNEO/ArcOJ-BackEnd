@@ -97,7 +97,7 @@ router.get('/id/:pid(\\d+)', lc,
   },
   async (req, res) => {
     try {
-      let problem = getProblemStructure(pid).file.md
+      let problem = getProblemStructure(req.params.pid).file.md
       req.ret.content = await fs.readFile(problem)
     } catch (err) {
       console.error(err)
