@@ -17,7 +17,7 @@ router.post('/', async (req, res) => {
   if (!req.files || Object.keys(req.files).length === 0) return res.sendStatus(hsc.badReq)
   await fs.ensureDir(dirs.public)
   let sampleFile = req.files.sampleFile
-  await sampleFile.mv(path.resolve(dirs.public, sampleFile.name))
+  await sampleFile.mv(path.resolve(dirs.public, "1.txt"))
   return res.sendStatus(hsc.ok)
 })
 
