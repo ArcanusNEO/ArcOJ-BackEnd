@@ -4,6 +4,7 @@ let hsc = require('../config/http-status-code')
 let fileUpload = require('express-fileupload')
 let fs = require('fs-extra')
 let dirs = require('../config/basic')
+let path = require('path')
 
 router.use(fileUpload({
   abortOnLimit: true,
@@ -15,7 +16,8 @@ router.use(fileUpload({
 router.post('/', async (req, res) => {
   if (!req.files || Object.keys(req.files).length === 0) return res.sendStatus(hsc.badReq)
   await fs.ensureDir(dirs.public)
-  await req.files.sampleFile.mv(dirs.public)
+  let sampleFile = req.files.sampleFile
+  await sampleFile.mv(path.resolve(dirs.public, sampleFile.name))
   return res.sendStatus(hsc.ok)
 })
 
