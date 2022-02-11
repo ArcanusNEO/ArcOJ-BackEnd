@@ -70,6 +70,13 @@ router.get('/assignment(s)?/:id(\\d+)/total', lc,
   async (req, res) => {
     return getCount(req.params.id)(req, res)
   })
+router.get('/problemset(s)?/:id(\\d+)/total', lc,
+  async (req, res, next) => {
+    return (mc['problemset'](req.tokenAcc.uid, req.params.id)(req, res, next))
+  },
+  async (req, res) => {
+    return getCount(req.params.id)(req, res)
+  })
 
 router.get('/global', lc, getList(undefined))
 router.get('/contest(s)?/:id(\\d+)', lc,
@@ -80,6 +87,13 @@ router.get('/contest(s)?/:id(\\d+)', lc,
     return getList(req.params.id)(req, res)
   })
 router.get('/assignment(s)?/:id(\\d+)', lc,
+  async (req, res, next) => {
+    return (mc['problemset'](req.tokenAcc.uid, req.params.id)(req, res, next))
+  },
+  async (req, res) => {
+    return getList(req.params.id)(req, res)
+  })
+router.get('/problemset(s)?/:id(\\d+)', lc,
   async (req, res, next) => {
     return (mc['problemset'](req.tokenAcc.uid, req.params.id)(req, res, next))
   },
