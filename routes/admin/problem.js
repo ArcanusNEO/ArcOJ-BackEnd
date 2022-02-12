@@ -173,7 +173,7 @@ router.post('/update/:pid(\\d+)', lc,
     let query = 'UPDATE "problem" SET "psid" = $1'
     for (let key of items)
       if (items[key]) query += `, "${key}" = $${param.push(items[key])}`
-    query += ` WHERE "pid" = $${param.push(pid)} RETURNING "pid", "psid", "title", "extra", "submit_ac" AS "submitAc", "submit_all" AS "submitAll", "special_judge" AS "speciaJudge", "detail_judge" AS "detailJudge", "cases", "time_limit" AS "timeLimit", "memory_limit" AS "memoryLimit", "owner_id" AS "ownerId"`
+    query += ` WHERE "pid" = $${param.push(pid)} RETURNING "pid", "psid", "title" AS "name", "extra", "submit_ac" AS "submitAc", "submit_all" AS "submitAll", "special_judge" AS "speciaJudge", "detail_judge" AS "detailJudge", "cases", "time_limit" AS "timeLimit", "memory_limit" AS "memoryLimit", "owner_id" AS "ownerId"`
     let ret = (await db.query(query, param)).rows[0]
     if (content) {
       let struct = getProblemStructure(pid)
