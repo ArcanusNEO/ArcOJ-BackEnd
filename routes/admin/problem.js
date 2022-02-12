@@ -206,15 +206,17 @@ router.get('/', lc, async (req, res) => {
 
 router.get('/id/:pid(\\d+)', lc,
   async (req, res, next) => {
-    return mtc.problem(req.tokenAcc.uid, parseInt(req.params.pid))(req, res, next)
+    let pid = parseInt(req.params.pid)
+    if (pid > 0) return mtc.problem(req.tokenAcc.uid, pid)(req, res, next)
+    return res.sendStatus(hsc.badReq)
   },
   async (req, res, next) => {
-    let pid = req.params.pid
+    let pid = parseInt(req.params.pid)
     let query = 'SELECT "problem"."pid", "problem"."psid", "problem"."title" AS "name", "problem"."extra", "problem"."submit_ac" AS "submitAc", "problem"."submit_all" AS "submitAll", "problem"."special_judge" AS "specialJudge", "problem"."detail_judge" AS "detailJudge", "problem"."cases", "problem"."time_limit" AS "timeLimit", "problem"."memory_limit" AS "memoryLimit", "problem"."owner_id" AS "ownerId" FROM "problem" WHERE "problem"."pid" = $1 LIMIT 1'
     let ret = (await db.query(query, [pid])).rows[0]
     if (!ret) return res.sendStatus(hsc.unauthorized)
     try {
-      let problem = getProblemStructure(req.params.pid).file.md
+      let problem = getProblemStructure(pid).file.md
       ret.content = await fs.readFile(problem)
     } catch (err) {
       console.error(err)
