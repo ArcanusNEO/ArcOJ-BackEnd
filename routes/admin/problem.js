@@ -6,7 +6,8 @@ let db = require('../../utils/database')
 let mtc = require('../midwares/maintainer-check')
 let pc = require('../midwares/permission-check')
 let { getProblemStructure } = require('../../utils/judge')
-const fs = require('fs-extra')
+let fs = require('fs-extra')
+let dirs = require('../../config/basic')
 
 const insertProblem = async (params) => {
   let { psid, title, extra, specialJudge, detailJudge, cases, timeLimit, memoryLimit, ownerId } = params
@@ -69,11 +70,21 @@ router.get('/fork/:pid(\\d+)/into/:psid(\\d+)', lc,
     return mtc.problemset(req.tokenAcc.uid, req.params.psid)(req, res, next)
   },
   async (req, res) => {
-    let { psid, title, extra, specialJudge, detailJudge, cases, timeLimit, memoryLimit, ownerId } = req.body
+    let { title, extra, specialJudge, detailJudge, cases, timeLimit, memoryLimit } = req.body
+    let ownerId = req.tokenAcc.uid, psid = parseInt(req.params.psid)
     let params = { psid, title, extra, specialJudge, detailJudge, cases, timeLimit, memoryLimit, ownerId }
-    let pid = await insertProblem(params)
-    if (pid > 0) return res.status(hsc.ok).json(pid)
-    return res.sendStatus(hsc.internalSrvErr)
+    let toPid = await insertProblem(params)
+    if (toPid === 0) res.sendStatus(hsc.internalSrvErr)
+    let fromPid = parseInt(req.params.pid)
+    let fromStruct = getProblemStructure(fromPid)
+    let toStruct = getProblemStructure(toPid)
+    await fs.ensureDir(toStruct.path.data)
+    await fs.ensureDir(toStruct.path.spj)
+    await fs.ensureDir(toStruct.path.problem)
+    await fs.copy(fromStruct.path.data, toStruct.path.data)
+    await fs.copy(fromStruct.path.spj, toStruct.path.spj)
+    await fs.copy(fromStruct.file.md, toStruct.file.md)
+    return res.status(hsc.ok).json(toPid)
   }
 )
 

@@ -40,6 +40,7 @@ const getProblemStructure = (pid) => {
   const fileMd = `${dataPath.problem}/${pid}.md`
   return {
     path: {
+      problem: dataPath.problem,
       data: pathData,
       spj: pathSpj
     },
