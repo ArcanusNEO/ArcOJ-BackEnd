@@ -262,8 +262,8 @@ router.post('/id/:pid(\\d+)/upload/io', lc,
     for (let i = 1; i <= cases; ++i) {
       let fileIn = req.files[i + ".in"]
       let fileOut = req.files[i + ".out"]
-      await fileIn.mv(struct.path.data)
-      await fileOut.mv(struct.path.data)
+      if (fileIn) await fileIn.mv(struct.path.data)
+      if (fileOut) await fileOut.mv(struct.path.data)
     }
     return res.sendStatus(hsc.ok)
   })
