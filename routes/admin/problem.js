@@ -163,7 +163,7 @@ router.post('/update/:pid(\\d+)', lc,
     return pc(req.tokenAcc.uid, req.reqPerms)(req, res, next)
   },
   async (req, res, next) => {
-    return mtc.problem(req.tokenAcc.uid, req.to.psid)(req, res, next)
+    return mtc.problem(req.tokenAcc.uid, parseInt(req.params.pid))(req, res, next)
   },
   async (req, res) => {
     let { title, extra, specialJudge, detailJudge, cases, timeLimit, memoryLimit, content } = req.body
@@ -199,5 +199,25 @@ router.get('/', lc, async (req, res) => {
   let ret = (await db.query(query, param)).rows
   return res.status(hsc.ok).json(ret)
 })
+
+router.get('/id/:pid(\\d+)', lc,
+  async (req, res, next) => {
+    return mtc.problem(req.tokenAcc.uid, parseInt(req.params.pid))(req, res, next)
+  },
+  async (req, res, next) => {
+    let pid = req.params.pid
+    let query = 'SELECT "problem"."pid", "problem"."psid", "problem"."title" AS "name", "problem"."extra", "problem"."submit_ac" AS "submitAc", "problem"."submit_all" AS "submitAll", "problem"."special_judge" AS "specialJudge", "problem"."detail_judge" AS "detailJudge", "problem"."cases", "problem"."time_limit" AS "timeLimit", "problem"."memory_limit" AS "memoryLimit", "problem"."owner_id" AS "ownerId" FROM "problem" WHERE "problem"."pid" = $1 LIMIT 1'
+    let ret = (await db.query(query, [pid])).rows[0]
+    if (!ret) return res.sendStatus(hsc.unauthorized)
+    try {
+      let problem = getProblemStructure(req.params.pid).file.md
+      ret.content = await fs.readFile(problem)
+    } catch (err) {
+      console.error(err)
+      return res.sendStatus(hsc.unauthorized)
+    }
+    return res.status(hsc.ok).json(ret)
+  }
+)
 
 module.exports = router
