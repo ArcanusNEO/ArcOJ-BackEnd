@@ -96,5 +96,16 @@ router.get('/fork/:pid(\\d+)/into/:psid(\\d+)', lc,
   }, forkProblem
 )
 
+router.get('/fork/:pid(\\d+)/global', lc,
+  async (req, res, next) => {
+    let pid = parseInt(req.params.pid)
+    if (pid > 0) return genPerms(pid, 'fork', -1)(req, res, next)
+    return res.sendStatus(hsc.badReq)
+  },
+  async (req, res, next) => {
+    return pc(req.tokenAcc.uid, req.reqPerms)(req, res, next)
+  }, forkProblem
+)
+
 module.exports = router
 
