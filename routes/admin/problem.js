@@ -35,8 +35,8 @@ const genPerms = (fromPid, verb, toPsid) => {
       psid: psid
     }
     req.to = {
-      psid: undefined,
-      cid: undefined
+      psid: null,
+      cid: null
     }
     if (toPsid > 0) {
       toLoc = 'Local'
@@ -56,6 +56,31 @@ const genPerms = (fromPid, verb, toPsid) => {
   }
 }
 
+const forkProblem = async (req, res) => {
+  let query = 'SELECT * FROM "problem" WHERE "pid" = $1'
+  let ret = (await db.query(query, [fromPid])).rows[0]
+  if (!ret) return res.sendStatus(hsc.internalSrvErr)
+  let { title, extra, cases } = ret
+  let specialJudge = ret.special_judge
+  let detailJudge = ret.detail_judge
+  let timeLimit = ret.time_limit
+  let memoryLimit = ret.memory_limit
+  let ownerId = req.tokenAcc.uid, psid = req.to.psid
+  let params = { psid, title, extra, specialJudge, detailJudge, cases, timeLimit, memoryLimit, ownerId }
+  let toPid = await insertProblem(params)
+  if (toPid === 0) res.sendStatus(hsc.internalSrvErr)
+  let fromPid = parseInt(req.params.pid)
+  let fromStruct = getProblemStructure(fromPid)
+  let toStruct = getProblemStructure(toPid)
+  await fs.ensureDir(toStruct.path.data)
+  await fs.ensureDir(toStruct.path.spj)
+  await fs.ensureDir(toStruct.path.problem)
+  await fs.copy(fromStruct.path.data, toStruct.path.data)
+  await fs.copy(fromStruct.path.spj, toStruct.path.spj)
+  await fs.copy(fromStruct.file.md, toStruct.file.md)
+  return res.status(hsc.ok).json(toPid)
+}
+
 router.get('/fork/:pid(\\d+)/into/:psid(\\d+)', lc,
   async (req, res, next) => {
     let pid = parseInt(req.params.pid)
@@ -67,25 +92,8 @@ router.get('/fork/:pid(\\d+)/into/:psid(\\d+)', lc,
     return pc(req.tokenAcc.uid, req.reqPerms)(req, res, next)
   },
   async (req, res, next) => {
-    return mtc.problemset(req.tokenAcc.uid, req.params.psid)(req, res, next)
-  },
-  async (req, res) => {
-    let { title, extra, specialJudge, detailJudge, cases, timeLimit, memoryLimit } = req.body
-    let ownerId = req.tokenAcc.uid, psid = parseInt(req.params.psid)
-    let params = { psid, title, extra, specialJudge, detailJudge, cases, timeLimit, memoryLimit, ownerId }
-    let toPid = await insertProblem(params)
-    if (toPid === 0) res.sendStatus(hsc.internalSrvErr)
-    let fromPid = parseInt(req.params.pid)
-    let fromStruct = getProblemStructure(fromPid)
-    let toStruct = getProblemStructure(toPid)
-    await fs.ensureDir(toStruct.path.data)
-    await fs.ensureDir(toStruct.path.spj)
-    await fs.ensureDir(toStruct.path.problem)
-    await fs.copy(fromStruct.path.data, toStruct.path.data)
-    await fs.copy(fromStruct.path.spj, toStruct.path.spj)
-    await fs.copy(fromStruct.file.md, toStruct.file.md)
-    return res.status(hsc.ok).json(toPid)
-  }
+    return mtc.problemset(req.tokenAcc.uid, req.to.psid)(req, res, next)
+  }, forkProblem
 )
 
 module.exports = router
