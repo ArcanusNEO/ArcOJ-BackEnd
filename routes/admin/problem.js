@@ -3,7 +3,7 @@ let router = express.Router()
 let hsc = require('../../config/http-status-code')
 let lc = require('../midwares/login-check')
 let db = require('../../utils/database')
-let mc = require('../midwares/member-check')
+let mtc = require('../midwares/maintainer-check')
 let pc = require('../midwares/permission-check')
 let { getProblemStructure } = require('../../utils/judge')
 const fs = require('fs-extra')
@@ -23,7 +23,9 @@ const insertProblem = async (params) => {
 const genPerms = (fromPid, verb, toPsid) => {
   return async (req, res, next) => {
     let query = 'SELECT "psid" FROM "problem" WHERE "pid" = $1'
-    let { psid } = (await db.query(query, [fromPid])).rows[0]
+    let ret = (await db.query(query, [fromPid])).rows[0]
+    if (!ret) return res.sendStatus(hsc.badReq)
+    let psid = ret.psid
     let fromLoc, toLoc, toPsLoc
     if (psid > 0) fromLoc = 'Local'
     else fromLoc = 'Global'
@@ -64,11 +66,15 @@ router.get('/fork/:pid(\\d+)/into/:psid(\\d+)', lc,
     return pc(req.tokenAcc.uid, req.reqPerms)(req, res, next)
   },
   async (req, res, next) => {
-
-  }
-  async (req, res, next) => {
-    if (req.)
+    return mtc.problemset(req.tokenAcc.uid, req.params.psid)(req, res, next)
   },
+  async (req, res) => {
+    let { psid, title, extra, specialJudge, detailJudge, cases, timeLimit, memoryLimit, ownerId } = req.body
+    let params = { psid, title, extra, specialJudge, detailJudge, cases, timeLimit, memoryLimit, ownerId }
+    let pid = await insertProblem(params)
+    if (pid > 0) return res.status(hsc.ok).json(pid)
+    return res.sendStatus(hsc.internalSrvErr)
+  }
 )
 
 module.exports = router
