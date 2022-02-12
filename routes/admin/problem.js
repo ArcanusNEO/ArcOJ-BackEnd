@@ -147,4 +147,3 @@ router.post('/create/into/:psid(\\d+)', lc,
 )
 
 module.exports = router
-
