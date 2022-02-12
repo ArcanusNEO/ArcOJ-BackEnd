@@ -110,25 +110,40 @@ router.get('/fork/:pid(\\d+)/global', lc,
   }, forkProblem
 )
 
+const createProblem = async (req, res, next) => {
+  let { title, extra, specialJudge, detailJudge, cases, timeLimit, memoryLimit } = req.body
+  let psid = req.to.psid, ownerId = req.tokenAcc.uid
+  let params = { psid, title, extra, specialJudge, detailJudge, cases, timeLimit, memoryLimit, ownerId }
+  let pid = await insertProblem(params)
+  if (pid === 0) res.sendStatus(hsc.internalSrvErr)
+  let struct = getProblemStructure(pid)
+  await fs.remove(struct.path.data)
+  await fs.remove(struct.path.spj)
+  await fs.remove(struct.file.md)
+  return res.status(hsc.ok).json(pid)
+}
+
 router.post('/create/global', lc,
   async (req, res, next) => {
     return genPerms(null, 'create', null)(req, res, next)
   },
   async (req, res, next) => {
     return pc(req.tokenAcc.uid, req.reqPerms)(req, res, next)
+  }, createProblem
+)
+
+router.post('/create/into/:psid(\\d+)', lc,
+  async (req, res, next) => {
+    let psid = parseInt(req.params.psid)
+    if (psid > 0) return genPerms(null, 'create', psid)(req, res, next)
+    return res.sendStatus(hsc.badReq)
   },
   async (req, res, next) => {
-    let { title, extra, specialJudge, detailJudge, cases, timeLimit, memoryLimit } = req.body
-    let psid = null, ownerId = req.tokenAcc.uid
-    let params = { psid, title, extra, specialJudge, detailJudge, cases, timeLimit, memoryLimit, ownerId }
-    let pid = await insertProblem(params)
-    if (pid === 0) res.sendStatus(hsc.internalSrvErr)
-    let struct = getProblemStructure(pid)
-    await fs.remove(struct.path.data)
-    await fs.remove(struct.path.spj)
-    await fs.remove(struct.file.md)
-    return res.status(hsc.ok).json(pid)
-  }
+    return pc(req.tokenAcc.uid, req.reqPerms)(req, res, next)
+  },
+  async (req, res, next) => {
+    return mtc.problemset(req.tokenAcc.uid, req.to.psid)(req, res, next)
+  }, createProblem
 )
 
 module.exports = router
