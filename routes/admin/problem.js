@@ -110,7 +110,7 @@ router.get('/fork/:pid(\\d+)/global', lc,
 )
 
 const createProblem = async (req, res) => {
-  let { title, extra, specialJudge, detailJudge, cases, timeLimit, memoryLimit } = req.body
+  let { title, extra, specialJudge, detailJudge, cases, timeLimit, memoryLimit, content } = req.body
   let psid = req.to.psid, ownerId = req.tokenAcc.uid
   let params = { psid, title, extra, specialJudge, detailJudge, cases, timeLimit, memoryLimit, ownerId }
   let pid = await insertProblem(params)
@@ -119,6 +119,7 @@ const createProblem = async (req, res) => {
   await fs.remove(struct.path.data)
   await fs.remove(struct.path.spj)
   await fs.remove(struct.file.md)
+  await fs.writeFile(struct.file.md, content)
   return res.status(hsc.ok).json(pid)
 }
 
