@@ -4,133 +4,35 @@ let hsc = require('../../config/http-status-code')
 let lc = require('../midwares/login-check')
 let db = require('../../utils/database')
 let mc = require('../midwares/member-check')
+let pc = require('../midwares/permission-check')
 let { getProblemStructure } = require('../../utils/judge')
 const fs = require('fs-extra')
 
-const getCount = (psid) => {
-  psid = parseInt(psid)
-  return async (req, res) => {
-    let query = '', total
-    if (psid > 0) {
-      query = 'SELECT COUNT(*) FROM "problem" WHERE "psid" = $1'
-      total = parseInt((await db.query(query, [psid])).rows[0].count)
-    } else if (psid === 0) {
-      query = 'SELECT COUNT(*) FROM "problem"'
-      total = parseInt((await db.query(query)).rows[0].count)
-    } else {
-      query = 'SELECT COUNT(*) FROM "problem" WHERE "psid" ISNULL'
-      total = parseInt((await db.query(query)).rows[0].count)
-    }
-    return res.status(hsc.ok).json(total)
+const insertProblem = async (params) => {
+  let { psid, title, extra, specialJudge, detailJudge, cases, timeLimit, memoryLimit, ownerId } = params
+  let pid, query = 'INSERT INTO "problem" ("psid", "title", "extra", "submit_ac", "submit_all", "special_judge", "detail_judge", "cases", "time_limit", "memory_limit", "owner_id") VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11) RETURNING "pid"'
+  try {
+    pid = (await db.query(query, [psid, title, extra, 0, 0, specialJudge, detailJudge, cases, timeLimit, memoryLimit, ownerId])).rows[0].pid
+  } catch (err) {
+    console.error(err)
+    return 0
   }
+  return parseInt(pid)
 }
 
-const getList = (psid) => {
-  psid = parseInt(psid)
-  return async (req, res) => {
-    let { page, item } = req.query
-    page = parseInt(page)
-    item = parseInt(item)
-    let uid = req.tokenAcc.uid
-    let limit = item, offset = (page - 1) * item
-    let query = 'SELECT "problem"."pid", "problem"."title" AS "name", MAX("solution"."score") AS "score" FROM "problem" LEFT JOIN "solution" ON "problem"."pid" = "solution"."pid"'
-    let param = []
-    if (psid > 0) query += ` WHERE "problem"."psid" = $${param.push(psid)}`
-    else if (psid === 0) { /* all */ }
-    else query += ' WHERE "problem"."psid" ISNULL'
-    query += ` AND ("solution"."uid" = $${param.push(uid)} OR "solution"."uid" ISNULL) GROUP BY "problem"."pid", "problem"."title" ORDER BY "problem"."title" ASC`
-    if (limit > 0) {
-      query += ` LIMIT $${param.push(limit)}`
-      if (offset >= 0) query += ` OFFSET $${param.push(offset)}`
-    }
-    let ret = (await db.query(query, param)).rows
-    for (let each of ret) {
-      let score = parseInt(each.score)
-      delete each.score
-      if (score >= 100) each.status = 2 // 已通过
-      else if (score >= 0) each.status = 1 // 已提交
-      else each.status = 0 // 未提交
-    }
-    return res.status(hsc.ok).json(ret)
-  }
-}
-
-router.get('/global/total', lc, getCount(undefined))
-router.get('/contest(s)?/:id(\\d+)/total', lc,
+router.get('/fork/:pid(\\d+)', lc,
   async (req, res, next) => {
-    return (mc['problemset'](req.tokenAcc.uid, req.params.id)(req, res, next))
-  },
-  async (req, res) => {
-    return getCount(req.params.id)(req, res)
-  })
-router.get('/assignment(s)?/:id(\\d+)/total', lc,
-  async (req, res, next) => {
-    return (mc['problemset'](req.tokenAcc.uid, req.params.id)(req, res, next))
-  },
-  async (req, res) => {
-    return getCount(req.params.id)(req, res)
-  })
-router.get('/problemset(s)?/:id(\\d+)/total', lc,
-  async (req, res, next) => {
-    return (mc['problemset'](req.tokenAcc.uid, req.params.id)(req, res, next))
-  },
-  async (req, res) => {
-    return getCount(req.params.id)(req, res)
-  })
-
-router.get('/global', lc, getList(undefined))
-router.get('/contest(s)?/:id(\\d+)', lc,
-  async (req, res, next) => {
-    return (mc['problemset'](req.tokenAcc.uid, req.params.id)(req, res, next))
-  },
-  async (req, res) => {
-    return getList(req.params.id)(req, res)
-  })
-router.get('/assignment(s)?/:id(\\d+)', lc,
-  async (req, res, next) => {
-    return (mc['problemset'](req.tokenAcc.uid, req.params.id)(req, res, next))
-  },
-  async (req, res) => {
-    return getList(req.params.id)(req, res)
-  })
-router.get('/problemset(s)?/:id(\\d+)', lc,
-  async (req, res, next) => {
-    return (mc['problemset'](req.tokenAcc.uid, req.params.id)(req, res, next))
-  },
-  async (req, res) => {
-    return getList(req.params.id)(req, res)
-  })
-
-router.get('/id/:pid(\\d+)', lc,
-  async (req, res, next) => {
-    let pid = req.params.pid
-    let uid = req.tokenAcc.uid
-    let query = 'SELECT "problem"."pid", "problem"."psid", "problem"."title" AS "name", "problem"."extra", "problem"."submit_ac" AS "submitAc", "problem"."submit_all" AS "submitAll", "problem"."special_judge" AS "specialJudge", "problem"."cases", "problem"."time_limit" AS "timeLimit", "problem"."memory_limit" AS "memoryLimit", "problem"."owner_id" AS "ownerId", MAX("solution"."score") AS "score" FROM "problem" LEFT JOIN "solution" ON "problem"."pid" = "solution"."pid" WHERE "problem"."pid" = $1 AND ("solution"."uid" = $2 OR "solution"."uid" ISNULL) GROUP BY "problem"."pid", "problem"."psid", "problem"."title", "problem"."extra", "problem"."submit_ac", "problem"."submit_all", "problem"."special_judge", "problem"."cases", "problem"."time_limit", "problem"."memory_limit", "problem"."owner_id" LIMIT 1'
-    let ret = (await db.query(query, [pid, uid])).rows[0]
-    if (!ret) return res.sendStatus(hsc.unauthorized)
-    let score = parseInt(ret.score)
-    delete ret.score
-    if (score >= 100) ret.status = 2 // 已通过
-    else if (score >= 0) ret.status = 1 // 已提交
-    else ret.status = 0 // 未提交
-    ret.psid = parseInt(ret.psid)
-    req.ret = ret
-    return next()
+    let query = 'SELECT "psid" FROM "problem" WHERE "pid" = $1'
+    let psid = parseInt((await db.query(query, [req.params.pid])).rows[0].psid)
+    let location
+    if (psid > 0) location = 'Local'
+    else location = 'Global'
+    req.from = psid
+    req.reqPerms = [`edit${location}Problem`, `fork${location}Problem`]
   },
   async (req, res, next) => {
-    if (req.ret.psid > 0) return (mc['problemset'](req.tokenAcc.uid, req.ret.psid)(req, res, next))
-    return next()
+    return pc(req.tokenAcc.uid, req.reqPerms)(req, res, next)
   },
-  async (req, res) => {
-    try {
-      let problem = getProblemStructure(req.params.pid).file.md
-      req.ret.content = await fs.readFile(problem)
-    } catch (err) {
-      console.error(err)
-      return res.sendStatus(hsc.unauthorized)
-    }
-    return res.status(hsc.ok).json(req.ret)
-  }
 )
 
 module.exports = router
