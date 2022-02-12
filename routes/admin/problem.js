@@ -20,18 +20,54 @@ const insertProblem = async (params) => {
   return parseInt(pid)
 }
 
-router.get('/fork/:pid(\\d+)', lc,
-  async (req, res, next) => {
+const genPerms = (fromPid, verb, toPsid) => {
+  return async (req, res, next) => {
     let query = 'SELECT "psid" FROM "problem" WHERE "pid" = $1'
-    let psid = parseInt((await db.query(query, [req.params.pid])).rows[0].psid)
-    let location
-    if (psid > 0) location = 'Local'
-    else location = 'Global'
-    req.from = psid
-    req.reqPerms = [`edit${location}Problem`, `fork${location}Problem`]
+    let { psid } = (await db.query(query, [fromPid])).rows[0]
+    let fromLoc, toLoc, toPsLoc
+    if (psid > 0) fromLoc = 'Local'
+    else fromLoc = 'Global'
+    req.from = {
+      pid: fromPid,
+      psid: psid
+    }
+    req.to = {
+      psid: undefined,
+      cid: undefined
+    }
+    if (toPsid > 0) {
+      toLoc = 'Local'
+      query = 'SELECT "cid" FROM "problemset" WHERE "psid" = $1'
+      let { cid } = (await db.query(query, [toPsid])).rows[0]
+      if (cid > 0) toPsLoc = 'Local'
+      else toPsLoc = 'Global'
+      req.to = {
+        psid: toPsid,
+        cid: cid
+      }
+    } else toLoc = 'Global'
+    req.reqPerms = [`edit${toLoc}Problem`]
+    if (verb === 'fork') req.reqPerms.push(`fork${fromLoc}Problem`)
+    if (toPsid > 0) req.reqPerms.push(`edit${toPsLoc}Problemset`)
+    return next()
+  }
+}
+
+router.get('/fork/:pid(\\d+)/into/:psid(\\d+)', lc,
+  async (req, res, next) => {
+    let pid = parseInt(req.params.pid)
+    let psid = parseInt(req.params.psid)
+    if (pid > 0 && psid > 0) return genPerms(pid, 'fork', psid)(req, res, next)
+    return res.sendStatus(hsc.badReq)
   },
   async (req, res, next) => {
     return pc(req.tokenAcc.uid, req.reqPerms)(req, res, next)
+  },
+  async (req, res, next) => {
+
+  }
+  async (req, res, next) => {
+    if (req.)
   },
 )
 
