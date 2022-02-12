@@ -184,4 +184,20 @@ router.post('/update/:pid(\\d+)', lc,
   }
 )
 
+router.get('/', lc, async (req, res) => {
+  let { page, item } = req.query
+  page = parseInt(page)
+  item = parseInt(item)
+  let uid = req.tokenAcc.uid
+  let limit = item, offset = (page - 1) * item
+  let param = []
+  let query = `SELECT "problem"."pid", "problem"."title" AS "name" FROM "problem_maintainer" INNER JOIN "problem" ON "problem"."pid" = "problem_maintainer"."pid" WHERE "uid" = $${param.push(uid)} ORDER BY "pid" DESC`
+  if (limit > 0) {
+    query += ` LIMIT $${param.push(limit)}`
+    if (offset >= 0) query += ` OFFSET $${param.push(offset)}`
+  }
+  let ret = (await db.query(query, param)).rows
+  return res.status(hsc.ok).json(ret)
+})
+
 module.exports = router
