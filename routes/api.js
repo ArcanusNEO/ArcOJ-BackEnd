@@ -2,7 +2,7 @@ let express = require('express')
 let router = express.Router()
 let hsc = require('../config/http-status-code')
 
-router.use('/admin', require('./admin'))
+router.use('/(admin(istrator)?|master)', require('./admin/admin'))
 router.use('/announcement(s)?', require('./announcement'))
 router.use('/assignment(s)?', require('./assignment'))
 router.use('/contest(s)?', require('./contest'))
