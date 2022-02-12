@@ -110,7 +110,7 @@ router.get('/fork/:pid(\\d+)/global', lc,
   }, forkProblem
 )
 
-const createProblem = async (req, res, next) => {
+const createProblem = async (req, res) => {
   let { title, extra, specialJudge, detailJudge, cases, timeLimit, memoryLimit } = req.body
   let psid = req.to.psid, ownerId = req.tokenAcc.uid
   let params = { psid, title, extra, specialJudge, detailJudge, cases, timeLimit, memoryLimit, ownerId }
