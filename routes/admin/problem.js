@@ -80,6 +80,8 @@ const forkProblem = async (req, res) => {
   await fs.copy(fromStruct.path.data, toStruct.path.data)
   await fs.copy(fromStruct.path.spj, toStruct.path.spj)
   await fs.copy(fromStruct.file.md, toStruct.file.md)
+  query = 'INSERT INTO "problem_maintainer" ("pid", "uid") VALUES ($1, $2)'
+  await db.query(query, [toPid, ownerId])
   return res.status(hsc.ok).json(toPid)
 }
 
@@ -120,6 +122,8 @@ const createProblem = async (req, res) => {
   await fs.remove(struct.path.spj)
   await fs.remove(struct.file.md)
   await fs.writeFile(struct.file.md, content)
+  let query = 'INSERT INTO "problem_maintainer" ("pid", "uid") VALUES ($1, $2)'
+  await db.query(query, [toPid, ownerId])
   return res.status(hsc.ok).json(pid)
 }
 
