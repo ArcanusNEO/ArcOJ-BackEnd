@@ -21,7 +21,7 @@ const insertProblem = async (params) => {
   return (pid > 0 ? pid : 0)
 }
 
-const genPerms = (fromPid, verb, toPsid) => {
+const preCheck = (fromPid, verb, toPsid) => {
   return async (req, res, next) => {
     let fromLoc, toLoc, toPsLoc, fromPsid = null, query, ret
     if (verb === 'fork') {
@@ -87,7 +87,7 @@ router.get('/fork/:pid(\\d+)/into/:psid(\\d+)', lc,
   async (req, res, next) => {
     let pid = parseInt(req.params.pid)
     let psid = parseInt(req.params.psid)
-    if (pid > 0 && psid > 0) return genPerms(pid, 'fork', psid)(req, res, next)
+    if (pid > 0 && psid > 0) return preCheck(pid, 'fork', psid)(req, res, next)
     return res.sendStatus(hsc.badReq)
   },
   async (req, res, next) => {
@@ -101,7 +101,7 @@ router.get('/fork/:pid(\\d+)/into/:psid(\\d+)', lc,
 router.get('/fork/:pid(\\d+)/global', lc,
   async (req, res, next) => {
     let pid = parseInt(req.params.pid)
-    if (pid > 0) return genPerms(pid, 'fork', null)(req, res, next)
+    if (pid > 0) return preCheck(pid, 'fork', null)(req, res, next)
     return res.sendStatus(hsc.badReq)
   },
   async (req, res, next) => {
@@ -125,7 +125,8 @@ const createProblem = async (req, res) => {
 
 router.post('/create/global', lc,
   async (req, res, next) => {
-    return genPerms(null, 'create', null)(req, res, next)
+    req.body.title = req.body.title || req.body.name
+    return preCheck(null, 'create', null)(req, res, next)
   },
   async (req, res, next) => {
     return pc(req.tokenAcc.uid, req.reqPerms)(req, res, next)
@@ -134,8 +135,9 @@ router.post('/create/global', lc,
 
 router.post('/create/into/:psid(\\d+)', lc,
   async (req, res, next) => {
+    req.body.title = req.body.title || req.body.name
     let psid = parseInt(req.params.psid)
-    if (psid > 0) return genPerms(null, 'create', psid)(req, res, next)
+    if (psid > 0) return preCheck(null, 'create', psid)(req, res, next)
     return res.sendStatus(hsc.badReq)
   },
   async (req, res, next) => {
@@ -144,6 +146,42 @@ router.post('/create/into/:psid(\\d+)', lc,
   async (req, res, next) => {
     return mtc.problemset(req.tokenAcc.uid, req.to.psid)(req, res, next)
   }, createProblem
+)
+
+router.post('/update/:pid(\\d+)', lc,
+  async (req, res, next) => {
+    req.body.title = req.body.title || req.body.name
+    let pid = parseInt(req.params.pid)
+    if (!(pid > 0)) return res.sendStatus(hsc.badReq)
+    let query = 'SELECT "pid", "psid" FROM "problem" WHERE "pid" = $1'
+    let ret = (await db.query(query, [pid])).rows[0]
+    if (!ret) return res.sendStatus(hsc.unauthorized)
+    let psid = ret.psid
+    return preCheck(pid, 'update', psid)(req, res, next)
+  },
+  async (req, res, next) => {
+    return pc(req.tokenAcc.uid, req.reqPerms)(req, res, next)
+  },
+  async (req, res, next) => {
+    return mtc.problem(req.tokenAcc.uid, req.to.psid)(req, res, next)
+  },
+  async (req, res) => {
+    let { title, extra, specialJudge, detailJudge, cases, timeLimit, memoryLimit, content } = req.body
+    let psid = req.to.psid, param = [psid]
+    let pid = req.from.pid
+    let items = { title, extra, specialJudge, detailJudge, cases, timeLimit, memoryLimit }
+    let query = 'UPDATE "problem" SET "psid" = $1'
+    for (let key of items)
+      if (items[key]) query += `, "${key}" = $${param.push(items[key])}`
+    query += ` WHERE "pid" = $${param.push(pid)} RETURNING "pid", "psid", "title", "extra", "submit_ac" AS "submitAc", "submit_all" AS "submitAll", "special_judge" AS "speciaJudge", "detail_judge" AS "detailJudge", "cases", "time_limit" AS "timeLimit", "memory_limit" AS "memoryLimit", "owner_id" AS "ownerId"`
+    let ret = (await db.query(query, param)).rows[0]
+    if (content) {
+      let struct = getProblemStructure(pid)
+      await fs.remove(struct.file.md)
+      await fs.writeFile(struct.file.md, content)
+    }
+    return res.status(hsc.ok).json(ret)
+  }
 )
 
 module.exports = router
