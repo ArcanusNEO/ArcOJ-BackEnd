@@ -14,11 +14,12 @@ const insertProblem = async (params) => {
   let pid, query = 'INSERT INTO "problem" ("psid", "title", "extra", "submit_ac", "submit_all", "special_judge", "detail_judge", "cases", "time_limit", "memory_limit", "owner_id") VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11) RETURNING "pid"'
   try {
     pid = (await db.query(query, [psid, title, extra, 0, 0, specialJudge, detailJudge, cases, timeLimit, memoryLimit, ownerId])).rows[0].pid
+    pid = parseInt(pid)
   } catch (err) {
     console.error(err)
     return 0
   }
-  return parseInt(pid)
+  return (pid > 0 ? pid : 0)
 }
 
 const genPerms = (fromPid, verb, toPsid) => {
@@ -111,8 +112,23 @@ router.get('/fork/:pid(\\d+)/global', lc,
 
 router.post('/create/global', lc,
   async (req, res, next) => {
-    return genPerms(pid, 'fork', null)(req, res, next)
+    return genPerms(null, 'create', null)(req, res, next)
   },
+  async (req, res, next) => {
+    return pc(req.tokenAcc.uid, req.reqPerms)(req, res, next)
+  },
+  async (req, res, next) => {
+    let { title, extra, specialJudge, detailJudge, cases, timeLimit, memoryLimit } = req.body
+    let psid = null, ownerId = req.tokenAcc.uid
+    let params = { psid, title, extra, specialJudge, detailJudge, cases, timeLimit, memoryLimit, ownerId }
+    let pid = await insertProblem(params)
+    if (pid === 0) res.sendStatus(hsc.internalSrvErr)
+    let struct = getProblemStructure(pid)
+    await fs.remove(struct.path.data)
+    await fs.remove(struct.path.spj)
+    await fs.remove(struct.file.md)
+    return res.status(hsc.ok).json(pid)
+  }
 )
 
 module.exports = router
