@@ -23,16 +23,18 @@ const insertProblem = async (params) => {
 
 const genPerms = (fromPid, verb, toPsid) => {
   return async (req, res, next) => {
-    let query = 'SELECT "psid" FROM "problem" WHERE "pid" = $1'
-    let ret = (await db.query(query, [fromPid])).rows[0]
-    if (!ret) return res.sendStatus(hsc.badReq)
-    let psid = ret.psid
-    let fromLoc, toLoc, toPsLoc
-    if (psid > 0) fromLoc = 'Local'
-    else fromLoc = 'Global'
+    let fromLoc, toLoc, toPsLoc, fromPsid = null, query, ret
+    if (verb === 'fork') {
+      query = 'SELECT "psid" FROM "problem" WHERE "pid" = $1'
+      ret = (await db.query(query, [fromPid])).rows[0]
+      if (!ret) return res.sendStatus(hsc.badReq)
+      fromPsid = ret.psid
+      if (fromPsid > 0) fromLoc = 'Local'
+      else fromLoc = 'Global'
+    }
     req.from = {
       pid: fromPid,
-      psid: psid
+      psid: fromPsid
     }
     req.to = {
       psid: null,
@@ -99,12 +101,18 @@ router.get('/fork/:pid(\\d+)/into/:psid(\\d+)', lc,
 router.get('/fork/:pid(\\d+)/global', lc,
   async (req, res, next) => {
     let pid = parseInt(req.params.pid)
-    if (pid > 0) return genPerms(pid, 'fork', -1)(req, res, next)
+    if (pid > 0) return genPerms(pid, 'fork', null)(req, res, next)
     return res.sendStatus(hsc.badReq)
   },
   async (req, res, next) => {
     return pc(req.tokenAcc.uid, req.reqPerms)(req, res, next)
   }, forkProblem
+)
+
+router.post('/create/global', lc,
+  async (req, res, next) => {
+    return genPerms(pid, 'fork', null)(req, res, next)
+  },
 )
 
 module.exports = router
