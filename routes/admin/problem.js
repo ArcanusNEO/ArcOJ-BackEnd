@@ -53,7 +53,7 @@ const preCheck = (fromPid, verb, toPsid) => {
     } else toLoc = 'Global'
     req.reqPerms = [`edit${toLoc}Problem`]
     if (verb === 'fork') req.reqPerms.push(`fork${fromLoc}Problem`)
-    if (toPsid > 0) req.reqPerms.push(`edit${toPsLoc}Problemset`)
+    // if (toPsid > 0) req.reqPerms.push(`edit${toPsLoc}Problemset`)
     return next()
   }
 }
@@ -225,6 +225,47 @@ router.get('/id/:pid(\\d+)', lc,
     return res.status(hsc.ok).json(ret)
   }
 )
+
+router.use(fileUpload({
+  abortOnLimit: true,
+  useTempFiles: true,
+  tempFileDir: '/tmp/',
+  limits: { fileSize: 16 * 1024 * 1024 } // 16M
+}))
+
+router.post('/id/:pid(\\d+)/upload/io', lc,
+  async (req, res, next) => {
+    let pid = parseInt(req.params.pid)
+    if (!(pid > 0)) return res.sendStatus(hsc.badReq)
+    let query = 'SELECT "pid", "psid" FROM "problem" WHERE "pid" = $1'
+    let ret = (await db.query(query, [pid])).rows[0]
+    if (!ret) return res.sendStatus(hsc.unauthorized)
+    let psid = ret.psid
+    return preCheck(pid, 'update', psid)(req, res, next)
+  },
+  async (req, res, next) => {
+    return pc(req.tokenAcc.uid, req.reqPerms)(req, res, next)
+  },
+  async (req, res, next) => {
+    return mtc.problem(req.tokenAcc.uid, parseInt(req.params.pid))(req, res, next)
+  },
+  async (req, res) => {
+    if (!req.files || Object.keys(req.files).length === 0) return res.sendStatus(hsc.badReq)
+    let pid = parseInt(req.params.pid)
+    let struct = getProblemStructure(pid)
+    await fs.ensureDir(struct.path.data)
+    let query = 'SELECT "cases" FROM "problem" WHERE "pid" = $1'
+    let ret = (await db.query(query, [pid])).rows[0]
+    if (!ret || !(parseInt(ret.cases) > 0)) return res.sendStatus(hsc.internalSrvErr)
+    let cases = parseInt(ret.cases)
+    for (let i = 1; i <= cases; ++i) {
+      let fileIn = req.files[i + ".in"]
+      let fileOut = req.files[i + ".out"]
+      await fileIn.mv(struct.path.data)
+      await fileOut.mv(struct.path.data)
+    }
+    return res.sendStatus(hsc.ok)
+  })
 
 module.exports = router
 
