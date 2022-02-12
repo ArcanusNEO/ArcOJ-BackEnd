@@ -7,6 +7,7 @@ let mtc = require('../midwares/maintainer-check')
 let pc = require('../midwares/permission-check')
 let { getProblemStructure } = require('../../utils/judge')
 let fs = require('fs-extra')
+let fileUpload = require('express-fileupload')
 
 const insertProblem = async (params) => {
   let { psid, title, extra, specialJudge, detailJudge, cases, timeLimit, memoryLimit, ownerId } = params
