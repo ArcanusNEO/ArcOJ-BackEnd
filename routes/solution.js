@@ -12,8 +12,15 @@ router.get('/id/:sid(\\d+)', lc,
     return res.sendStatus(hsc.badReq)
   },
   async (req, res) => {
-    let query = 'SELECT "solution"."sid", "solution"."uid", "solution"."pid", "solution"."status_id" AS "statusId", "solution"."lang_id" AS "langId", "solution"."code_size" AS "codeSize", "solution"."share", "solution"."run_time" AS "runTime", "solution"."run_memory" AS "runMemory", "solution"."when", "solution"."detail", "solution"."compile_info" AS "compileInfo", "solution"."score", "problem"."title" AS "name" FROM "solution" INNER JOIN "problem" ON "solution"."pid" = "problem"."pid" WHERE "sid" = $1'
+    let uid = req.tokenAcc.uid
+    let query = 'SELECT "solution"."sid", "solution"."uid", "solution"."pid", "solution"."status_id" AS "statusId", "solution"."lang_id" AS "langId", "solution"."code_size" AS "codeSize", "solution"."share", "solution"."run_time" AS "runTime", "solution"."run_memory" AS "runMemory", "solution"."when", "solution"."detail", "solution"."compile_info" AS "compileInfo", "solution"."score", "problem"."title" AS "name" FROM "solution" INNER JOIN "problem" ON "solution"."pid" = "problem"."pid" WHERE "solution"."sid" = $1 AND "solution"."uid" = $2'
     let ret = (await db.query(query, [req.params.sid])).rows[0]
+    if (!ret) return res.sendStatus(hsc.unauthorized)
+    let pid = ret.pid
+    query = `SELECT "problem"."pid" FROM "problem" INNER JOIN "problemset" ON "problem"."psid" = "problemset"."psid" INNER JOIN "problemset_user" ON "problemset"."psid" = "problemset_user"."psid" WHERE "problem"."pid" = $1 AND "problemset_user"."uid" = $2 AND "problemset"."type" = 'contest' AND NOW()::TIMESTAMPTZ <@ "problemset"."during"`
+    let sqlRet = (await db.query(query, [pid, uid])).rows[0]
+    if (sqlRet) ret.score = null
+    // 注意！这里虽然没有用到member-check，却检查了problemset_user
     return res.status(hsc.ok).json(ret)
   }
 )
@@ -24,7 +31,7 @@ router.get('/id/:sid(\\d+)/status', lc,
     return res.sendStatus(hsc.badReq)
   },
   async (req, res) => {
-    let query = 'SELECT "status_id" FROM "solution" WHERE "sid" = $1'
+    let query = 'SELECT "status_id" FROM "solution" WHERE "sid" = $1 AND "uid" = $2'
     let ret = (await db.query(query, [req.params.sid])).rows[0]
     if (!ret) return res.sendStatus(hsc.unauthorized)
     return res.status(hsc.ok).json(ret['status_id'])
