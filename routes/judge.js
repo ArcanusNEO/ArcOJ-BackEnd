@@ -29,6 +29,7 @@ router.post('/', lc,
     // 不属于问题集或者检查完权限，开测
     try {
       let langExt = languageExtension.langExt[lang]
+      if (!langExt) throw Error('Unsupported language type')
       let langId = languageExtension.langId[langExt]
       let codeSize = Buffer.byteLength(code, 'utf8')
       sqlStr = 'INSERT INTO "solution" ("uid", "pid", "status_id", "lang_id", "code_size", "share", "run_time", "run_memory", "when", "score") VALUES ($1, $2, $3, $4, $5, $6, $7, $8, NOW()::TIMESTAMPTZ, $9) RETURNING sid'
