@@ -205,6 +205,12 @@ router.get('/', lc, async (req, res) => {
   return res.status(hsc.ok).json(ret)
 })
 
+router.get('/total', lc, async (req, res) => {
+  let query = 'SELECT COUNT(*) FROM "problem_maintainer" INNER JOIN "problem" ON "problem"."pid" = "problem_maintainer"."pid" WHERE "uid" = $1'
+  let total = (await db.query(query, [req.tokenAcc.uid])).rows[0].count
+  return res.status(hsc.ok).json(total)
+})
+
 router.get('/id/:pid(\\d+)', lc,
   async (req, res, next) => {
     let pid = parseInt(req.params.pid)
