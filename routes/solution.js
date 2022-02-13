@@ -25,7 +25,7 @@ router.get('/total', lc,
   async (req, res) => {
     let query = 'SELECT COUNT(*) FROM "solution" WHERE "uid" = $1'
     let ret = (await db.query(query, [req.tokenAcc.uid])).rows[0]
-    let total = ret.count
+    let total = parseInt(ret.count)
     return res.status(hsc.ok).json(total)
   }
 )
