@@ -60,6 +60,7 @@ const preCheck = (fromPid, verb, toPsid) => {
 }
 
 const forkProblem = async (req, res) => {
+  let fromPid = parseInt(req.params.pid)
   let query = 'SELECT * FROM "problem" WHERE "pid" = $1'
   let ret = (await db.query(query, [fromPid])).rows[0]
   if (!ret) return res.sendStatus(hsc.internalSrvErr)
@@ -72,7 +73,6 @@ const forkProblem = async (req, res) => {
   let params = { psid, title, extra, specialJudge, detailJudge, cases, timeLimit, memoryLimit, ownerId }
   let toPid = await insertProblem(params)
   if (toPid === 0) res.sendStatus(hsc.internalSrvErr)
-  let fromPid = parseInt(req.params.pid)
   let fromStruct = getProblemStructure(fromPid)
   let toStruct = getProblemStructure(toPid)
   await fs.ensureDir(toStruct.path.data)
