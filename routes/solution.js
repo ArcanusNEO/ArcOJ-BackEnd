@@ -30,4 +30,23 @@ router.get('/total', lc,
   }
 )
 
+router.get('/', lc,
+  async (req, res, next) => {
+    return pc(req.tokenAcc.uid, ['getJudgeInfo'])(req, res, next)
+  },
+  async (req, res) => {
+    let query = 'SELECT "sid", "uid", "pid", "status_id" AS "statusId", "lang_id" AS "langId", "code_size" AS "codeSize", "share", "run_time" AS "runTime", "run_memory" AS "runMemory", "when", "detail", "compile_info" AS "compileInfo", "score" FROM "solution" WHERE "uid" = $1 ORDER BY "sid" DESC'
+    let param = [req.tokenAcc.uid]
+    let { page, item } = req.query
+    page = parseInt(page)
+    item = parseInt(item)
+    if (limit > 0) {
+      query += ` LIMIT $${param.push(limit)}`
+      if (offset >= 0) query += ` OFFSET $${param.push(offset)}`
+    }
+    let ret = (await db.query(query, param)).rows
+    return res.status(hsc.ok).json(ret)
+  }
+)
+
 module.exports = router
