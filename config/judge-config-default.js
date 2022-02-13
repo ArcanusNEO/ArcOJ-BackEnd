@@ -1,14 +1,14 @@
 module.exports = {
-  "sid": undefined,
-  "filename": undefined,
-  "lang": undefined,
-  "pid": undefined,
-  "max_time": undefined,
+  "sid": null,
+  "filename": null,
+  "lang": null,
+  "pid": null,
+  "max_time": null,
   "max_time_total": 30000,
-  "max_memory": undefined,
+  "max_memory": 262144,      // 256 * 1024 KiB
   "max_output": 10000000,
   "max_thread": 4,
-  "continue_on": undefined,
-  "test_case_count": undefined,
-  "spj_mode": undefined,
+  "continue_on": null,
+  "test_case_count": null,
+  "spj_mode": null,
 }
