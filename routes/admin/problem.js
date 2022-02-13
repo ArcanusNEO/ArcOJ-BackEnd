@@ -8,6 +8,7 @@ let pc = require('../midwares/permission-check')
 let { getProblemStructure } = require('../../utils/judge')
 let fs = require('fs-extra')
 let fileUpload = require('express-fileupload')
+let path = require('path')
 
 const insertProblem = async (params) => {
   let { psid, title, extra, specialJudge, detailJudge, cases, timeLimit, memoryLimit, ownerId } = params
@@ -273,8 +274,8 @@ router.post('/id/:pid(\\d+)/upload/io', lc,
     for (let i = 1; i <= cases; ++i) {
       let fileIn = req.files[i + ".in"]
       let fileOut = req.files[i + ".out"]
-      if (fileIn) await fileIn.mv(struct.path.data)
-      if (fileOut) await fileOut.mv(struct.path.data)
+      if (fileIn) await fileIn.mv(path.resolve(struct.path.data, ".in"))
+      if (fileOut) await fileOut.mv(path.resolve(struct.path.data, ".out"))
     }
     return res.sendStatus(hsc.ok)
   })
