@@ -18,6 +18,19 @@ router.get('/id/:sid(\\d+)', lc,
   }
 )
 
+router.get('/id/:sid(\\d+)/status', lc,
+  async (req, res, next) => {
+    if (parseInt(req.params.sid) > 0) return pc(req.tokenAcc.uid, ['getJudgeInfo'])(req, res, next)
+    return res.sendStatus(hsc.badReq)
+  },
+  async (req, res) => {
+    let query = 'SELECT "status_id" AS "statusId" FROM "solution" WHERE "sid" = $1'
+    let ret = (await db.query(query, [req.params.sid])).rows[0]
+    if (!ret) return res.sendStatus(hsc.unauthorized)
+    return res.status(hsc.ok).json(ret.statusId)
+  }
+)
+
 router.get('/total', lc,
   async (req, res, next) => {
     return pc(req.tokenAcc.uid, ['getJudgeInfo'])(req, res, next)
