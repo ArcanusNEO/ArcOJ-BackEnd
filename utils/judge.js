@@ -91,6 +91,10 @@ const judge = async (params) => {
     let score = parseInt(acCount * 100.0 / cases)
     let sqlStr = 'UPDATE "solution" SET "status_id" = $1, "run_time" = $2, "run_memory" = $3, "detail" = $4, "compile_info" = $5, "score" = $6 WHERE "sid" = $7'
     await db.query(sqlStr, [result, time, memory, JSON.stringify(json.detail).replace(/\u\d\d\d\d/gms, match => '\\' + match), json.compiler, score, sid])
+    if (score >= 100) {
+      let query = 'UPDATE "problem" SET "submit_ac" = "submit_ac" + 1 WHERE "pid" = $1'
+      await db.query(query, [pid])
+    }
   } catch (err) {
     console.error(err)
     let sqlStr = 'UPDATE "solution" SET "status_id" = $1 WHERE "sid" = $7'
