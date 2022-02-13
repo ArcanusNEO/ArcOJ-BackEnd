@@ -24,10 +24,10 @@ router.get('/id/:sid(\\d+)/status', lc,
     return res.sendStatus(hsc.badReq)
   },
   async (req, res) => {
-    let query = 'SELECT "status_id" AS "statusId" FROM "solution" WHERE "sid" = $1'
+    let query = 'SELECT "status_id" FROM "solution" WHERE "sid" = $1'
     let ret = (await db.query(query, [req.params.sid])).rows[0]
     if (!ret) return res.sendStatus(hsc.unauthorized)
-    return res.status(hsc.ok).json(ret.statusId)
+    return res.status(hsc.ok).json(ret['status_id'])
   }
 )
 
