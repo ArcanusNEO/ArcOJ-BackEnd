@@ -54,7 +54,7 @@ const getList = (psid) => {
     return res.status(hsc.ok).json(ret)
   }
 }
-
+// 懒的查getJudgeInfo权限了，出问题再改
 router.get('/global/total', lc, getCount(undefined))
 router.get('/contest(s)?/:id(\\d+)/total', lc,
   async (req, res, next) => {

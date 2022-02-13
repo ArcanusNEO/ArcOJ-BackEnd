@@ -16,6 +16,7 @@ router.use('/problem(s)?', require('./problem'))
 router.use('/reset', require('./reset'))
 router.use('/signup', require('./signup'))
 router.use('/u(ser(s)?)?', require('./user'))
+router.use('/solution(s)?', require('./solution'))
 router.use('/test', require('./test'))
 
 router.all('*', (req, res) => {

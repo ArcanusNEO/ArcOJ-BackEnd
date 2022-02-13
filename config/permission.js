@@ -15,9 +15,9 @@ module.exports = {
   'postAnnouncement': 14,
   'getGlobalCode': 15,              // 指即便code.share为false并且正在比赛也能随意查看代码
   'getLocalCode': 16,               // 指即便code.share为false并且正在比赛也能随意查看代码
-  'getGlobalJudgeInfo': 17,
-  'getLocalJudgeInfo': 18,
-  'getJudgeStatus': 19,
+  'getGlobalJudgeInfo': 17,         // 指所有用户的
+  'getLocalJudgeInfo': 18,          // 指所有用户的
+  'getJudgeInfo': 19,
   'forkGlobalProblem': 20,
   'forkLocalProblem': 21,
   'joinCourse': 22,
