@@ -124,7 +124,7 @@ const createProblem = async (req, res) => {
   await fs.remove(struct.file.md)
   await fs.writeFile(struct.file.md, content)
   let query = 'INSERT INTO "problem_maintainer" ("pid", "uid") VALUES ($1, $2)'
-  await db.query(query, [toPid, ownerId])
+  await db.query(query, [pid, ownerId])
   return res.status(hsc.ok).json(pid)
 }
 
