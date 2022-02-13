@@ -12,7 +12,7 @@ router.get('/id/:sid(\\d+)', lc,
     return res.sendStatus(hsc.badReq)
   },
   async (req, res) => {
-    let query = 'SELECT "solution"."sid", "solution"."uid", "solution"."pid", "solution"."status_id" AS "statusId", "solution"."lang_id" AS "langId", "solution"."code_size" AS "codeSize", "solution"."share", "solution"."run_time" AS "runTime", "solution"."run_memory" AS "runMemory", "solution"."when", "solution"."detail", "solution"."compile_info" AS "compileInfo", "solution"."score" FROM "solution" WHERE "sid" = $1'
+    let query = 'SELECT "solution"."sid", "solution"."uid", "solution"."pid", "solution"."status_id" AS "statusId", "solution"."lang_id" AS "langId", "solution"."code_size" AS "codeSize", "solution"."share", "solution"."run_time" AS "runTime", "solution"."run_memory" AS "runMemory", "solution"."when", "solution"."detail", "solution"."compile_info" AS "compileInfo", "solution"."score", "problem"."title" AS "name" FROM "solution" INNER JOIN "problem" ON "solution"."pid" = "problem"."pid" WHERE "sid" = $1'
     let ret = (await db.query(query, [req.params.sid])).rows[0]
     return res.status(hsc.ok).json(ret)
   }
