@@ -119,9 +119,12 @@ const createProblem = async (req, res) => {
   let pid = await insertProblem(params)
   if (pid === 0) res.sendStatus(hsc.internalSrvErr)
   let struct = getProblemStructure(pid)
+  await fs.ensureDir(struct.path.problem)
   await fs.remove(struct.path.data)
   await fs.remove(struct.path.spj)
   await fs.remove(struct.file.md)
+  await fs.ensureDir(struct.path.data)
+  await fs.ensureDir(struct.path.spj)
   await fs.writeFile(struct.file.md, content)
   let query = 'INSERT INTO "problem_maintainer" ("pid", "uid") VALUES ($1, $2)'
   await db.query(query, [pid, ownerId])
