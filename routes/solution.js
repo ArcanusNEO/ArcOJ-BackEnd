@@ -37,9 +37,8 @@ router.get('/', lc,
   async (req, res) => {
     let query = 'SELECT "sid", "uid", "pid", "status_id" AS "statusId", "lang_id" AS "langId", "code_size" AS "codeSize", "share", "run_time" AS "runTime", "run_memory" AS "runMemory", "when", "detail", "compile_info" AS "compileInfo", "score" FROM "solution" WHERE "uid" = $1 ORDER BY "sid" DESC'
     let param = [req.tokenAcc.uid]
-    let { page, item } = req.query
-    page = parseInt(page)
-    item = parseInt(item)
+    let page = parseInt(req.query.page), item = parseInt(req.query.item)
+    let limit = item, offset = (page - 1) * item
     if (limit > 0) {
       query += ` LIMIT $${param.push(limit)}`
       if (offset >= 0) query += ` OFFSET $${param.push(offset)}`
