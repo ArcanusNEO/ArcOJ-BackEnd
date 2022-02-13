@@ -197,7 +197,7 @@ router.get('/', lc, async (req, res) => {
   let uid = req.tokenAcc.uid
   let limit = item, offset = (page - 1) * item
   let param = []
-  let query = `SELECT "problem"."pid", "problem"."title" AS "name" FROM "problem_maintainer" INNER JOIN "problem" ON "problem"."pid" = "problem_maintainer"."pid" WHERE "uid" = $${param.push(uid)} ORDER BY "pid" DESC`
+  let query = `SELECT "problem"."pid" AS "id", "problem"."title" AS "name" FROM "problem_maintainer" INNER JOIN "problem" ON "problem"."pid" = "problem_maintainer"."pid" WHERE "uid" = $${param.push(uid)} ORDER BY "pid" DESC`
   if (limit > 0) {
     query += ` LIMIT $${param.push(limit)}`
     if (offset >= 0) query += ` OFFSET $${param.push(offset)}`
