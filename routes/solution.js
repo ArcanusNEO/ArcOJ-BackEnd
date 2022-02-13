@@ -23,7 +23,7 @@ router.get('/id/:sid(\\d+)', lc,
     return (mc['problemset'](req.tokenAcc.uid, req.ann.psid)(req, res, next))
   },
   async (req, res) => {
-
+    return res.status(hsc.ok).json(req.ann)
   }
 )
 
