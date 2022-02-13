@@ -177,7 +177,7 @@ router.post('/update/:pid(\\d+)', lc,
     let pid = req.from.pid
     let items = { title, extra, specialJudge, detailJudge, cases, timeLimit, memoryLimit }
     let query = 'UPDATE "problem" SET "psid" = $1'
-    for (let key of items)
+    for (let key in items)
       if (items[key]) query += `, "${key}" = $${param.push(items[key])}`
     query += ` WHERE "pid" = $${param.push(pid)} RETURNING "pid", "psid", "title" AS "name", "extra", "submit_ac" AS "submitAc", "submit_all" AS "submitAll", "special_judge" AS "speciaJudge", "detail_judge" AS "detailJudge", "cases", "time_limit" AS "timeLimit", "memory_limit" AS "memoryLimit", "owner_id" AS "ownerId"`
     let ret = (await db.query(query, param)).rows[0]
