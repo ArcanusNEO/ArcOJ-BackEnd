@@ -120,19 +120,16 @@ router.get('/id/:pid(\\d+)', lc,
       console.error(err)
       return res.sendStatus(hsc.unauthorized)
     }
+    if (!psid || req.tokenAcc.permission === 2) return res.status(hsc.ok).json(ret)
     query = 'SELECT * FROM "problem_maintainer" WHERE "pid" = $1 AND "uid" = $2'
     let check = (await db.query(query, [pid, uid])).rows[0]
-    if (check || req.tokenAcc.permission === 2) return res.status(hsc.ok).json(ret)
-    let inset = false, before = false
-    if (psid) {
-      query = 'SELECT * FROM "problemset_user" WHERE "psid" = $1 AND "uid" = $2'
-      check = (await db.query(query, [psid, uid])).rows[0]
-      if (check) inset = true
-    } else inset = true
-    if (!inset) return res.sendStatus(hsc.forbidden)
+    if (check) return res.status(hsc.ok).json(ret)
+    query = 'SELECT * FROM "problemset_user" WHERE "psid" = $1 AND "uid" = $2'
+    check = (await db.query(query, [psid, uid])).rows[0]
+    if (!check) return res.sendStatus(hsc.forbidden)
     query = 'SELECT (NOW()::TIMESTAMPTZ < LOWER("problemset"."during")) AS "before" FROM "problemset" WHERE "psid" = $1'
-    before = (await db.query(query, [psid])).rows[0].before
-    if (before) return res.sendStatus(hsc.forbidden)
+    check = (await db.query(query, [psid])).rows[0].before
+    if (check) return res.sendStatus(hsc.forbidden)
     return res.status(hsc.ok).json(ret)
   }
 )
