@@ -16,18 +16,26 @@ router.get('/id/:sid(\\d+)', lc,
   },
   async (req, res) => {
     let uid = req.tokenAcc.uid, sid = req.params.sid, permission = req.tokenAcc.permission
-    let query = 'SELECT "solution"."sid", "solution"."uid", "solution"."pid", "solution"."status_id" AS "statusId", "solution"."lang_id" AS "langId", "solution"."code_size" AS "codeSize", "solution"."share", "solution"."run_time" AS "runTime", "solution"."run_memory" AS "runMemory", "solution"."when", "solution"."detail", "solution"."compile_info" AS "compileInfo", "solution"."score", "problem"."title" AS "name", ("solution"."uid" <> $1 AND "problemset"."secret_time" NOTNULL AND NOW()::TIMESTAMPTZ <@ "problemset"."secret_time") AS "secret", ("solution"."uid" <> $2 AND NOW()::TIMESTAMPTZ <@ "problemset"."during") AS "open" FROM "solution" INNER JOIN "problem" ON "solution"."pid" = "problem"."pid" LEFT JOIN "problemset" ON "problem"."psid" = "problemset"."psid" WHERE "sid" = $3'
-    let ret = (await db.query(query, [uid, uid, sid])).rows[0]
+    let query = 'SELECT "solution"."sid", "solution"."uid", "solution"."pid", "solution"."status_id" AS "statusId", "solution"."lang_id" AS "langId", "solution"."code_size" AS "codeSize", "solution"."share", "solution"."run_time" AS "runTime", "solution"."run_memory" AS "runMemory", "solution"."when", "solution"."detail", "solution"."compile_info" AS "compileInfo", "solution"."score", "problem"."title" AS "name", ("solution"."uid" <> $1 AND "problemset"."secret_time" NOTNULL AND NOW()::TIMESTAMPTZ <@ "problemset"."secret_time") AS "secret", ("solution"."uid" <> $1 AND NOW()::TIMESTAMPTZ <@ "problemset"."during") AS "open" FROM "solution" INNER JOIN "problem" ON "solution"."pid" = "problem"."pid" LEFT JOIN "problemset" ON "problem"."psid" = "problemset"."psid" WHERE "sid" = $2'
+    let ret = (await db.query(query, [uid, sid])).rows[0]
     if (!ret) return res.sendStatus(hsc.unauthorized)
-    if (permission === 2 || !ret.open) {
-      let struct = await getSolutionStructure(sid)
-      let fileCode = struct.file.codeBase + languageExtension.idExt[ret.langId]
-      let code = await fs.readFile(fileCode, 'utf8')
-      ret.code = code
-      delete ret.secret
-      delete ret.open
-      return res.status(hsc.ok).json(ret)
+    let struct = await getSolutionStructure(sid)
+    let fileCode = struct.file.codeBase + languageExtension.idExt[ret.langId]
+    let code = await fs.readFile(fileCode, 'utf8')
+    ret.code = code
+    let { secret, before, open } = ret
+    delete ret.secret
+    delete ret.before
+    delete ret.open
+    if (permission === 2) res.status(hsc.ok).json(ret)
+    let blockList = []
+    if (before || !ret.share || open || secret) {
+      blockList.push(['code', 'detail', 'compileInfo', 'codeSize'])
+      if (before || secret) blockList.push(['runTime', 'runMemory', 'score'])
     }
+    for (let key of blockList)
+      ret[key] = null
+    if (secret) ret.statusId = jsc.msgCode.HD
     return res.status(hsc.ok).json(ret)
   }
 )
@@ -41,7 +49,7 @@ router.get('/id/:sid(\\d+)/status', lc,
     let query = 'SELECT "solution"."status_id" AS "statusId", ("solution"."uid" <> $1 AND "problemset"."secret_time" NOTNULL AND NOW()::TIMESTAMPTZ <@ "problemset"."secret_time") AS "hide" FROM "solution" INNER JOIN "problem" ON "solution"."pid" = "problem"."pid" LEFT JOIN "problemset" ON "problem"."psid" = "problemset"."psid" WHERE "sid" = $2'
     let ret = (await db.query(query, [req.tokenAcc.uid, req.params.sid])).rows[0]
     if (!ret) return res.sendStatus(hsc.unauthorized)
-    let status = (ret.hide || req.tokenAcc.permission === 2 ? jsc.msgCode.HD : ret.statusId)
+    let status = (ret.hide && req.tokenAcc.permission !== 2 ? jsc.msgCode.HD : ret.statusId)
     return res.status(hsc.ok).json(status)
   }
 )
