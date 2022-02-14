@@ -25,7 +25,7 @@ const getCount = (psid) => {
   }
 }
 
-const getList = (psid) => {
+const getList = (psid, order = '"problem"."title"') => {
   psid = parseInt(psid)
   return async (req, res) => {
     let { page, item } = req.query
@@ -38,7 +38,7 @@ const getList = (psid) => {
     if (psid > 0) query += ` WHERE "problem"."psid" = $${param.push(psid)}`
     else if (psid === 0) { /* all */ }
     else query += ' WHERE "problem"."psid" ISNULL'
-    query += ` AND ("solution"."uid" = $${param.push(uid)} OR "solution"."uid" ISNULL) GROUP BY "problem"."pid", "problem"."title" ORDER BY "problem"."title" ASC`
+    query += ` AND ("solution"."uid" = $${param.push(uid)} OR "solution"."uid" ISNULL) GROUP BY "problem"."pid", "problem"."title" ORDER BY ${order} ASC`
     if (limit > 0) {
       query += ` LIMIT $${param.push(limit)}`
       if (offset >= 0) query += ` OFFSET $${param.push(offset)}`
@@ -78,7 +78,7 @@ router.get('/problemset(s)?/:id(\\d+)/total', lc,
     return getCount(req.params.id)(req, res)
   })
 
-router.get('/global', lc, getList(undefined))
+router.get('/global', lc, getList(-1, '"problem"."pid"'))
 router.get('/contest(s)?/:id(\\d+)', lc,
   async (req, res, next) => {
     return (mc['problemset'](req.tokenAcc.uid, req.params.id)(req, res, next))
