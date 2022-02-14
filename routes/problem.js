@@ -102,34 +102,38 @@ router.get('/problemset(s)?/:id(\\d+)', lc,
   })
 
 router.get('/id/:pid(\\d+)', lc,
-  async (req, res, next) => {
+  async (req, res) => {
     let pid = req.params.pid
     let uid = req.tokenAcc.uid
     let query = 'SELECT "problem"."pid", "problem"."psid", "problem"."title" AS "name", "problem"."extra", "problem"."submit_ac" AS "submitAc", "problem"."submit_all" AS "submitAll", "problem"."special_judge" AS "specialJudge", "problem"."detail_judge" AS "detailJudge", "problem"."cases", "problem"."time_limit" AS "timeLimit", "problem"."memory_limit" AS "memoryLimit", "problem"."owner_id" AS "ownerId", MAX("solution"."score") AS "score" FROM "problem" LEFT JOIN "solution" ON "problem"."pid" = "solution"."pid" WHERE "problem"."pid" = $1 AND ("solution"."uid" = $2 OR "solution"."uid" ISNULL) GROUP BY "problem"."pid", "problem"."psid", "problem"."title", "problem"."extra", "problem"."submit_ac", "problem"."submit_all", "problem"."special_judge", "problem"."cases", "problem"."time_limit", "problem"."memory_limit", "problem"."owner_id"'
     let ret = (await db.query(query, [pid, uid])).rows[0]
     if (!ret) return res.sendStatus(hsc.unauthorized)
-    let score = parseInt(ret.score)
+    let score = parseInt(ret.score), psid = ret.psid
     delete ret.score
     if (score >= 100) ret.status = 2 // 已通过
     else if (score >= 0) ret.status = 1 // 已提交
     else ret.status = 0 // 未提交
-    ret.psid = parseInt(ret.psid)
-    req.ret = ret
-    return next()
-  },
-  async (req, res, next) => {
-    if (req.ret.psid > 0) return (mc['problemset'](req.tokenAcc.uid, req.ret.psid)(req, res, next))
-    return next()
-  },
-  async (req, res) => {
     try {
-      let problem = getProblemStructure(req.params.pid).file.md
-      req.ret.content = await fs.readFile(problem)
+      let problem = getProblemStructure(pid).file.md
+      ret.content = await fs.readFile(problem)
     } catch (err) {
       console.error(err)
       return res.sendStatus(hsc.unauthorized)
     }
-    return res.status(hsc.ok).json(req.ret)
+    query = 'SELECT * FROM "problem_maintainer" WHERE "pid" = $1 AND "uid" = $2'
+    let check = (await db.query(query, [pid, uid])).rows[0]
+    if (check || req.tokenAcc.permission === 2) return res.status(hsc.ok).json(ret)
+    let inset = false, before = false
+    if (psid) {
+      query = 'SELECT * FROM "problemset_user" WHERE "psid" = $1 AND "uid" = $2'
+      check = (await db.query(query, [psid, uid])).rows[0]
+      if (check) inset = true
+    } else inset = true
+    if (!inset) return res.sendStatus(hsc.forbidden)
+    query = 'SELECT (NOW()::TIMESTAMPTZ < LOWER("problemset"."during")) AS "before" FROM "problemset" WHERE "psid" = $1'
+    before = (await db.query(query, [psid])).rows[0].before
+    if (before) return res.sendStatus(hsc.forbidden)
+    return res.status(hsc.ok).json(ret)
   }
 )
 
