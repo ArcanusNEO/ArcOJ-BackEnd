@@ -34,8 +34,8 @@ router.post('/', lc,
       let codeSize = Buffer.byteLength(code, 'utf8')
       sqlStr = 'INSERT INTO "solution" ("uid", "pid", "status_id", "lang_id", "code_size", "share", "run_time", "run_memory", "when", "score") VALUES ($1, $2, $3, $4, $5, $6, $7, $8, NOW()::TIMESTAMPTZ, $9) RETURNING sid'
       ret = (await db.query(sqlStr, [uid, pid, jsc.msgCode.RU, langId, codeSize, share, 0, 0, 0])).rows[0]
-      let sid = ret['sid']
-      if (sid) res.status(hsc.ok).json({ sid })
+      let sid = parseInt(ret['sid'])
+      if (sid) res.status(hsc.ok).json(sid)
       else throw Error('Failed to get solution id')
       return judge({ sid, uid, pid, psid, langId, langExt, lang, code, codeSize, cases, specialJudge, detailJudge, timeLimit, memoryLimit })
     } catch (err) {

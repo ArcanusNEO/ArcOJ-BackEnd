@@ -37,17 +37,12 @@ router.get('/id/:sid(\\d+)/status', lc,
   }
 )
 
-router.get('/total', lc,
-  async (req, res, next) => {
-    return pc(req.tokenAcc.uid, ['getJudgeInfo'])(req, res, next)
-  },
-  async (req, res) => {
-    let query = 'SELECT COUNT(*) FROM "solution" WHERE "uid" = $1'
-    let ret = (await db.query(query, [req.tokenAcc.uid])).rows[0]
-    let total = parseInt(ret.count)
-    return res.status(hsc.ok).json(total)
-  }
-)
+router.get('/total', lc, async (req, res) => {
+  let query = 'SELECT COUNT(*) FROM "solution" WHERE "uid" = $1'
+  let ret = (await db.query(query, [req.tokenAcc.uid])).rows[0]
+  let total = parseInt(ret.count)
+  return res.status(hsc.ok).json(total)
+})
 
 router.get('/', lc,
   async (req, res, next) => {
