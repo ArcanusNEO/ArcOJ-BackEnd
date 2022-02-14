@@ -4,6 +4,7 @@ let hsc = require('../config/http-status-code')
 let db = require('../utils/database')
 let lc = require('./midwares/login-check')
 let pc = require('./midwares/permission-check')
+let jsc = require('../config/judge-status-code')
 
 router.get('/id/:sid(\\d+)', lc,
   async (req, res, next) => {
@@ -30,7 +31,7 @@ router.get('/id/:sid(\\d+)/status', lc,
     return res.sendStatus(hsc.badReq)
   },
   async (req, res) => {
-    let query = 'SELECT "status_id" FROM "solution" WHERE "sid" = $1 AND "uid" = $2'
+    let query = 'SELECT "status_id" FROM "solution" WHERE "sid" = $1'
     let ret = (await db.query(query, [req.params.sid])).rows[0]
     if (!ret) return res.sendStatus(hsc.unauthorized)
     return res.status(hsc.ok).json(ret['status_id'])
@@ -38,7 +39,7 @@ router.get('/id/:sid(\\d+)/status', lc,
 )
 
 router.get('/total', lc, async (req, res) => {
-  let query = 'SELECT COUNT(*) FROM "solution" WHERE "uid" = $1'
+  let query = 'SELECT COUNT(*) FROM "solution"'
   let ret = (await db.query(query, [req.tokenAcc.uid])).rows[0]
   let total = parseInt(ret.count)
   return res.status(hsc.ok).json(total)
@@ -49,7 +50,7 @@ router.get('/', lc,
     return pc(req.tokenAcc.uid, ['getJudgeInfo'])(req, res, next)
   },
   async (req, res) => {
-    let query = 'SELECT "solution"."sid", "problem"."pid", "solution"."status_id" AS "statusId", "problem"."title" AS "name" FROM "solution" INNER JOIN "problem" ON "solution"."pid" = "problem"."pid" WHERE "uid" = $1 ORDER BY "sid" DESC'
+    let query = 'SELECT "solution"."sid", "problem"."pid", "solution"."status_id" AS "statusId", "problem"."title" AS "name", ("solution"."uid" <> $1 AND NOW()::TIMESTAMPTZ <@ "problemset"."secret_time") AS "hide" FROM "solution" INNER JOIN "problem" ON "solution"."pid" = "problem"."pid" LEFT JOIN "problemset" ON "problem"."psid" = "problemset"."psid" ORDER BY "sid" DESC'
     let param = [req.tokenAcc.uid]
     let page = parseInt(req.query.page), item = parseInt(req.query.item)
     let limit = item, offset = (page - 1) * item
@@ -58,6 +59,10 @@ router.get('/', lc,
       if (offset >= 0) query += ` OFFSET $${param.push(offset)}`
     }
     let ret = (await db.query(query, param)).rows
+    for (let each of ret) {
+      if (each.hide && req.tokenAcc.permission !== 2) each.statusId = jsc.msgCode.HD
+      delete each.hide
+    }
     return res.status(hsc.ok).json(ret)
   }
 )

@@ -11,7 +11,8 @@ let msgCode = {
   "FL": 109,  //函数调用不合法
   "DM": 110,  //多组数据
   "SE": 118,  //未知错误
-  "CI": 120   //正在编译
+  "CI": 120,  //正在编译
+  "HD": 121   //隐藏
 }
 let codeMsg = {
   100: "RU",
@@ -26,6 +27,7 @@ let codeMsg = {
   109: "FL",
   110: "DM",
   118: "SE",
-  120: "CI"
+  120: "CI",
+  121: "HD"
 }
 module.exports = { msgCode, codeMsg }
