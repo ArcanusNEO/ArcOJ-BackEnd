@@ -52,7 +52,7 @@ const email = (req, pos, item) => {
     if (req[pos][item].indexOf('@') === -1) req[pos][item] += '@mail.nankai.edu.cn'
     req[pos][item] = req[pos][item].toLowerCase()
     if (!/^[0-9a-z_-]+@[0-9a-z_-]+(\.[0-9a-z_-]+)+$/igs.test(req[pos][item])
-      || !/@(mail\.)?nankai\.edu\.cn$/igs.test(req[pos][item])) throw Error('Invalid email address')
+      || !/@(.+\.)?nankai\.edu\.cn$/igs.test(req[pos][item])) throw Error('Invalid email address')
   } catch (err) {
     console.error(err)
     return false
