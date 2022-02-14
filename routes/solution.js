@@ -34,7 +34,7 @@ router.get('/id/:sid(\\d+)/status', lc,
     let query = 'SELECT "solution"."status_id" AS "statusId", ("solution"."uid" <> $1 AND "problemset"."secret_time" NOTNULL AND NOW()::TIMESTAMPTZ <@ "problemset"."secret_time") AS "hide" FROM "solution" INNER JOIN "problem" ON "solution"."pid" = "problem"."pid" LEFT JOIN "problemset" ON "problem"."psid" = "problemset"."psid" WHERE "sid" = $2'
     let ret = (await db.query(query, [req.tokenAcc.uid, req.params.sid])).rows[0]
     if (!ret) return res.sendStatus(hsc.unauthorized)
-    let status = (ret.hide ? jsc.msgCode.HD : ret.statusId)
+    let status = (ret.hide || req.tokenAcc.permission === 2 ? jsc.msgCode.HD : ret.statusId)
     return res.status(hsc.ok).json(status)
   }
 )
