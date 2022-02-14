@@ -31,16 +31,17 @@ router.get('/id/:sid(\\d+)/status', lc,
     return res.sendStatus(hsc.badReq)
   },
   async (req, res) => {
-    let query = 'SELECT "status_id" FROM "solution" WHERE "sid" = $1'
-    let ret = (await db.query(query, [req.params.sid])).rows[0]
+    let query = 'SELECT "solution"."status_id" AS "statusId", ("solution"."uid" <> $1 AND "problemset"."secret_time" NOTNULL AND NOW()::TIMESTAMPTZ <@ "problemset"."secret_time") AS "hide" FROM "solution" INNER JOIN "problem" ON "solution"."pid" = "problem"."pid" LEFT JOIN "problemset" ON "problem"."psid" = "problemset"."psid" WHERE "sid" = $2'
+    let ret = (await db.query(query, [req.tokenAcc.uid, req.params.sid])).rows[0]
     if (!ret) return res.sendStatus(hsc.unauthorized)
-    return res.status(hsc.ok).json(ret['status_id'])
+    let status = (ret.hide ? jsc.msgCode.HD : ret.statusId)
+    return res.status(hsc.ok).json(status)
   }
 )
 
 router.get('/total', lc, async (req, res) => {
   let query = 'SELECT COUNT(*) FROM "solution"'
-  let ret = (await db.query(query, [req.tokenAcc.uid])).rows[0]
+  let ret = (await db.query(query)).rows[0]
   let total = parseInt(ret.count)
   return res.status(hsc.ok).json(total)
 })
@@ -50,7 +51,7 @@ router.get('/', lc,
     return pc(req.tokenAcc.uid, ['getJudgeInfo'])(req, res, next)
   },
   async (req, res) => {
-    let query = 'SELECT "solution"."sid", "problem"."pid", "solution"."status_id" AS "statusId", "problem"."title" AS "name", ("solution"."uid" <> $1 AND NOW()::TIMESTAMPTZ <@ "problemset"."secret_time") AS "hide" FROM "solution" INNER JOIN "problem" ON "solution"."pid" = "problem"."pid" LEFT JOIN "problemset" ON "problem"."psid" = "problemset"."psid" ORDER BY "sid" DESC'
+    let query = 'SELECT "solution"."sid", "problem"."pid", "solution"."status_id" AS "statusId", "problem"."title" AS "name", ("solution"."uid" <> $1 AND "problemset"."secret_time" NOTNULL AND NOW()::TIMESTAMPTZ <@ "problemset"."secret_time") AS "hide" FROM "solution" INNER JOIN "problem" ON "solution"."pid" = "problem"."pid" LEFT JOIN "problemset" ON "problem"."psid" = "problemset"."psid" ORDER BY "sid" DESC'
     let param = [req.tokenAcc.uid]
     let page = parseInt(req.query.page), item = parseInt(req.query.item)
     let limit = item, offset = (page - 1) * item
