@@ -5,6 +5,9 @@ let db = require('../utils/database')
 let lc = require('./midwares/login-check')
 let pc = require('./midwares/permission-check')
 let jsc = require('../config/judge-status-code')
+let { getSolutionStructure } = require('../utils/judge')
+let languageExtension = require('../config/lang-ext')
+let fs = require('fs-extra')
 
 router.get('/id/:sid(\\d+)', lc,
   async (req, res, next) => {
@@ -12,15 +15,19 @@ router.get('/id/:sid(\\d+)', lc,
     return res.sendStatus(hsc.badReq)
   },
   async (req, res) => {
-    let uid = req.tokenAcc.uid
-    let query = 'SELECT "solution"."sid", "solution"."uid", "solution"."pid", "solution"."status_id" AS "statusId", "solution"."lang_id" AS "langId", "solution"."code_size" AS "codeSize", "solution"."share", "solution"."run_time" AS "runTime", "solution"."run_memory" AS "runMemory", "solution"."when", "solution"."detail", "solution"."compile_info" AS "compileInfo", "solution"."score", "problem"."title" AS "name" FROM "solution" INNER JOIN "problem" ON "solution"."pid" = "problem"."pid" WHERE "solution"."sid" = $1 AND "solution"."uid" = $2'
-    let ret = (await db.query(query, [req.params.sid])).rows[0]
+    let uid = req.tokenAcc.uid, sid = req.params.sid, permission = req.tokenAcc.permission
+    let query = 'SELECT "solution"."sid", "solution"."uid", "solution"."pid", "solution"."status_id" AS "statusId", "solution"."lang_id" AS "langId", "solution"."code_size" AS "codeSize", "solution"."share", "solution"."run_time" AS "runTime", "solution"."run_memory" AS "runMemory", "solution"."when", "solution"."detail", "solution"."compile_info" AS "compileInfo", "solution"."score", "problem"."title" AS "name", ("solution"."uid" <> $1 AND "problemset"."secret_time" NOTNULL AND NOW()::TIMESTAMPTZ <@ "problemset"."secret_time") AS "secret", ("solution"."uid" <> $2 AND NOW()::TIMESTAMPTZ <@ "problemset"."during") AS "open" FROM "solution" INNER JOIN "problem" ON "solution"."pid" = "problem"."pid" LEFT JOIN "problemset" ON "problem"."psid" = "problemset"."psid" WHERE "sid" = $3'
+    let ret = (await db.query(query, [uid, uid, sid])).rows[0]
     if (!ret) return res.sendStatus(hsc.unauthorized)
-    let pid = ret.pid
-    query = `SELECT "problem"."pid" FROM "problem" INNER JOIN "problemset" ON "problem"."psid" = "problemset"."psid" INNER JOIN "problemset_user" ON "problemset"."psid" = "problemset_user"."psid" WHERE "problem"."pid" = $1 AND "problemset_user"."uid" = $2 AND "problemset"."type" = 'contest' AND NOW()::TIMESTAMPTZ <@ "problemset"."during"`
-    let sqlRet = (await db.query(query, [pid, uid])).rows[0]
-    if (sqlRet) ret.score = null
-    // 注意！这里虽然没有用到member-check，却检查了problemset_user
+    if (permission === 2 || !ret.open) {
+      let struct = await getSolutionStructure(sid)
+      let fileCode = struct.file.codeBase + languageExtension.idExt[ret.langId]
+      let code = await fs.readFile(fileCode, 'utf8')
+      ret.code = code
+      delete ret.secret
+      delete ret.open
+      return res.status(hsc.ok).json(ret)
+    }
     return res.status(hsc.ok).json(ret)
   }
 )

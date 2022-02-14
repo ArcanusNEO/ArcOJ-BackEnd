@@ -5,7 +5,7 @@ let lc = require('./midwares/login-check')
 let db = require('../utils/database')
 let mc = require('./midwares/member-check')
 let { getProblemStructure } = require('../utils/judge')
-const fs = require('fs-extra')
+let fs = require('fs-extra')
 
 const getCount = (psid) => {
   psid = parseInt(psid)
@@ -54,7 +54,7 @@ const getList = (psid, order = '"problem"."title"') => {
     return res.status(hsc.ok).json(ret)
   }
 }
-// 懒的查getJudgeInfo权限了，出问题再改
+
 router.get('/global/total', lc, getCount(undefined))
 router.get('/contest(s)?/:id(\\d+)/total', lc,
   async (req, res, next) => {
@@ -105,7 +105,7 @@ router.get('/id/:pid(\\d+)', lc,
   async (req, res, next) => {
     let pid = req.params.pid
     let uid = req.tokenAcc.uid
-    let query = 'SELECT "problem"."pid", "problem"."psid", "problem"."title" AS "name", "problem"."extra", "problem"."submit_ac" AS "submitAc", "problem"."submit_all" AS "submitAll", "problem"."special_judge" AS "specialJudge", "problem"."detail_judge" AS "detailJudge", "problem"."cases", "problem"."time_limit" AS "timeLimit", "problem"."memory_limit" AS "memoryLimit", "problem"."owner_id" AS "ownerId", MAX("solution"."score") AS "score" FROM "problem" LEFT JOIN "solution" ON "problem"."pid" = "solution"."pid" WHERE "problem"."pid" = $1 AND ("solution"."uid" = $2 OR "solution"."uid" ISNULL) GROUP BY "problem"."pid", "problem"."psid", "problem"."title", "problem"."extra", "problem"."submit_ac", "problem"."submit_all", "problem"."special_judge", "problem"."cases", "problem"."time_limit", "problem"."memory_limit", "problem"."owner_id" LIMIT 1'
+    let query = 'SELECT "problem"."pid", "problem"."psid", "problem"."title" AS "name", "problem"."extra", "problem"."submit_ac" AS "submitAc", "problem"."submit_all" AS "submitAll", "problem"."special_judge" AS "specialJudge", "problem"."detail_judge" AS "detailJudge", "problem"."cases", "problem"."time_limit" AS "timeLimit", "problem"."memory_limit" AS "memoryLimit", "problem"."owner_id" AS "ownerId", MAX("solution"."score") AS "score" FROM "problem" LEFT JOIN "solution" ON "problem"."pid" = "solution"."pid" WHERE "problem"."pid" = $1 AND ("solution"."uid" = $2 OR "solution"."uid" ISNULL) GROUP BY "problem"."pid", "problem"."psid", "problem"."title", "problem"."extra", "problem"."submit_ac", "problem"."submit_all", "problem"."special_judge", "problem"."cases", "problem"."time_limit", "problem"."memory_limit", "problem"."owner_id"'
     let ret = (await db.query(query, [pid, uid])).rows[0]
     if (!ret) return res.sendStatus(hsc.unauthorized)
     let score = parseInt(ret.score)

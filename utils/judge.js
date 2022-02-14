@@ -21,15 +21,15 @@ const getSolutionStructure = async (sid) => {
     path: {
       solution: pathSolution,
       temp: pathTemp,
-      exec_out: pathExecOut
+      execOut: pathExecOut
     },
     file: {
       result: fileResult,
       time: fileTime,
       memory: fileMemory,
       detail: fileDetail,
-      compile_info: fileCompileInfo,
-      code_base: fileCodeBase
+      compileInfo: fileCompileInfo,
+      codeBase: fileCodeBase
     }
   }
 }
@@ -66,7 +66,7 @@ const genConfig = (params) => {
 
 const judge = async (params) => {
   let { sid, pid, langExt, lang, code, cases, specialJudge, detailJudge, timeLimit, memoryLimit } = params
-  let struct = getSolutionStructure(sid)
+  let struct = await getSolutionStructure(sid)
   let filename = `main.${langExt}`
   let config = genConfig({ sid, filename, lang, pid, timeLimit, memoryLimit, detailJudge, cases, specialJudge })
   await fs.writeFile(`${struct.path.solution}/main.${langExt}`, code)
@@ -114,6 +114,6 @@ module.exports = {
   getProblemStructure,
   judge,
   async unlinkTempFolder(sid) {
-    await fs.unlink(getSolutionStructure(sid).path.temp + '/main')
+    await fs.unlink((await getSolutionStructure(sid)).path.temp + '/main')
   }
 }
