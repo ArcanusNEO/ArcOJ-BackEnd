@@ -210,7 +210,7 @@ DROP FUNCTION IF EXISTS "public"."ac_counter"();
 CREATE OR REPLACE FUNCTION "public"."ac_counter"() RETURNS "pg_catalog"."trigger" AS $BODY$ BEGIN IF NEW.score >= 100
   AND OLD.score < 100 THEN
 UPDATE problem
-SET "submmit_ac" = "submit_ac" + 1
+SET "submit_ac" = "submit_ac" + 1
 WHERE pid = NEW.pid;
 END IF;
 IF NEW.score < 100
