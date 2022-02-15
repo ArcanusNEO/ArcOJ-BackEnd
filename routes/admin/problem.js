@@ -240,8 +240,8 @@ router.get('/id/:pid(\\d+)', lc,
 )
 
 router.use(fileUpload({
-  // abortOnLimit: true,
-  // limits: { fileSize: 16 * 1024 * 1024 }, // 16M
+  abortOnLimit: true,
+  limits: { fileSize: 10 * 1024 }, // 10K
   useTempFiles: true,
   tempFileDir: '/tmp/'
 }))
