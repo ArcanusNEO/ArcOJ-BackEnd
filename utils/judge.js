@@ -98,7 +98,7 @@ const judge = async (params) => {
     // 这里不需要更新submit_ac，UPDATE solution会触发触发器自动判断score更新
   } catch (err) {
     console.error(err)
-    let sqlStr = 'UPDATE "solution" SET "status_id" = $1 WHERE "sid" = $7'
+    let sqlStr = 'UPDATE "solution" SET "status_id" = $1 WHERE "sid" = $2'
     try {
       await db.query(sqlStr, [jsc.msgCode.CE, sid])
     } catch (e) {

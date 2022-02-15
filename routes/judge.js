@@ -19,7 +19,7 @@ router.post('/', lc,
     let ret = (await db.query(sqlStr, [pid])).rows[0]
     if (!ret) return res.sendStatus(hsc.unauthorized)
     let { psid, cases } = ret
-    let specialJudge = ret['special_judge'], detailJudge = ret['detail_judge'], timeLimit = ret['time_limit'], memoryLimit = ret['memory_limit']
+    let specialJudge = ret['special_judge'], detailJudge = ret['detail_judge'], timeLimit = ret['time_limit'], memoryLimit = parseInt(ret['memory_limit'])
     if (psid) {
       // 属于某个问题集，检查权限
       sqlStr = 'SELECT "during" FROM "problemset" INNER JOIN "problemset_user" ON "problemset"."psid" = "problemset_user"."psid" WHERE "problemset"."psid" = $1 AND NOW()::TIMESTAMPTZ <@ "problemset"."during" AND "problemset_user"."uid" = $2 LIMIT 1'
