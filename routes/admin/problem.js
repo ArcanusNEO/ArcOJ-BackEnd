@@ -220,8 +220,9 @@ router.get('/total', lc, async (req, res) => {
 router.get('/id/:pid(\\d+)', lc,
   async (req, res, next) => {
     let pid = parseInt(req.params.pid)
-    if (pid > 0) return mtc.problem(req.tokenAcc.uid, pid)(req, res, next)
-    return res.sendStatus(hsc.badReq)
+    if (!(pid > 0)) return res.sendStatus(hsc.badReq)
+    if (req.tokenAcc.permission < 1) return res.sendStatus(hsc.forbidden)
+    return next()
   },
   async (req, res, next) => {
     let pid = parseInt(req.params.pid)

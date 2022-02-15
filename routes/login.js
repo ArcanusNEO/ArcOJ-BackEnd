@@ -23,7 +23,7 @@ router.post('/', fc(['body'], ['username', 'password'], hsc.parseErr, { ok: fals
     if (!dbRes.rows[0]) return res.status(hsc.passwdMismatch).json({ ok: false })
     let uid = dbRes.rows[0]['uid'], nickname = dbRes.rows[0]['nickname'], permission = dbRes.rows[0]['gid']
     //权限映射
-    let permMap = [-1, 2, 1, 0]
+    let permMap = [-1, 2, 1, 0, 0]
     permission = permMap[permission]
     let account = {
       uid: uid,

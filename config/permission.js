@@ -1,7 +1,7 @@
 module.exports = {
   'master': 1,
   'editGroup': 2,
-  'getJudgeCode': 3,                       // 未实现
+  'getJudgeCode': 3,                // 未实现
   'changeProfile': 4,
   'submitCode': 5,
   'editGlobalProblem': 6,
