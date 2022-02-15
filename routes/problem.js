@@ -46,7 +46,7 @@ const getList = (psid, order = '"problem"."title"') => {
     let ret = (await db.query(query, param)).rows
     for (let each of ret) {
       query = 'SELECT MAX("score") AS "score" FROM "solution" WHERE "pid" = $1 AND "uid" = $2'
-      let { score } = (await db.query(query, [each.pid, uid]))
+      let { score } = (await db.query(query, [each.pid, uid])).rows[0]
       score = parseInt(score)
       if (score >= 100) each.status = 2 // 已通过
       else if (score >= 0) each.status = 1 // 已提交
