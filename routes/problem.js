@@ -105,11 +105,13 @@ router.get('/id/:pid(\\d+)', lc,
   async (req, res) => {
     let pid = req.params.pid
     let uid = req.tokenAcc.uid
-    let query = 'SELECT "problem"."pid", "problem"."psid", "problem"."title" AS "name", "problem"."extra", "problem"."submit_ac" AS "submitAc", "problem"."submit_all" AS "submitAll", "problem"."special_judge" AS "specialJudge", "problem"."detail_judge" AS "detailJudge", "problem"."cases", "problem"."time_limit" AS "timeLimit", "problem"."memory_limit" AS "memoryLimit", "problem"."owner_id" AS "ownerId", MAX("solution"."score") AS "score" FROM "problem" LEFT JOIN "solution" ON "problem"."pid" = "solution"."pid" WHERE "problem"."pid" = $1 AND ("solution"."uid" = $2 OR "solution"."uid" ISNULL) GROUP BY "problem"."pid", "problem"."psid", "problem"."title", "problem"."extra", "problem"."submit_ac", "problem"."submit_all", "problem"."special_judge", "problem"."cases", "problem"."time_limit", "problem"."memory_limit", "problem"."owner_id"'
-    let ret = (await db.query(query, [pid, uid])).rows[0]
+    let query = 'SELECT "problem"."pid", "problem"."psid", "problem"."title" AS "name", "problem"."extra", "problem"."submit_ac" AS "submitAc", "problem"."submit_all" AS "submitAll", "problem"."special_judge" AS "specialJudge", "problem"."detail_judge" AS "detailJudge", "problem"."cases", "problem"."time_limit" AS "timeLimit", "problem"."memory_limit" AS "memoryLimit", "problem"."owner_id" AS "ownerId" FROM "problem" WHERE "problem"."pid" = $1'
+    let ret = (await db.query(query, [pid])).rows[0]
     if (!ret) return res.sendStatus(hsc.unauthorized)
-    let score = parseInt(ret.score), psid = ret.psid
-    delete ret.score
+    query = 'SELECT MAX("score") FROM "solution" WHERE "pid" = 1 AND "uid" = 2'
+    let { score } = (await db.query(query, [pid, uid])).rows[0]
+    score = parseInt(score)
+    let psid = ret.psid
     if (score >= 100) ret.status = 2 // 已通过
     else if (score >= 0) ret.status = 1 // 已提交
     else ret.status = 0 // 未提交
