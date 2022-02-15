@@ -60,7 +60,7 @@ router.get('/total', lc, async (req, res) => {
   let param = []
   if (queryUid > 0) query += ` AND "solution"."uid" = $${param.push(queryUid)}`
   if (queryPid > 0) query += ` AND "solution"."pid" = $${param.push(queryPid)}`
-  let ret = (await db.query(query)).rows[0]
+  let ret = (await db.query(query, param)).rows[0]
   let total = parseInt(ret.count)
   return res.status(hsc.ok).json(total)
 })
