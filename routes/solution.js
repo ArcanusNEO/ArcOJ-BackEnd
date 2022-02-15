@@ -66,7 +66,7 @@ router.get('/', lc,
     return pc(req.tokenAcc.uid, ['getJudgeInfo'])(req, res, next)
   },
   async (req, res) => {
-    let query = 'SELECT "solution"."sid", "problem"."pid", "solution"."status_id" AS "statusId", "problem"."title" AS "name", ("solution"."uid" <> $1 AND "problemset"."secret_time" NOTNULL AND NOW()::TIMESTAMPTZ <@ "problemset"."secret_time") AS "hide" FROM "solution" INNER JOIN "problem" ON "solution"."pid" = "problem"."pid" LEFT JOIN "problemset" ON "problem"."psid" = "problemset"."psid" ORDER BY "sid" DESC'
+    let query = 'SELECT "solution"."sid", "solution"."uid", "problem"."pid", "solution"."status_id" AS "statusId", "problem"."title" AS "name", ("solution"."uid" <> $1 AND "problemset"."secret_time" NOTNULL AND NOW()::TIMESTAMPTZ <@ "problemset"."secret_time") AS "hide" FROM "solution" INNER JOIN "problem" ON "solution"."pid" = "problem"."pid" LEFT JOIN "problemset" ON "problem"."psid" = "problemset"."psid" ORDER BY "sid" DESC'
     let param = [req.tokenAcc.uid]
     let page = parseInt(req.query.page), item = parseInt(req.query.item)
     let limit = item, offset = (page - 1) * item
