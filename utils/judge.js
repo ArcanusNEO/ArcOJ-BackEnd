@@ -75,8 +75,10 @@ const judge = async (params) => {
     await spawn('docker', ['exec', '-i', 'judgecore', './judgecore', `${struct.path.solution}/exec.config`])
     let json = JSON.parse(await fs.readFile(`${struct.path.execOut}/result.json`, { encoding: 'utf8' }))
 
+    console.log(json)
     let statusMap = [jsc.msgCode.AC, jsc.msgCode.PE, jsc.msgCode.WA, jsc.msgCode.CE, jsc.msgCode.RE, jsc.msgCode.MLE, jsc.msgCode.TLE, jsc.msgCode.OLE, jsc.msgCode.FL, jsc.msgCode.SE]
     let result = statusMap[json.status]
+    console.log(result)
 
     let time = json.time
     let memory = json.memory
