@@ -33,20 +33,21 @@ const getList = (psid, order = '"problem"."title"') => {
     item = parseInt(item)
     let uid = req.tokenAcc.uid
     let limit = item, offset = (page - 1) * item
-    let query = 'SELECT "problem"."pid", "problem"."title" AS "name", MAX("solution"."score") AS "score" FROM "problem" LEFT JOIN "solution" ON "problem"."pid" = "solution"."pid"'
+    let query = 'SELECT "problem"."pid", "problem"."title" AS "name" FROM "problem"'
     let param = []
     if (psid > 0) query += ` WHERE "problem"."psid" = $${param.push(psid)}`
     else if (psid === 0) { /* all */ }
     else query += ' WHERE "problem"."psid" ISNULL'
-    query += ` AND ("solution"."uid" = $${param.push(uid)} OR "solution"."uid" ISNULL) GROUP BY "problem"."pid", "problem"."title" ORDER BY ${order} ASC`
+    query += ` ORDER BY ${order} ASC`
     if (limit > 0) {
       query += ` LIMIT $${param.push(limit)}`
       if (offset >= 0) query += ` OFFSET $${param.push(offset)}`
     }
     let ret = (await db.query(query, param)).rows
     for (let each of ret) {
-      let score = parseInt(each.score)
-      delete each.score
+      query = 'SELECT MAX("score") AS "score" FROM "solution" WHERE "pid" = $1 AND "uid" = $2'
+      let { score } = (await db.query(query, [ret.pid, uid]))
+      score = parseInt(score)
       if (score >= 100) each.status = 2 // 已通过
       else if (score >= 0) each.status = 1 // 已提交
       else each.status = 0 // 未提交
