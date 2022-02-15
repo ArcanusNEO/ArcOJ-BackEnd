@@ -240,8 +240,8 @@ router.get('/id/:pid(\\d+)', lc,
 )
 
 router.use(fileUpload({
-  abortOnLimit: true,
-  limits: { fileSize: 512 * 1024 * 1024 }, // 512M
+  // abortOnLimit: true,
+  // limits: { fileSize: 512 * 1024 * 1024 }, // 512M 已经在nginx拦下就行了
   useTempFiles: true,
   tempFileDir: '/tmp/'
 }))
