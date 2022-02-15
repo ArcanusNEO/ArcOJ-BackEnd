@@ -221,7 +221,7 @@ router.get('/id/:pid(\\d+)', lc,
   async (req, res, next) => {
     let pid = parseInt(req.params.pid)
     if (!(pid > 0)) return res.sendStatus(hsc.badReq)
-    if (req.tokenAcc.permission < 1) return res.sendStatus(hsc.forbidden)
+    if (!(req.tokenAcc.permission >= 1)) return res.sendStatus(hsc.forbidden)
     return next()
   },
   async (req, res, next) => {
