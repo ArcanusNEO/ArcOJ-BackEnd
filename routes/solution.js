@@ -55,7 +55,11 @@ router.get('/id/:sid(\\d+)/status', lc,
 )
 
 router.get('/total', lc, async (req, res) => {
-  let query = 'SELECT COUNT(*) FROM "solution"'
+  let query = 'SELECT COUNT(*) FROM "solution" WHERE TRUE'
+  let queryUid = parseInt(req.query.uid), queryPid = parseInt(req.query.pid)
+  let param = []
+  if (queryUid > 0) query += ` AND "solution"."uid" = $${param.push(queryUid)}`
+  if (queryPid > 0) query += ` AND "solution"."pid" = $${param.push(queryPid)}`
   let ret = (await db.query(query)).rows[0]
   let total = parseInt(ret.count)
   return res.status(hsc.ok).json(total)
