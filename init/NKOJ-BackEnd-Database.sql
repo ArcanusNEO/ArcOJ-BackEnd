@@ -68,7 +68,8 @@ CREATE TABLE "public"."course" (
   "visiable" bool NOT NULL DEFAULT false,
   "teacher" text COLLATE "pg_catalog"."default",
   "number" text COLLATE "pg_catalog"."default",
-  "semester" text COLLATE "pg_catalog"."default"
+  "semester" text COLLATE "pg_catalog"."default",
+  "passcode" text COLLATE "pg_catalog"."default"
 );
 ALTER TABLE "public"."course" OWNER TO "OJMaster";
 -- ----------------------------
