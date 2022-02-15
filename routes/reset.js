@@ -8,6 +8,7 @@ let md5 = require('../utils/md5')
 let salt = require('../config/salt')
 let lc = require('./midwares/login-check')
 let pc = require('./midwares/permission-check')
+let permMap = require('../config/permission-map')
 
 router.post('/password', fc(['body'], ['username', 'password']), async (req, res) => {
   try {
@@ -20,7 +21,6 @@ router.post('/password', fc(['body'], ['username', 'password']), async (req, res
     if (!sqlRes.rows[0]) throw Error('No such user')
     let uid = sqlRes.rows[0]['uid'], permission = sqlRes.rows[0]['gid'], nickname = sqlRes.rows[0]['nickname']
     //权限映射
-    let permMap = [-1, 2, 1, 0, 0]
     permission = permMap[permission]
     sqlStr = 'UPDATE "user" SET "password" = $1 WHERE "uid" = $2'
     await db.query(sqlStr, [password, uid])
