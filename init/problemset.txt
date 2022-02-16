@@ -1,0 +1,2 @@
+"psid"	"title"	"description"	"type"	"private"	"during"	"secret_time"	"cid"	"owner_id"
+"1"	"摸鱼学导论作业集"	"旨在考察摸鱼水平"	"assignment"	"t"	"[""2222-01-01 12:00:00+08"",""2222-06-01 12:00:00+08"")"		"1"	"1"
