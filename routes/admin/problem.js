@@ -73,7 +73,7 @@ const forkProblem = async (req, res) => {
   let ownerId = req.tokenAcc.uid, psid = req.to.psid
   let params = { psid, title, extra, specialJudge, detailJudge, cases, timeLimit, memoryLimit, ownerId }
   let toPid = await insertProblem(params)
-  if (toPid === 0) res.sendStatus(hsc.internalSrvErr)
+  if (toPid === 0) return res.sendStatus(hsc.internalSrvErr)
   let fromStruct = getProblemStructure(fromPid)
   let toStruct = getProblemStructure(toPid)
   await fs.ensureDir(toStruct.path.data)
@@ -118,7 +118,7 @@ const createProblem = async (req, res) => {
   let psid = req.to.psid, ownerId = req.tokenAcc.uid
   let params = { psid, title, extra, specialJudge, detailJudge, cases, timeLimit, memoryLimit, ownerId }
   let pid = await insertProblem(params)
-  if (pid === 0) res.sendStatus(hsc.internalSrvErr)
+  if (pid === 0) return res.sendStatus(hsc.internalSrvErr)
   let struct = getProblemStructure(pid)
   await fs.ensureDir(struct.path.problem)
   await fs.remove(struct.path.data)

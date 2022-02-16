@@ -13,10 +13,10 @@ router.get('/', lc, (req, res) => {
       nickname: tokenAcc['nickname'],
       permission: tokenAcc['permission']
     }
-    res.status(hsc.ok).json(account)
+    return res.status(hsc.ok).json(account)
   } catch (err) {
     console.error(err)
-    res.sendStatus(hsc.unauthorized)
+    return res.sendStatus(hsc.unauthorized)
   }
 })
 
