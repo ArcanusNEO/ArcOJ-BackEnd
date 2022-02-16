@@ -4,7 +4,6 @@ const hsc = require('../config/http-status-code')
 const lc = require('./midwares/login-check')
 const db = require('../utils/database')
 
-// 出于兼容目的保留
 router.get('/', lc, (req, res) => {
   try {
     let tokenAcc = req.tokenAcc
