@@ -30,8 +30,8 @@ router.get('/id/:sid(\\d+)', lc,
     if (permission === 2) return res.status(hsc.ok).json(ret)
     let blockList = []
     if (before || !ret.share || open || secret) {
-      blockList.push(['code', 'detail', 'compileInfo', 'codeSize'])
-      if (before || secret) blockList.push(['runTime', 'runMemory', 'score'])
+      blockList.push('code', 'detail', 'compileInfo', 'codeSize')
+      if (before || secret) blockList.push('runTime', 'runMemory', 'score')
     }
     for (let key of blockList)
       ret[key] = null
