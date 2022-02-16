@@ -1,9 +1,9 @@
 module.exports = {
-  'master': 1,
+  'master': 1,                      // 最高权限位，一些奇奇怪怪的权限会检查
   'editGroup': 2,
-  'getJudgeCode': 3,                // 未实现
+  'getShareCode': 3,                // 还未实现
   'changeProfile': 4,
-  'submitCode': 5,
+  'submitCode': 5,                  // 评测权限
   'editGlobalProblem': 6,
   'editLocalProblem': 7,
   'editGlobalProblemset': 8,
@@ -17,7 +17,7 @@ module.exports = {
   'getLocalCode': 16,               // 指即便code.share为false并且正在比赛也能随意查看代码
   'getGlobalJudgeInfo': 17,         // 指所有用户的
   'getLocalJudgeInfo': 18,          // 指所有用户的
-  'getJudgeInfo': 19,
+  'getJudgeInfo': 19,               // 指自己的
   'forkGlobalProblem': 20,
   'forkLocalProblem': 21,
   'joinCourse': 22,
@@ -27,7 +27,7 @@ module.exports = {
 //                               Default User   Administrator   Read Only
 // master                        0              0               0
 // editGroup                     0              0               0
-// login                         1              1               1
+// getShareCode                  1              1               0
 // changeProfile                 1              1               0
 // submitCode                    1              1               0
 // editGlobalProblem             0              0               0
