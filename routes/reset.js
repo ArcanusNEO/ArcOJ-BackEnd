@@ -67,6 +67,7 @@ router.post('/profile', lc,
     if (req.items.indexOf('nickname') !== -1) {
       let account = req.tokenAcc
       account.nickname = ret.nickname
+      tokenUtils.remove(res, 'acc')
       tokenUtils.write(res, 'acc', account)
     }
     return res.status(hsc.ok).json(ret)
