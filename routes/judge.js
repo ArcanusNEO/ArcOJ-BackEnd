@@ -24,7 +24,7 @@ router.post('/', lc,
       // 属于某个问题集，检查权限
       sqlStr = 'SELECT "during" FROM "problemset" INNER JOIN "problemset_user" ON "problemset"."psid" = "problemset_user"."psid" WHERE "problemset"."psid" = $1 AND NOW()::TIMESTAMPTZ <@ "problemset"."during" AND "problemset_user"."uid" = $2 LIMIT 1'
       let pbret = (await db.query(sqlStr, [psid, uid])).rows[0]
-      if (!pbret) res.sendStatus(hsc.forbidden)
+      if (!pbret) return res.sendStatus(hsc.forbidden)
     }
     // 不属于问题集或者检查完权限，开测
     try {
