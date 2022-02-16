@@ -65,9 +65,12 @@ router.post('/profile', lc,
     ret = (await db.query(query, param)).rows[0]
     if (!ret) return res.sendStatus(hsc.forbidden)
     if (req.items.indexOf('nickname') !== -1) {
-      let account = req.tokenAcc
-      account.nickname = ret.nickname
-      tokenUtils.remove(res, 'acc')
+      let account = {
+        uid: req.tokenAcc.uid,
+        username: req.tokenAcc.username,
+        nickname: ret.nickname,
+        permission: req.tokenAcc.permission
+      }
       tokenUtils.write(res, 'acc', account)
     }
     return res.status(hsc.ok).json(ret)
