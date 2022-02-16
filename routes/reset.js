@@ -64,6 +64,11 @@ router.post('/profile', lc,
     query += ` WHERE "uid" = $${param.push(req.tokenAcc.uid)} RETURNING "nickname", "qq", "tel", "realname", "school", "words"`
     ret = (await db.query(query, param)).rows[0]
     if (!ret) return res.sendStatus(hsc.forbidden)
+    if (req.items.indexOf('nickname') !== -1) {
+      let account = req.tokenAcc
+      account.nickname = ret.nickname
+      tokenUtils.write(res, 'acc', account)
+    }
     return res.status(hsc.ok).json(ret)
   })
 

@@ -9,7 +9,8 @@ router.get('/', lc, (req, res) => {
     let tokenAcc = req.tokenAcc
     let account = {
       uid: tokenAcc['uid'],
-      username: tokenAcc['username'].split('@', 1)[0],
+      // username: tokenAcc['username'].split('@', 1)[0],
+      username: tokenAcc['username'],
       nickname: tokenAcc['nickname'],
       permission: tokenAcc['permission']
     }
