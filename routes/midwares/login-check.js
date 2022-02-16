@@ -1,5 +1,5 @@
-let tokenUtils = require('../../utils/token')
-let hsc = require('../../config/http-status-code')
+const tokenUtils = require('../../utils/token')
+const hsc = require('../../config/http-status-code')
 
 module.exports = (req, res, next) => {
   try {

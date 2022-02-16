@@ -1,6 +1,6 @@
-let permdef = require('../../config/permission')
-let db = require('../../utils/database')
-let hsc = require('../../config/http-status-code')
+const permdef = require('../../config/permission')
+const db = require('../../utils/database')
+const hsc = require('../../config/http-status-code')
 
 module.exports = (uid, reqPerms) => {
   return async (req, res, next) => {

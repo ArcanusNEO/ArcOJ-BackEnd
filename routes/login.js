@@ -1,10 +1,10 @@
-let express = require('express')
-let router = express.Router()
-let hsc = require('../config/http-status-code')
-let tokenUtils = require('../utils/token')
-let fc = require('./midwares/form-check')
-let db = require('../utils/database')
-let permMap = require('../config/permission-map')
+const express = require('express')
+const router = express.Router()
+const hsc = require('../config/http-status-code')
+const tokenUtils = require('../utils/token')
+const fc = require('./midwares/form-check')
+const db = require('../utils/database')
+const permMap = require('../config/permission-map')
 
 router.post('/', fc(['body'], ['username', 'password'], hsc.parseErr, { ok: false }), async (req, res) => {
   try {

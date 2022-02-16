@@ -1,8 +1,8 @@
-let express = require('express')
-let router = express.Router()
-let hsc = require('../config/http-status-code')
-let lc = require('./midwares/login-check')
-let db = require('../utils/database')
+const express = require('express')
+const router = express.Router()
+const hsc = require('../config/http-status-code')
+const lc = require('./midwares/login-check')
+const db = require('../utils/database')
 
 // 出于兼容目的保留
 router.get('/', lc, (req, res) => {

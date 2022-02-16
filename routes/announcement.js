@@ -1,9 +1,9 @@
-let express = require('express')
-let router = express.Router()
-let hsc = require('../config/http-status-code')
-let db = require('../utils/database')
-let lc = require('./midwares/login-check')
-let mc = require('./midwares/member-check')
+const express = require('express')
+const router = express.Router()
+const hsc = require('../config/http-status-code')
+const db = require('../utils/database')
+const lc = require('./midwares/login-check')
+const mc = require('./midwares/member-check')
 
 router.get('/id/:id(\\d+)', lc,
   async (req, res, next) => {

@@ -1,4 +1,4 @@
-let msgCode = {
+const msgCode = {
   "RU": 100,  //运行中
   "CE": 101,  //编译错误
   "WA": 102,  //答案错误
@@ -14,7 +14,7 @@ let msgCode = {
   "CI": 120,  //正在编译
   "HD": 121   //隐藏
 }
-let codeMsg = {
+const codeMsg = {
   100: "RU",
   101: "CE",
   102: "WA",

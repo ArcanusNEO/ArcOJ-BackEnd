@@ -1,8 +1,8 @@
-let { get, getOpen, getDetail } = require('./problemset')
-let express = require('express')
-let router = express.Router()
-let lc = require('./midwares/login-check')
-let mc = require('./midwares/member-check')
+const { get, getOpen, getDetail } = require('./problemset')
+const express = require('express')
+const router = express.Router()
+const lc = require('./midwares/login-check')
+const mc = require('./midwares/member-check')
 
 router.get('/', lc,
   async (req, res, next) => {

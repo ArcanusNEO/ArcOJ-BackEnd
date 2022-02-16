@@ -1,11 +1,11 @@
-let express = require('express')
-let router = express.Router()
-let hsc = require('../config/http-status-code')
-let tokenUtils = require('../utils/token')
-let fc = require('./midwares/form-check')
-let db = require('../utils/database')
-let md5 = require('../utils/md5')
-let salt = require('../config/salt')
+const express = require('express')
+const router = express.Router()
+const hsc = require('../config/http-status-code')
+const tokenUtils = require('../utils/token')
+const fc = require('./midwares/form-check')
+const db = require('../utils/database')
+const md5 = require('../utils/md5')
+const salt = require('../config/salt')
 
 router.post('/', fc(['body'], ['password', 'username', 'nickname'], hsc.parseErr, { ok: false }), async (req, res) => {
   try {

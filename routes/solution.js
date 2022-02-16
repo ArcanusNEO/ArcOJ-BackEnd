@@ -1,13 +1,13 @@
-let express = require('express')
-let router = express.Router()
-let hsc = require('../config/http-status-code')
-let db = require('../utils/database')
-let lc = require('./midwares/login-check')
-let pc = require('./midwares/permission-check')
-let jsc = require('../config/judge-status-code')
-let { getSolutionStructure } = require('../utils/judge')
-let languageExtension = require('../config/lang-ext')
-let fs = require('fs-extra')
+const express = require('express')
+const router = express.Router()
+const hsc = require('../config/http-status-code')
+const db = require('../utils/database')
+const lc = require('./midwares/login-check')
+const pc = require('./midwares/permission-check')
+const jsc = require('../config/judge-status-code')
+const { getSolutionStructure } = require('../utils/judge')
+const languageExtension = require('../config/lang-ext')
+const fs = require('fs-extra')
 
 router.get('/id/:sid(\\d+)', lc,
   async (req, res, next) => {

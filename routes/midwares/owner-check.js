@@ -1,5 +1,5 @@
-let db = require('../../utils/database')
-let hsc = require('../../config/http-status-code')
+const db = require('../../utils/database')
+const hsc = require('../../config/http-status-code')
 
 module.exports = {
   'problem': (uid, pid) => {

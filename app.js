@@ -1,12 +1,12 @@
-let express = require('express')
-let path = require('path')
-let cookieParser = require('cookie-parser')
-let logger = require('morgan')
-let hsc = require('./config/http-status-code')
+const express = require('express')
+const path = require('path')
+const cookieParser = require('cookie-parser')
+const logger = require('morgan')
+const hsc = require('./config/http-status-code')
 
-let api = require('./routes/api')
+const api = require('./routes/api')
 
-let app = express()
+const app = express()
 
 app.set('trust proxy', true) // nginx反向代理正确显示ip
 

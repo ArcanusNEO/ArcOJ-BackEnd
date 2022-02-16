@@ -1,9 +1,9 @@
-let express = require('express')
-let router = express.Router()
-let hsc = require('../../config/http-status-code')
-let lc = require('../midwares/login-check')
-let pc = require('../midwares/permission-check')
-let db = require('../../utils/database')
+const express = require('express')
+const router = express.Router()
+const hsc = require('../../config/http-status-code')
+const lc = require('../midwares/login-check')
+const pc = require('../midwares/permission-check')
+const db = require('../../utils/database')
 
 router.get('/', lc,
   async (req, res, next) => {

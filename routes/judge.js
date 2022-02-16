@@ -1,12 +1,12 @@
-let express = require('express')
-let router = express.Router()
-let hsc = require('../config/http-status-code')
-let db = require('../utils/database')
-let lc = require('./midwares/login-check')
-let pc = require('./midwares/permission-check')
-let languageExtension = require('../config/lang-ext')
-let jsc = require('../config/judge-status-code')
-let { judge } = require('../utils/judge')
+const express = require('express')
+const router = express.Router()
+const hsc = require('../config/http-status-code')
+const db = require('../utils/database')
+const lc = require('./midwares/login-check')
+const pc = require('./midwares/permission-check')
+const languageExtension = require('../config/lang-ext')
+const jsc = require('../config/judge-status-code')
+const { judge } = require('../utils/judge')
 
 router.post('/', lc,
   async (req, res, next) => {

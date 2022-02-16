@@ -1,10 +1,10 @@
-let express = require('express')
-let router = express.Router()
-let hsc = require('../config/http-status-code')
-let fileUpload = require('express-fileupload')
-let fs = require('fs-extra')
-let dirs = require('../config/basic')
-let path = require('path')
+const express = require('express')
+const router = express.Router()
+const hsc = require('../config/http-status-code')
+const fileUpload = require('express-fileupload')
+const fs = require('fs-extra')
+const dirs = require('../config/basic')
+const path = require('path')
 
 router.use(fileUpload({
   abortOnLimit: true,

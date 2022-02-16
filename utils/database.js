@@ -1,7 +1,7 @@
-let { Pool } = require('pg')
-let config = require('../config/postgres')
-let db = {}
-let pool = new Pool(config)
+const { Pool } = require('pg')
+const config = require('../config/postgres')
+const db = {}
+const pool = new Pool(config)
 
 pool.query('SELECT NOW() as now', (err, res) => {
   if (err) console.log('Database connected error.', err)

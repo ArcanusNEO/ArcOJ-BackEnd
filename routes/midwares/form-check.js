@@ -1,5 +1,5 @@
-let crypto = require('../../utils/passwd-crypto')
-let hsc = require('../../config/http-status-code')
+const crypto = require('../../utils/passwd-crypto')
+const hsc = require('../../config/http-status-code')
 
 const nickname = (req, pos, item) => {
   if (!req[pos][item]) return false

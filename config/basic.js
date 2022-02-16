@@ -1,5 +1,5 @@
-let path = require('path')
-let data = require('./path')
+const path = require('path')
+const data = require('./path')
 
 for (let p in data) {
   if (p === 'dataBase') continue

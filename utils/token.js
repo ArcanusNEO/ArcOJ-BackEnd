@@ -1,8 +1,8 @@
-let jwt = require('jsonwebtoken')
-let salt = require('../config/salt')
-let cookieOpts = require('../config/cookie')
+const jwt = require('jsonwebtoken')
+const salt = require('../config/salt')
+const cookieOpts = require('../config/cookie')
 
-let options = {
+const options = {
   expiresIn: '7d'
 }
 const sign = (content) => {

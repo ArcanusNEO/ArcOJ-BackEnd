@@ -1,9 +1,9 @@
-let nodemailer = require('nodemailer')
-let info = require('../config/email')
+const nodemailer = require('nodemailer')
+const info = require('../config/email')
 
-let transporter = nodemailer.createTransport(info.transportInfo)
+const transporter = nodemailer.createTransport(info.transportInfo)
 
-let sendEmail = async (address, content) => {
+const sendEmail = async (address, content) => {
   info.mailInfo['to'] = address
   info.mailInfo['text'] = content
   try {

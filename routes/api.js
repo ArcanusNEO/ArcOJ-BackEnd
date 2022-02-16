@@ -1,6 +1,6 @@
-let express = require('express')
-let router = express.Router()
-let hsc = require('../config/http-status-code')
+const express = require('express')
+const router = express.Router()
+const hsc = require('../config/http-status-code')
 
 router.use('/admin(istrator(s)?)?', require('./admin/admin'))
 router.use('/announcement(s)?', require('./announcement'))

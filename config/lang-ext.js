@@ -1,4 +1,4 @@
-let extId = {
+const extId = {
   c: 0,
   cpp: 1,
   py: 2,
@@ -7,7 +7,7 @@ let extId = {
   txt: 5,
   pypy3: 6
 }
-let idExt = {
+const idExt = {
   [0]: 'c',
   [1]: 'cpp',
   [2]: 'py',
@@ -16,7 +16,7 @@ let idExt = {
   [5]: 'txt',
   [6]: 'pypy3'
 }
-let langExt = {
+const langExt = {
   'c': 'c',
   'c++': 'cpp',
   'python': 'py',
