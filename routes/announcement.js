@@ -29,8 +29,9 @@ router.get('/id/:id(\\d+)', lc,
 
 const getMsgInSection = (idName) => {
   return async (req, res) => {
-    let ret, limit = req.query.limit, id = req.params.id
-    if (limit) {
+    let ret, limit = parseInt(req.query.limit), id = parseInt(req.params.id)
+    if (!(id > 0)) return res.sendStatus(hsc.badReq)
+    if (limit > 0) {
       let query = `SELECT "mid" AS "id", "title", "content", "when" AS "time" FROM "message" WHERE "from_del" = FALSE AND "to" IS NULL AND "${idName}" = $1 ORDER BY "when" DESC LIMIT $2`
       ret = (await db.query(query, [id, limit])).rows
     } else {
@@ -43,25 +44,31 @@ const getMsgInSection = (idName) => {
 
 router.get('/course(s)?/:id(\\d+)', lc,
   async (req, res, next) => {
-    return (mc['course'](req.tokenAcc.uid, req.params.id)(req, res, next))
+    let cid = parseInt(req.params.id)
+    if (!(cid > 0)) return res.sendStatus(hsc.badReq)
+    return (mc['course'](req.tokenAcc.uid, cid)(req, res, next))
   },
   getMsgInSection('cid'))
 
 router.get('/contest(s)?/:id(\\d+)', lc,
   async (req, res, next) => {
-    return (mc['problemset'](req.tokenAcc.uid, req.params.id)(req, res, next))
+    let psid = parseInt(req.params.id)
+    if (!(psid > 0)) return res.sendStatus(hsc.badReq)
+    return (mc['problemset'](req.tokenAcc.uid, psid)(req, res, next))
   },
   getMsgInSection('psid'))
 
 router.get('/assignment(s)?/:id(\\d+)', lc,
   async (req, res, next) => {
-    return (mc['problemset'](req.tokenAcc.uid, req.params.id)(req, res, next))
+    let psid = parseInt(req.params.id)
+    if (!(psid > 0)) return res.sendStatus(hsc.badReq)
+    return (mc['problemset'](req.tokenAcc.uid, psid)(req, res, next))
   },
   getMsgInSection('psid'))
 
 router.get('/global', lc, async (req, res) => {
-  let ret, limit = req.query.limit
-  if (limit) {
+  let ret, limit = parseInt(req.query.limit)
+  if (limit > 0) {
     let query = 'SELECT "mid" AS "id", "title", "content", "when" AS "time" FROM "message" WHERE "from_del" = FALSE AND "to" IS NULL AND "cid" IS NULL AND "psid" IS NULL ORDER BY "when" DESC LIMIT $1'
     ret = (await db.query(query, [limit])).rows
   } else {
