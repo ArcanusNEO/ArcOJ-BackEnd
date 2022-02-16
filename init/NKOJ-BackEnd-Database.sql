@@ -15,11 +15,11 @@
  Date: 13/02/2022 14:51:49
  */
 -- ----------------------------
--- Sequence structure for problemset_cid_seq
+-- Sequence structure for problemset_psid_seq
 -- ----------------------------
-DROP SEQUENCE IF EXISTS "public"."problemset_cid_seq";
-CREATE SEQUENCE "public"."problemset_cid_seq" INCREMENT 1 MINVALUE 1 MAXVALUE 2147483647 START 1 CACHE 1;
-ALTER SEQUENCE "public"."problemset_cid_seq" OWNER TO "OJMaster";
+DROP SEQUENCE IF EXISTS "public"."problemset_psid_seq";
+CREATE SEQUENCE "public"."problemset_psid_seq" INCREMENT 1 MINVALUE 1 MAXVALUE 2147483647 START 1 CACHE 1;
+ALTER SEQUENCE "public"."problemset_psid_seq" OWNER TO "OJMaster";
 -- ----------------------------
 -- Sequence structure for course_cid_seq
 -- ----------------------------
@@ -142,7 +142,7 @@ ALTER TABLE "public"."problem_maintainer" OWNER TO "OJMaster";
 -- ----------------------------
 DROP TABLE IF EXISTS "public"."problemset";
 CREATE TABLE "public"."problemset" (
-  "psid" int4 NOT NULL DEFAULT nextval('problemset_cid_seq'::regclass),
+  "psid" int4 NOT NULL DEFAULT nextval('problemset_psid_seq'::regclass),
   "title" text COLLATE "pg_catalog"."default" NOT NULL,
   "description" text COLLATE "pg_catalog"."default",
   "type" text COLLATE "pg_catalog"."default" NOT NULL,
@@ -239,8 +239,8 @@ ALTER FUNCTION "public"."submit_counter"() OWNER TO "OJMaster";
 -- ----------------------------
 -- Alter sequences owned by
 -- ----------------------------
-ALTER SEQUENCE "public"."problemset_cid_seq" OWNED BY "public"."problemset"."psid";
-SELECT setval('"public"."problemset_cid_seq"', 2, false);
+ALTER SEQUENCE "public"."problemset_psid_seq" OWNED BY "public"."problemset"."psid";
+SELECT setval('"public"."problemset_psid_seq"', 2, false);
 -- ----------------------------
 -- Alter sequences owned by
 -- ----------------------------
