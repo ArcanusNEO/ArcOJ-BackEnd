@@ -27,7 +27,7 @@ router.get('/id/:sid(\\d+)', lc,
     delete ret.secret
     delete ret.before
     delete ret.open
-    if (permission === 2) res.status(hsc.ok).json(ret)
+    if (permission === 2) return res.status(hsc.ok).json(ret)
     let blockList = []
     if (before || !ret.share || open || secret) {
       blockList.push(['code', 'detail', 'compileInfo', 'codeSize'])
