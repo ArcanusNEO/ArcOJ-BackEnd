@@ -62,7 +62,12 @@ router.post('/profile', lc,
     for (let key of req.items)
       query += `, "${key}" = $${param.push(req.body[key])}`
     query += ` WHERE "uid" = $${param.push(req.tokenAcc.uid)} RETURNING "nickname", "qq", "tel", "realname", "school", "words"`
-    ret = (await db.query(query, param)).rows[0]
+    try {
+      ret = (await db.query(query, param)).rows[0]
+    } catch (err) {
+      console.error(err)
+      return res.sendStatus(hsc.forbidden)
+    }
     if (!ret) return res.sendStatus(hsc.forbidden)
     if (req.items.indexOf('nickname') !== -1) {
       let account = {
