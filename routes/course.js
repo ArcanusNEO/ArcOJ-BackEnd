@@ -4,6 +4,7 @@ const hsc = require('../config/http-status-code')
 const db = require('../utils/database')
 const lc = require('./midwares/login-check')
 const mc = require('./midwares/member-check')
+const pc = require('../midwares/permission-check')
 
 router.get('/', lc, async (req, res) => {
   let uid = req.tokenAcc.uid
