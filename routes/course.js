@@ -23,4 +23,35 @@ router.get('/id/:cid(\\d+)', lc,
     return res.sendStatus(hsc.unauthorized)
   })
 
+router.get('/all', lc, async (req, res) => {
+  let uid = req.tokenAcc.uid
+  let query = 'SELECT "cid" AS "id", "title" AS "name" FROM "course_user" WHERE "visiable" ORDER BY "cid" DESC'
+  let ret = (await db.query(query, [uid])).rows
+  return res.status(hsc.ok).json(ret)
+})
+
+router.post('/join/:cid(\\d+)', lc,
+  async (req, res, next) => {
+    let cid = parseInt(req.params.cid)
+    if (!(cid > 0)) return res.sendStatus(hsc.badReq)
+    return pc(req.tokenAcc.uid, ['joinCourse'])(req, res, next)
+  },
+  async (req, res, next) => {
+    let passcode = req.body.passcode
+    let uid = req.tokenAcc.uid
+    let cid = parseInt(req.params.cid)
+    let query = 'SELECT "cid" FROM "course" WHERE "cid" = $1 AND "visiable" AND "passcode" = $2'
+    let ret = (await db.query(query, [cid, passcode])).rows[0]
+    if (!ret) return res.sendStatus(hsc.passwdMismatch)
+    query = 'INSERT INTO "course_user" ("cid", "uid") VALUES ($1, $2)'
+    try {
+      await db.query(query, [cid, uid])
+    } catch (err) {
+      console.error(err)
+      return res.sendStatus(hsc.alreadyExist)
+    }
+    return sendStatus(hsc.ok)
+  }
+)
+
 module.exports = router

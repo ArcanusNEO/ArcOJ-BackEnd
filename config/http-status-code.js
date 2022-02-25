@@ -5,6 +5,7 @@ module.exports = {
   noContent: 204,
   resetContent: 205,
 
+  alreadyExist: 295, //资源已经存在
   resOccupied: 296, //资源被占用
   captchaMismatch: 297,
   passwdMismatch: 298, //用户名或密码错误
