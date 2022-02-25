@@ -30,7 +30,7 @@ router.get('/all', lc, async (req, res) => {
   return res.status(hsc.ok).json(ret)
 })
 
-router.post('/join/:cid(\\d+)', lc,
+router.post('/subscribe/:cid(\\d+)', lc,
   async (req, res, next) => {
     let cid = parseInt(req.params.cid)
     if (!(cid > 0)) return res.sendStatus(hsc.badReq)
