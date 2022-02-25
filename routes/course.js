@@ -25,7 +25,7 @@ router.get('/id/:cid(\\d+)', lc,
 
 router.get('/all', lc, async (req, res) => {
   let uid = req.tokenAcc.uid
-  let query = 'SELECT "cid" AS "id", "title" AS "name", ("passcode" ISNULL) AS "public" FROM "course_user" WHERE "visiable" ORDER BY "cid" DESC'
+  let query = 'SELECT "cid" AS "id", "title" AS "name", ("passcode" ISNULL) AS "public" FROM "course" WHERE "visiable" ORDER BY "cid" DESC'
   let ret = (await db.query(query, [uid])).rows
   return res.status(hsc.ok).json(ret)
 })
