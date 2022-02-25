@@ -8,7 +8,7 @@ const pc = require('./midwares/permission-check')
 
 router.get('/', lc, async (req, res) => {
   let uid = req.tokenAcc.uid
-  let query = 'SELECT "course"."cid" AS "id", "title" AS "name" FROM "course_user" INNER JOIN "course" ON "course"."cid" = "course_user"."cid" WHERE "uid" = $1 AND "visiable" ORDER BY "course"."cid" DESC'
+  let query = 'SELECT "course"."cid" AS "id", "title" AS "name", "number" FROM "course_user" INNER JOIN "course" ON "course"."cid" = "course_user"."cid" WHERE "uid" = $1 AND "visiable" ORDER BY "course"."cid" DESC'
   let ret = (await db.query(query, [uid])).rows
   return res.status(hsc.ok).json(ret)
 })
@@ -25,7 +25,7 @@ router.get('/id/:cid(\\d+)', lc,
   })
 
 router.get('/all', lc, async (req, res) => {
-  let query = 'SELECT "cid" AS "id", "title" AS "name", ("passcode" ISNULL) AS "public" FROM "course" WHERE "visiable" ORDER BY "cid" DESC'
+  let query = 'SELECT "cid" AS "id", "title" AS "name", ("passcode" ISNULL) AS "public", "number" FROM "course" WHERE "visiable" ORDER BY "cid" DESC'
   let ret = (await db.query(query)).rows
   return res.status(hsc.ok).json(ret)
 })
