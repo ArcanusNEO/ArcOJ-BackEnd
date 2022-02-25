@@ -55,7 +55,7 @@ router.post('/subscribe/:cid(\\d+)', lc,
       console.error(err)
       return res.sendStatus(hsc.alreadyExist)
     }
-    return sendStatus(hsc.ok)
+    return res.sendStatus(hsc.ok)
   }
 )
 
