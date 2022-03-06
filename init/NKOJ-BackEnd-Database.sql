@@ -240,12 +240,12 @@ ALTER FUNCTION "public"."submit_counter"() OWNER TO "OJMaster";
 -- Alter sequences owned by
 -- ----------------------------
 ALTER SEQUENCE "public"."problemset_psid_seq" OWNED BY "public"."problemset"."psid";
-SELECT setval('"public"."problemset_psid_seq"', 2, false);
+SELECT setval('"public"."problemset_psid_seq"', 3, false);
 -- ----------------------------
 -- Alter sequences owned by
 -- ----------------------------
 ALTER SEQUENCE "public"."course_cid_seq" OWNED BY "public"."course"."cid";
-SELECT setval('"public"."course_cid_seq"', 2, false);
+SELECT setval('"public"."course_cid_seq"', 3, false);
 -- ----------------------------
 -- Alter sequences owned by
 -- ----------------------------
@@ -255,22 +255,22 @@ SELECT setval('"public"."group_gid_seq"', 1, false);
 -- Alter sequences owned by
 -- ----------------------------
 ALTER SEQUENCE "public"."message_mid_seq" OWNED BY "public"."message"."mid";
-SELECT setval('"public"."message_mid_seq"', 1, false);
+SELECT setval('"public"."message_mid_seq"', 3, false);
 -- ----------------------------
 -- Alter sequences owned by
 -- ----------------------------
 ALTER SEQUENCE "public"."problem_pid_seq" OWNED BY "public"."problem"."pid";
-SELECT setval('"public"."problem_pid_seq"', 1, false);
+SELECT setval('"public"."problem_pid_seq"', 3, false);
 -- ----------------------------
 -- Alter sequences owned by
 -- ----------------------------
 ALTER SEQUENCE "public"."solution_sid_seq" OWNED BY "public"."solution"."sid";
-SELECT setval('"public"."solution_sid_seq"', 1, false);
+SELECT setval('"public"."solution_sid_seq"', 3, false);
 -- ----------------------------
 -- Alter sequences owned by
 -- ----------------------------
 ALTER SEQUENCE "public"."user_uid_seq" OWNED BY "public"."user"."uid";
-SELECT setval('"public"."user_uid_seq"', 1, false);
+SELECT setval('"public"."user_uid_seq"', 3, false);
 -- ----------------------------
 -- Primary Key structure for table course
 -- ----------------------------
@@ -344,8 +344,6 @@ CREATE INDEX "user_email_idx" ON "public"."user" USING hash (
 -- ----------------------------
 -- Uniques structure for table user
 -- ----------------------------
-ALTER TABLE "public"."user"
-ADD CONSTRAINT "user_nickname_key" UNIQUE ("nickname");
 ALTER TABLE "public"."user"
 ADD CONSTRAINT "user_email_key" UNIQUE ("email");
 -- ----------------------------
