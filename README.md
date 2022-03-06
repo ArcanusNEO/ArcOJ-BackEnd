@@ -1,6 +1,6 @@
 # ArcOJ-BackEnd
 
-NankaiACM Online Judge原后端**[NKOJ-Back-End](https://github.com/NankaiACM/NKOJ-Back-End)**的重构版本
+NankaiACM Online Judge原后端[NKOJ-Back-End](https://github.com/NankaiACM/NKOJ-Back-End)的重构版本
 
 ## 部署
 
