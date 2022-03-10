@@ -1,2 +1,2 @@
 "cid"	"title"	"description"	"owner_id"	"visiable"	"teacher"	"number"	"semester"	"passcode"
-"1"	"system"		"1"	"f"				"bS9UrZJNvVqCciEbS9UrZJNvVqCciE"
+"1"	"system"		"1"	"f"				"passcode-for-system"
