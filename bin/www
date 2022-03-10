@@ -4,7 +4,7 @@ const app = require('../app')
 const http = require('http')
 
 const httpServer = http.createServer()
-const port = 3000
+const port = 2999
 
   ; (async () => {
     app.set('port', port)
