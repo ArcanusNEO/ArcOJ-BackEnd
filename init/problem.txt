@@ -1,0 +1,2 @@
+"pid"	"psid"	"title"	"extra"	"submit_ac"	"submit_all"	"special_judge"	"detail_judge"	"cases"	"time_limit"	"memory_limit"	"owner_id"
+"1"	"1"	"system"		"0"	"0"	"0"	"f"	"10"	"1000"	"32767"	"1"

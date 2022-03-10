@@ -1,10 +1,2 @@
 "cid"	"title"	"description"	"owner_id"	"visiable"	"teacher"	"number"	"semester"	"passcode"
-"1"	"2022 摸鱼学导论"	"即使不得不上班，也为大家带来保持快乐的小秘诀：
-
-
-1.早上到公司先带薪发呆一小时
-2.午休吃饱饱睡一觉
-3.睡醒工作前发呆一小时
-4.工作30分钟后网上冲浪3小时知晓时事热点
-4.下班前一小时整点动感音乐
-5.美好的一天从带薪拉屎开始 "	"1"	"f"	"卢麒萱"	"0000"	"秋季"	
+"1"	"system"		"1"	"f"				"bS9UrZJNvVqCciEbS9UrZJNvVqCciE"
