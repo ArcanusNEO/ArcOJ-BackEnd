@@ -17,8 +17,8 @@ router.get('/id/:id(\\d+)', lc,
     return res.sendStatus(hsc.unauthorized)
   },
   async (req, res, next) => {
-    if (ret.ann.cid) return (mc['course'](req.tokenAcc.uid, ret.ann.cid)(req, res, next))
-    else if (ret.ann.psid) return (mc['problemset'](req.tokenAcc.uid, ret.ann.psid)(req, res, next))
+    if (req.ann.cid) return (mc['course'](req.tokenAcc.uid, ret.ann.cid)(req, res, next))
+    else if (req.ann.psid) return (mc['problemset'](req.tokenAcc.uid, ret.ann.psid)(req, res, next))
     return next()
   },
   async (req, res) => {
