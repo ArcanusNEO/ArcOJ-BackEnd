@@ -9,6 +9,8 @@ const { getProblemStructure } = require('../../utils/judge')
 const fs = require('fs-extra')
 const fileUpload = require('express-fileupload')
 const path = require('path')
+const compressing = require("compressing")
+const dataPath = require('../../config/basic')
 
 const insertProblem = async (params) => {
   let { psid, title, extra, specialJudge, detailJudge, cases, timeLimit, memoryLimit, ownerId } = params
@@ -237,6 +239,28 @@ router.get('/id/:pid(\\d+)', lc,
       return res.sendStatus(hsc.unauthorized)
     }
     return res.status(hsc.ok).json(ret)
+  }
+)
+
+router.get('/id/:pid(\\d+)/io', lc,
+  async (req, res, next) => {
+    let pid = parseInt(req.params.pid)
+    if (!(pid > 0)) return res.sendStatus(hsc.badReq)
+    if (!(req.tokenAcc.permission >= 1)) return res.sendStatus(hsc.forbidden)
+    return next()
+  },
+  async (req, res, next) => {
+    let pid = parseInt(req.params.pid)
+    try {
+      let problemData = getProblemStructure(pid).data
+      let ioDataTmp = path.resolve(dataPath.temp, `${pid}.zip`)
+      await compressing.zip.compressDir(problemData, ioDataTmp)
+      res.download(ioDataTmp)
+    } catch (err) {
+      console.error(err)
+      return res.sendStatus(hsc.unauthorized)
+    }
+    return fs.unlink(ioDataTmp)
   }
 )
 
