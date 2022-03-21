@@ -123,7 +123,7 @@ router.get('/id/:pid(\\d+)', lc,
       console.error(err)
       return res.sendStatus(hsc.unauthorized)
     }
-    if (!psid || req.tokenAcc.permission === 2) return res.status(hsc.ok).json(ret)
+    if (!psid || req.tokenAcc.permission >= 1) return res.status(hsc.ok).json(ret)
     query = 'SELECT * FROM "problem_maintainer" WHERE "pid" = $1 AND "uid" = $2'
     let check = (await db.query(query, [pid, uid])).rows[0]
     if (check) return res.status(hsc.ok).json(ret)

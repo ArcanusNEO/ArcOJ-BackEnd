@@ -27,7 +27,7 @@ router.get('/id/:sid(\\d+)', lc,
     delete ret.secret
     delete ret.before
     delete ret.open
-    if (ret.uid === uid || permission === 2) return res.status(hsc.ok).json(ret)
+    if (ret.uid === uid || permission >= 1) return res.status(hsc.ok).json(ret)
     let blockList = []
     if (before || !ret.share || open || secret) {
       blockList.push('code', 'detail', 'compileInfo', 'codeSize')
@@ -49,7 +49,7 @@ router.get('/id/:sid(\\d+)/status', lc,
     let query = 'SELECT "solution"."status_id" AS "statusId", ("solution"."uid" <> $1 AND "problemset"."secret_time" NOTNULL AND NOW()::TIMESTAMPTZ <@ "problemset"."secret_time") AS "hide" FROM "solution" INNER JOIN "problem" ON "solution"."pid" = "problem"."pid" LEFT JOIN "problemset" ON "problem"."psid" = "problemset"."psid" WHERE "sid" = $2'
     let ret = (await db.query(query, [req.tokenAcc.uid, req.params.sid])).rows[0]
     if (!ret) return res.sendStatus(hsc.unauthorized)
-    let status = (ret.hide && req.tokenAcc.permission !== 2 ? jsc.msgCode.HD : ret.statusId)
+    let status = (ret.hide && req.tokenAcc.permission < 1 ? jsc.msgCode.HD : ret.statusId)
     return res.status(hsc.ok).json(status)
   }
 )
@@ -86,7 +86,7 @@ router.get('/', lc,
     }
     let ret = (await db.query(query, param)).rows
     for (let each of ret) {
-      if (each.hide && req.tokenAcc.permission !== 2) each.statusId = jsc.msgCode.HD
+      if (each.hide && req.tokenAcc.permission < 1) each.statusId = jsc.msgCode.HD
       delete each.hide
     }
     return res.status(hsc.ok).json(ret)
