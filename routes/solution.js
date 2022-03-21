@@ -55,7 +55,7 @@ router.get('/id/:sid(\\d+)/status', lc,
 )
 
 router.get('/total', lc, async (req, res) => {
-  let query = 'SELECT COUNT(*) FROM "solution" WHERE TRUE'
+  let query = 'SELECT COUNT(*) FROM "solution" INNER JOIN "user" ON "solution"."uid" = "user"."uid" WHERE TRUE'
   let queryUid = parseInt(req.query.uid), queryPid = parseInt(req.query.pid)
   let queryNick = req.query.nickname
   let param = []
