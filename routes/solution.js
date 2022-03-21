@@ -72,11 +72,11 @@ router.get('/', lc,
   async (req, res) => {
     let query = 'SELECT "solution"."sid", "solution"."uid", "solution"."pid", "solution"."status_id" AS "statusId", "problem"."title" AS "name", "user"."nickname", ("solution"."uid" <> $1 AND "problemset"."secret_time" NOTNULL AND NOW()::TIMESTAMPTZ <@ "problemset"."secret_time") AS "hide" FROM "solution" INNER JOIN "problem" ON "solution"."pid" = "problem"."pid" INNER JOIN "user" ON "solution"."uid" = "user"."uid" LEFT JOIN "problemset" ON "problem"."psid" = "problemset"."psid" WHERE TRUE'
     let queryUid = parseInt(req.query.uid), queryPid = parseInt(req.query.pid)
-    let queryNick = req.query.nickname
+    let queryNick = '%' + req.query.nickname + '%'
     let param = [req.tokenAcc.uid]
     if (queryUid > 0) query += ` AND "solution"."uid" = $${param.push(queryUid)}`
     if (queryPid > 0) query += ` AND "solution"."pid" = $${param.push(queryPid)}`
-    if (queryNick) query += ` AND "user"."nickname" = $${param.push(queryNick)}`
+    if (queryNick) query += ` AND "user"."nickname" LIKE $${param.push(queryNick)}`
     query += ' ORDER BY "sid" DESC'
     let page = parseInt(req.query.page), item = parseInt(req.query.item)
     let limit = item, offset = (page - 1) * item
