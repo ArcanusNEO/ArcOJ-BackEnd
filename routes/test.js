@@ -9,7 +9,7 @@ const path = require('path')
 const compressing = require("compressing")
 const dataPath = require('../config/basic')
 
-router.post('/:pid(\\d+)', async (req, res) => {
+router.get('/:pid(\\d+)', async (req, res) => {
   let pid = parseInt(req.params.pid)
   try {
     let problemData = getProblemStructure(pid).data
