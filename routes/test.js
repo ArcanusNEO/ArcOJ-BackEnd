@@ -26,4 +26,8 @@ router.get('/:pid(\\d+)', async (req, res) => {
   }
 })
 
+router.get('/', async (req, res) => {
+  return res.download('/var/www/data/problems-data/18/1.in')
+})
+
 module.exports = router
