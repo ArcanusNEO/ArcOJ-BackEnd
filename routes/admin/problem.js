@@ -256,7 +256,7 @@ router.get('/id/:pid(\\d+)/io', lc,
       await fs.ensureDir(dataPath.temp)
       let ioDataTmp = path.resolve(dataPath.temp, `${pid}.zip`)
       await compressing.zip.compressDir(problemData, ioDataTmp)
-      res.download(ioDataTmp, (err) => {
+      return res.download(ioDataTmp, (err) => {
         console.error(err)
         fs.unlink(ioDataTmp, (fserr) => { console.error(fserr) })
       })
