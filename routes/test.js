@@ -27,7 +27,10 @@ router.get('/:pid(\\d+)', async (req, res) => {
 })
 
 router.get('/', async (req, res) => {
-  return res.download('/var/www/data/problems-data/18/1.in')
+  return res.download('/var/www/data/problems-data/18/1.in', (err) => {
+    console.error(err)
+    fs.unlink('/var/www/data/temp/7.zip', (fserr) => { console.error(fserr) })
+  })
 })
 
 module.exports = router
