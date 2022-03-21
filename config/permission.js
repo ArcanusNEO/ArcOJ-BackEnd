@@ -23,6 +23,7 @@ module.exports = {
   'joinCourse': 22,
   'joinProblemset': 23
 }
+// 大部分权限都用于管理页，普通api下的特权是hack行为
 
 //                               Default User   Administrator   Read Only
 // master                        0              0               0
