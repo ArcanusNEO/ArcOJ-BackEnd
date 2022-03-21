@@ -9,30 +9,9 @@ const path = require('path')
 const compressing = require("compressing")
 const dataPath = require('../config/basic')
 
-router.get('/:pid(\\d+)', async (req, res) => {
-  let pid = parseInt(req.params.pid)
-  try {
-    let problemData = getProblemStructure(pid).path.data
-    let ioDataTmp = path.resolve(dataPath.temp, `${pid}.zip`)
-    await fs.ensureDir(dataPath.temp)
-    console.log(problemData, ioDataTmp)
-    await compressing.zip.compressDir(problemData, ioDataTmp)
-    console.log('compress done')
-    return res.download(ioDataTmp, (err) => {
-      console.error(err)
-      fs.unlink(ioDataTmp, (fserr) => { console.error(fserr) })
-    })
-  } catch (err) {
-    console.error(err)
-    return res.sendStatus(hsc.unauthorized)
-  }
-})
 
 router.get('/', async (req, res) => {
-  return res.download('/var/www/data/problems-data/18/1.in', (err) => {
-    console.error(err)
-    fs.unlink('/var/www/data/temp/7.zip', (fserr) => { console.error(fserr) })
-  })
+  return res.end('Developed by Lucas and Wans')
 })
 
 module.exports = router
