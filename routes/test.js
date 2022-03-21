@@ -12,7 +12,7 @@ const dataPath = require('../config/basic')
 router.get('/:pid(\\d+)', async (req, res) => {
   let pid = parseInt(req.params.pid)
   try {
-    let problemData = getProblemStructure(pid).data
+    let problemData = getProblemStructure(pid).path.data
     let ioDataTmp = path.resolve(dataPath.temp, `${pid}.zip`)
     await fs.ensureDir(dataPath.temp)
     console.log(problemData, ioDataTmp)
