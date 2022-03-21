@@ -11,7 +11,7 @@ const dataPath = require('../config/basic')
 
 
 router.get('/', async (req, res) => {
-  return res.end('Developed by Lucas and Wans')
+  return res.end('Powered by Lucas and Wans.')
 })
 
 module.exports = router
