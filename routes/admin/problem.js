@@ -255,12 +255,14 @@ router.get('/id/:pid(\\d+)/io', lc,
       let problemData = getProblemStructure(pid).data
       let ioDataTmp = path.resolve(dataPath.temp, `${pid}.zip`)
       await compressing.zip.compressDir(problemData, ioDataTmp)
-      res.download(ioDataTmp)
+      res.download(ioDataTmp, (err) => {
+        console.error(err)
+        fs.unlink(ioDataTmp, (fserr) => { console.error(fserr) })
+      })
     } catch (err) {
       console.error(err)
       return res.sendStatus(hsc.unauthorized)
     }
-    return fs.unlink(ioDataTmp)
   }
 )
 
