@@ -13,9 +13,9 @@ router.get('/:pid(\\d+)', async (req, res) => {
   let pid = parseInt(req.params.pid)
   try {
     let problemData = getProblemStructure(pid).data
-    let ioDataTmp = path.resolve(dataPath.temp, `${pid}.zip`)
+    let ioDataTmp = path.resolve(dataPath.temp, `${pid}.tar`)
     await fs.ensureDir(dataPath.temp)
-    await compressing.zip.compressDir(problemData, dataPath.temp)
+    await compressing.tar.compressDir(problemData, ioDataTmp)
     return res.download(ioDataTmp, (err) => {
       console.error(err)
       fs.unlink(ioDataTmp, (fserr) => { console.error(fserr) })
