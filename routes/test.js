@@ -1,24 +1,29 @@
 const express = require('express')
 const router = express.Router()
 const hsc = require('../config/http-status-code')
-const fileUpload = require('express-fileupload')
+const db = require('../utils/database')
+const { getProblemStructure } = require('../utils/judge')
 const fs = require('fs-extra')
-const dirs = require('../config/basic')
+const fileUpload = require('express-fileupload')
 const path = require('path')
+const compressing = require("compressing")
+const dataPath = require('../config/basic')
 
-router.use(fileUpload({
-  abortOnLimit: true,
-  useTempFiles: true,
-  tempFileDir: '/tmp/',
-  limits: { fileSize: 10 * 1024 } // 10K
-}))
-
-router.post('/', async (req, res) => {
-  if (!req.files || Object.keys(req.files).length === 0) return res.sendStatus(hsc.badReq)
-  await fs.ensureDir(dirs.public)
-  let sampleFile = req.files.sampleFile
-  await sampleFile.mv(path.resolve(dirs.public, "1.txt"))
-  return res.sendStatus(hsc.ok)
+router.post('/:pid(\\d+)', async (req, res) => {
+  let pid = parseInt(req.params.pid)
+  try {
+    let problemData = getProblemStructure(pid).data
+    await fs.ensureDir(dataPath.temp)
+    let ioDataTmp = path.resolve(dataPath.temp, `${pid}.zip`)
+    await compressing.zip.compressDir(problemData, ioDataTmp)
+    return res.download(ioDataTmp, (err) => {
+      console.error(err)
+      // fs.unlink(ioDataTmp, (fserr) => { console.error(fserr) })
+    })
+  } catch (err) {
+    console.error(err)
+    return res.sendStatus(hsc.unauthorized)
+  }
 })
 
 module.exports = router

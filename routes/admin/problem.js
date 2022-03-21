@@ -249,7 +249,7 @@ router.get('/id/:pid(\\d+)/io', lc,
     if (!(req.tokenAcc.permission >= 1)) return res.sendStatus(hsc.forbidden)
     return next()
   },
-  async (req, res, next) => {
+  async (req, res) => {
     let pid = parseInt(req.params.pid)
     try {
       let problemData = getProblemStructure(pid).data
