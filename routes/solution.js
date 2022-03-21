@@ -76,7 +76,7 @@ router.get('/', lc,
     let param = [req.tokenAcc.uid]
     if (queryUid > 0) query += ` AND "solution"."uid" = $${param.push(queryUid)}`
     if (queryPid > 0) query += ` AND "solution"."pid" = $${param.push(queryPid)}`
-    if (queryNick) query += ` AND "user"."nickname" LIKE '%$${param.push(queryNick)}%'`
+    if (queryNick) query += ` AND "user"."nickname" LIKE N'%$${param.push(queryNick)}%'`
     query += ' ORDER BY "sid" DESC'
     let page = parseInt(req.query.page), item = parseInt(req.query.item)
     let limit = item, offset = (page - 1) * item
