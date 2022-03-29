@@ -117,8 +117,9 @@ router.get('/id/:pid(\\d+)', lc,
     else if (score >= 0) ret.status = 1 // 已提交
     else ret.status = 0 // 未提交
     try {
-      let problem = getProblemStructure(pid).file.md
-      ret.content = await fs.readFile(problem)
+      let problemMd = getProblemStructure(pid).file.md
+      // let problemPdf = getProblemStructure(pid).file.pdf
+      ret.content = await fs.readFile(problemMd)
     } catch (err) {
       console.error(err)
       return res.sendStatus(hsc.unauthorized)
