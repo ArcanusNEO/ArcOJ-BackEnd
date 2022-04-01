@@ -77,9 +77,6 @@ const judge = async (params) => {
     await spawn('docker', ['exec', '-i', 'judgecore', './judgecore', `${struct.path.solution}/exec.config`])
     let json = JSON.parse(await fs.readFile(`${struct.path.execOut}/result.json`, { encoding: 'utf8' }))
 
-    let statusMap = [jsc.msgCode.AC, jsc.msgCode.PE, jsc.msgCode.WA, jsc.msgCode.CE, jsc.msgCode.RE, jsc.msgCode.MLE, jsc.msgCode.TLE, jsc.msgCode.OLE, jsc.msgCode.FL, jsc.msgCode.SE]
-    let result = statusMap[json.status]
-
     let time = json.time
     let memory = json.memory
 
@@ -88,8 +85,11 @@ const judge = async (params) => {
       json.detail.forEach((i) => {
         i.extra = i.extra || json.extra
         if (i.status === 0 || i.status === 1) acCount += 1
+        json.status = max(json.status, i.status)
       })
     }
+    let statusMap = [jsc.msgCode.AC, jsc.msgCode.PE, jsc.msgCode.WA, jsc.msgCode.CE, jsc.msgCode.RE, jsc.msgCode.MLE, jsc.msgCode.TLE, jsc.msgCode.OLE, jsc.msgCode.FL, jsc.msgCode.SE]
+    let result = statusMap[json.status]
     let score = parseInt(acCount * 100.0 / cases)
     let sqlStr = 'UPDATE "solution" SET "status_id" = $1, "run_time" = $2, "run_memory" = $3, "detail" = $4, "compile_info" = $5, "score" = $6 WHERE "sid" = $7'
     await db.query(sqlStr, [result, time, memory, JSON.stringify(json.detail).replace(/\u\d\d\d\d/gms, match => '\\' + match), json.compiler, score, sid])
