@@ -86,13 +86,13 @@ const judge = async (params) => {
         i.extra = i.extra || json.extra
         if (i.status === 0 || i.status === 1) acCount += 1
         console.log(i)
-        // status = max(status, i.status)
+        status = max(status, i.status)
       })
     }
     let statusMap = [jsc.msgCode.AC, jsc.msgCode.PE, jsc.msgCode.WA, jsc.msgCode.CE, jsc.msgCode.RE, jsc.msgCode.MLE, jsc.msgCode.TLE, jsc.msgCode.OLE, jsc.msgCode.FL, jsc.msgCode.SE]
     let result = statusMap[status]
     let score = parseInt(acCount * 100.0 / cases)
-    console.log(score)
+    console.log(status, result, score)
     let sqlStr = 'UPDATE "solution" SET "status_id" = $1, "run_time" = $2, "run_memory" = $3, "detail" = $4, "compile_info" = $5, "score" = $6 WHERE "sid" = $7'
     await db.query(sqlStr, [result, time, memory, JSON.stringify(json.detail).replace(/\u\d\d\d\d/gms, match => '\\' + match), json.compiler, score, sid])
     // if (score >= 100) {
