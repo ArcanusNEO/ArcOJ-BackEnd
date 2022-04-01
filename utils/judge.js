@@ -85,7 +85,7 @@ const judge = async (params) => {
       json.detail.forEach((i) => {
         i.extra = i.extra || json.extra
         if (i.status === 0 || i.status === 1) acCount += 1
-        status = max(status, i.status)
+        // status = max(status, i.status)
       })
     }
     let statusMap = [jsc.msgCode.AC, jsc.msgCode.PE, jsc.msgCode.WA, jsc.msgCode.CE, jsc.msgCode.RE, jsc.msgCode.MLE, jsc.msgCode.TLE, jsc.msgCode.OLE, jsc.msgCode.FL, jsc.msgCode.SE]
