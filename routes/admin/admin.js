@@ -8,6 +8,7 @@ router.use('/contest(s)?', require('./contest'))
 router.use('/course(s)?', require('./course'))
 router.use('/problem(s)?', require('./problem'))
 router.use('/u(ser(s)?)?', require('./user'))
+router.use('/rejudge', require('./rejudge'))
 
 router.get('*', (req, res) => {
   res.sendStatus(hsc.notFound)

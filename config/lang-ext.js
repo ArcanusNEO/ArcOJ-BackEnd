@@ -26,4 +26,14 @@ const langExt = {
   'pypy3': 'pypy3'
 }
 
-module.exports = { extId, idExt, langExt }
+const idLang = {
+  [0]: 'c',
+  [1]: 'c++',
+  [2]: 'python',
+  [3]: 'javascript',
+  [4]: 'go',
+  [5]: 'text',
+  [6]: 'pypy3'
+}
+
+module.exports = { extId, idExt, langExt, idLang }
