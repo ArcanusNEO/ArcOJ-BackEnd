@@ -82,6 +82,7 @@ const judge = async (params) => {
 
     let acCount = 0
     if (json.detail) {
+      json.status = 0
       json.detail.forEach((i) => {
         i.extra = i.extra || json.extra
         if (i.status === 0 || i.status === 1) acCount += 1
