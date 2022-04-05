@@ -42,8 +42,8 @@ router.get('/sid/:sid(\\d+)', lc,
       if (!langExt) throw Error('Unsupported language type')
       let code = await fs.readFile(`${struct.path.solution}/main.${langExt}`, 'utf8')
       let codeSize = Buffer.byteLength(code, 'utf8')
-      let query = 'UPDATE "solution" SET "status_id" = $1, "code_size" = $2, "run_time" = $3, "run_memory" = $4, "score" = $5, "detail" = NULL, "compile_info" = NULL'
-      await db.query(query, [jsc.msgCode.RU, codeSize, 0, 0, 0])
+      let query = 'UPDATE "solution" SET "status_id" = $1, "code_size" = $2, "run_time" = $3, "run_memory" = $4, "score" = $5, "detail" = NULL, "compile_info" = NULL WHERE "sid" = $6'
+      await db.query(query, [jsc.msgCode.RU, codeSize, 0, 0, 0, sid])
       if (judge({ sid, uid, pid, langId, langExt, lang, code, codeSize, cases, specialJudge, detailJudge, timeLimit, memoryLimit }))
         return res.sendStatus(hsc.ok)
     } catch (err) {
