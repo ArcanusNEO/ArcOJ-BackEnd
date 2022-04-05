@@ -7,6 +7,7 @@ const mtc = require('../midwares/maintainer-check')
 const pc = require('../midwares/permission-check')
 const { getSolutionStructure } = require('../../utils/judge')
 const languageExtension = require('../../config/lang-ext')
+const jsc = require('../../config/judge-status-code')
 const fs = require('fs-extra')
 
 router.get('/sid/:sid(\\d+)', lc,
