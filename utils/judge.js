@@ -107,9 +107,9 @@ const judge = async (params) => {
     } catch (e) {
       console.error(e)
     }
-    return err
+    return false
   }
-  return 0
+  return true
 }
 
 module.exports = {
