@@ -11,6 +11,8 @@ const fileUpload = require('express-fileupload')
 const path = require('path')
 const compressing = require("compressing")
 const dataPath = require('../../config/basic')
+const jsc = require('../../config/judge-status-code')
+const langMap = require('../../config/lang-ext')
 
 const insertProblem = async (params) => {
   let { psid, title, extra, specialJudge, detailJudge, cases, timeLimit, memoryLimit, ownerId } = params
@@ -219,14 +221,15 @@ router.get('/total', lc, async (req, res) => {
   return res.status(hsc.ok).json(parseInt(total))
 })
 
-router.get('/id/:pid(\\d+)', lc,
-  async (req, res, next) => {
-    let pid = parseInt(req.params.pid)
-    if (!(pid > 0)) return res.sendStatus(hsc.badReq)
-    if (!(req.tokenAcc.permission >= 1)) return res.sendStatus(hsc.forbidden)
-    return next()
-  },
-  async (req, res, next) => {
+const pidPermChk = async (req, res, next) => {
+  let pid = parseInt(req.params.pid)
+  if (!(pid > 0)) return res.sendStatus(hsc.badReq)
+  if (!(req.tokenAcc.permission >= 1)) return res.sendStatus(hsc.forbidden)
+  return next()
+}
+
+router.get('/id/:pid(\\d+)', lc, pidPermChk,
+  async (req, res) => {
     let pid = parseInt(req.params.pid)
     let query = 'SELECT "problem"."pid", "problem"."psid", "problem"."title" AS "name", "problem"."extra", "problem"."submit_ac" AS "submitAc", "problem"."submit_all" AS "submitAll", "problem"."special_judge" AS "specialJudge", "problem"."detail_judge" AS "detailJudge", "problem"."cases", "problem"."time_limit" AS "timeLimit", "problem"."memory_limit" AS "memoryLimit", "problem"."owner_id" AS "ownerId" FROM "problem" WHERE "problem"."pid" = $1 LIMIT 1'
     let ret = (await db.query(query, [pid])).rows[0]
@@ -242,13 +245,7 @@ router.get('/id/:pid(\\d+)', lc,
   }
 )
 
-router.get('/id/:pid(\\d+)/io', lc,
-  async (req, res, next) => {
-    let pid = parseInt(req.params.pid)
-    if (!(pid > 0)) return res.sendStatus(hsc.badReq)
-    if (!(req.tokenAcc.permission >= 1)) return res.sendStatus(hsc.forbidden)
-    return next()
-  },
+router.get('/id/:pid(\\d+)/io', lc, pidPermChk,
   async (req, res) => {
     let pid = parseInt(req.params.pid)
     try {
@@ -264,6 +261,19 @@ router.get('/id/:pid(\\d+)/io', lc,
       console.error(err)
       return res.sendStatus(hsc.unauthorized)
     }
+  }
+)
+
+router.get('/id/:pid(\\d+)/statistics', lc, pidPermChk,
+  async (req, res) => {
+    let pid = parseInt(req.params.pid)
+    let query = 'SELECT DISTINCT ON ("solution"."uid") "solution"."pid", "problem"."title", "solution"."sid", "solution"."uid", "user"."email" AS "email", "user"."nickname", "user"."realname", "solution"."score", "solution"."status_id" AS "status", "solution"."lang_id" AS "lang", "solution"."code_size" AS "codeSize (B)", "solution"."run_time" AS "time (ms)", "solution"."run_memory" AS "memory (KiB)" FROM "problem" INNER JOIN "solution" ON "problem"."pid" = "solution"."pid" INNER JOIN "user" ON "solution"."uid" = "user"."uid" WHERE "solution"."pid" = $1 ORDER BY "solution"."uid" ASC, "solution"."score" DESC, "solution"."sid" DESC'
+    let ret = (await db.query(query, [pid])).rows
+    for (let row of ret) {
+      row.status = jsc.codeMsg[row.status]
+      row.lang = langMap.idLang[row.lang]
+    }
+    res.status(hsc.ok).json(ret)
   }
 )
 
