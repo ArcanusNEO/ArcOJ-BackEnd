@@ -4,7 +4,7 @@ const db = {}
 const pool = new Pool(config)
 
 pool.query('SELECT NOW() as now', (err, res) => {
-  if (err) console.log('Database connected error.', err)
+  if (err) console.error('Database connected error.', err)
   else console.log(`Database connected at ${res.rows[0].now}`)
 })
 
