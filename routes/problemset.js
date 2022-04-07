@@ -48,4 +48,27 @@ router.get('/id/:psid(\\d+)', lc,
     return (mc['problemset'](req.tokenAcc.uid, req.params.psid)(req, res, next))
   }, getDetail)
 
+router.get('/subscribe/:psid(\\d+)', lc,
+  async (req, res, next) => {
+    let psid = parseInt(req.params.psid)
+    if (!(psid > 0)) return res.sendStatus(hsc.badReq)
+    return pc(req.tokenAcc.uid, ['joinProblemset'])(req, res, next)
+  },
+  async (req, res) => {
+    let uid = req.tokenAcc.uid
+    let psid = parseInt(req.params.psid)
+    let query = 'SELECT "psid" FROM "problemset" WHERE "psid" = $1 AND NOT "private" AND NOW()::TIMESTAMPTZ < UPPER("during")::TIMESTAMPTZ AND "cid" ISNULL'
+    let ret = (await db.query(query, [psid])).rows[0]
+    if (!ret) return res.sendStatus(hsc.forbidden)
+    query = 'INSERT INTO "problemset_user" ("psid", "uid") VALUES ($1, $2)'
+    try {
+      await db.query(query, [psid, uid])
+    } catch (err) {
+      console.error(err)
+      return res.sendStatus(hsc.alreadyExist)
+    }
+    return res.sendStatus(hsc.ok)
+  }
+)
+
 module.exports = { get, getOpen, getDetail, router }
