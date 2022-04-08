@@ -18,7 +18,7 @@ router.use('/reset', require('./reset'))
 router.use('/signup', require('./signup'))
 router.use('/u(ser(s)?)?', require('./user'))
 router.use('/solution(s)?', require('./solution'))
-router.use('/test', require('./test'))
+router.use('/version', require('./version'))
 
 router.all('*', (req, res) => {
   res.sendStatus(hsc.notFound)
