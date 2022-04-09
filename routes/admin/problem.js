@@ -278,9 +278,9 @@ router.get('/id/:pid(\\d+)/statistics', lc, pidPermChk,
       row.lang = langMap.idLang[row.lang]
       let sid = parseInt(row.sid)
       let solCodeFile = (await getSolutionStructure(sid)).file.codeBase + ext
-      await fs.link(solCodeFile, path.resolve(solTmpDir, `${sid}.${ext}`))
+      await fs.link(solCodeFile, path.resolve(solTmpDir, `uid-${row.uid}-sid-${sid}.${ext}`))
     }
-    let solSetTmp = path.resolve(dataPath.temp, `${pid}-sol.zip`)
+    let solSetTmp = path.resolve(dataPath.temp, `pid-${pid}-solutions.zip`)
     await compressing.zip.compressDir(solTmpDir, solSetTmp)
     return res.download(solSetTmp, (err) => {
       console.error(err)
