@@ -5,7 +5,7 @@ const lc = require('../midwares/login-check')
 const db = require('../../utils/database')
 const mtc = require('../midwares/maintainer-check')
 const pc = require('../midwares/permission-check')
-const { getProblemStructure } = require('../../utils/judge')
+const { getProblemStructure, getSolutionStructure } = require('../../utils/judge')
 const fs = require('fs-extra')
 const fileUpload = require('express-fileupload')
 const path = require('path')
@@ -269,11 +269,25 @@ router.get('/id/:pid(\\d+)/statistics', lc, pidPermChk,
     let pid = parseInt(req.params.pid)
     let query = 'SELECT DISTINCT ON ("solution"."uid") "solution"."pid", "problem"."title", "solution"."sid", "solution"."uid", "user"."email" AS "email", "user"."nickname", "user"."realname", "solution"."score", "solution"."status_id" AS "status", "solution"."lang_id" AS "lang", "solution"."code_size" AS "codeSize (B)", "solution"."run_time" AS "time (ms)", "solution"."run_memory" AS "memory (KiB)" FROM "problem" INNER JOIN "solution" ON "problem"."pid" = "solution"."pid" INNER JOIN "user" ON "solution"."uid" = "user"."uid" WHERE "solution"."pid" = $1 ORDER BY "solution"."uid" ASC, "solution"."score" DESC, "solution"."sid" DESC'
     let ret = (await db.query(query, [pid])).rows
+    await fs.ensureDir(dataPath.temp)
+    let solTmpDir = path.resolve(dataPath.temp, `${pid}-sol`)
+    await fs.ensureDir(solTmpDir)
     for (let row of ret) {
       row.status = jsc.codeMsg[row.status]
+      let ext = langMap.idExt[row.lang]
       row.lang = langMap.idLang[row.lang]
+      let sid = parseInt(row.sid)
+      let solCodeFile = (await getSolutionStructure(sid)).file.codeBase + ext
+      await fs.link(solCodeFile, path.resolve(solTmpDir, `${sid}.${ext}`))
     }
-    res.status(hsc.ok).json(ret)
+    let solSetTmp = path.resolve(dataPath.temp, `${pid}-sol.zip`)
+    await compressing.zip.compressDir(solTmpDir, solSetTmp)
+    return res.download(solSetTmp, (err) => {
+      console.error(err)
+      fs.unlink(solSetTmp, (fserr) => { console.error(fserr) })
+      fs.remove(solTmpDir, (fserr) => { console.error(fserr) })
+    })
+    // res.status(hsc.ok).json(ret)
   }
 )
 
