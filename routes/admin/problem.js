@@ -282,7 +282,7 @@ router.get('/id/:pid(\\d+)/statistics', lc, pidPermChk,
     }
     let solSetTmp = path.resolve(dataPath.temp, `pid-${pid}-solutions.zip`)
     await compressing.zip.compressDir(solTmpDir, solSetTmp)
-    return res.download(solSetTmp, (err) => {
+    return res.json(ret).download(solSetTmp, (err) => {
       console.error(err)
       fs.unlink(solSetTmp, (fserr) => { console.error(fserr) })
       fs.remove(solTmpDir, (fserr) => { console.error(fserr) })
