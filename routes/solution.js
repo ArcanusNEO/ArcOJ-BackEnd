@@ -9,16 +9,15 @@ const { getSolutionStructure } = require('../utils/judge')
 const languageExtension = require('../config/lang-ext')
 const fs = require('fs-extra')
 
-const examing = (uid) => {
+const examing = async (uid) => {
   let query = `SELECT COUNT(*) FROM "problemset" INNER JOIN "problemset_user" ON "problemset"."psid" = "problemset_user"."psid" WHERE "problemset_user"."uid" = $1 AND NOW()::TIMESTAMPTZ <@ "problemset"."during" AND "problemset"."type" <> 'assignment'`
-  console.log(db)
-  let ret = 0 // (await db.query(query, [uid])).rows[0].count
+  let ret = (await db.query(query, [uid])).rows[0].count
   return (ret > 0)
 }
 
-const problemExaming = (pid) => {
+const problemExaming = async (pid) => {
   let query = `SELECT COUNT(*) FROM "problemset" INNER JOIN "problem" ON "problemset"."psid" = "problem"."psid" WHERE "problem"."pid" = $1 AND NOW()::TIMESTAMPTZ <@ "problemset"."during" AND "problemset"."type" <> 'assignment'`
-  let ret = 0 // (await db.query(query, [pid])).rows[0].count
+  let ret = (await db.query(query, [pid])).rows[0].count
   return (ret > 0)
 }
 
