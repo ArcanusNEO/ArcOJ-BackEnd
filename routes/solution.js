@@ -41,8 +41,6 @@ router.get('/id/:sid(\\d+)', lc,
     delete ret.open
     let uExaming = await examing(uid)
     let pExaming = await problemExaming(ret.pid)
-    console.log(uExaming)
-    console.log(pExaming)
     if (ret.uid === uid && (uExaming && pExaming || !uExaming) || permission >= 1) return res.status(hsc.ok).json(ret)
     let blockList = []
     if (before || !ret.share || open || secret || uExaming) {
