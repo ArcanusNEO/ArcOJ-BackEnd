@@ -13,6 +13,7 @@ const compressing = require("compressing")
 const dataPath = require('../../config/basic')
 const jsc = require('../../config/judge-status-code')
 const langMap = require('../../config/lang-ext')
+const filenamify = require('filenamify')
 
 const insertProblem = async (params) => {
   let { psid, title, extra, specialJudge, detailJudge, cases, timeLimit, memoryLimit, ownerId } = params
@@ -291,7 +292,8 @@ router.get('/id/:pid(\\d+)/statistics/code(s)?', lc, pidPermChk,
       row.lang = langMap.idLang[row.lang]
       let sid = parseInt(row.sid)
       let solCodeFile = (await getSolutionStructure(sid)).file.codeBase + ext
-      await fs.link(solCodeFile, path.resolve(solTmpDir, `uid-${row.uid}-sid-${sid}.${ext}`))
+      let nick = filenamify.default(row.nickname)
+      await fs.link(solCodeFile, path.resolve(solTmpDir, `uid-${row.uid}-sid-${sid}-nick-${nick}.${ext}`))
     }
     let solSetTmp = path.resolve(dataPath.temp, `pid-${pid}-solutions.zip`)
     await compressing.zip.compressDir(solTmpDir, solSetTmp)
