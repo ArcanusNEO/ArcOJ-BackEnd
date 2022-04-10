@@ -5,6 +5,8 @@ module.exports = {
   noContent: 204,
   resetContent: 205,
 
+  userNotExaming: 293,
+  userExaming: 294,
   alreadyExist: 295, //资源已经存在
   resOccupied: 296, //资源被占用
   captchaMismatch: 297,
