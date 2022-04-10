@@ -277,7 +277,7 @@ router.get('/id/:pid(\\d+)/statistics', lc, pidPermChk,
   }
 )
 
-router.get('/id/:pid(\\d+)/code(s)?', lc, pidPermChk,
+router.get('/id/:pid(\\d+)/statistics/code(s)?', lc, pidPermChk,
   async (req, res) => {
     let pid = parseInt(req.params.pid)
     let query = 'SELECT DISTINCT ON ("solution"."uid") "solution"."pid", "problem"."title", "solution"."sid", "solution"."uid", "user"."email" AS "email", "user"."nickname", "user"."realname", "solution"."score", "solution"."status_id" AS "status", "solution"."lang_id" AS "lang", "solution"."code_size" AS "codeSize (B)", "solution"."run_time" AS "time (ms)", "solution"."run_memory" AS "memory (KiB)" FROM "problem" INNER JOIN "solution" ON "problem"."pid" = "solution"."pid" INNER JOIN "user" ON "solution"."uid" = "user"."uid" WHERE "solution"."pid" = $1 ORDER BY "solution"."uid" ASC, "solution"."score" DESC, "solution"."sid" DESC'
