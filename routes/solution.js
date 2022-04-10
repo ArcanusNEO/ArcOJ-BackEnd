@@ -9,6 +9,18 @@ const { getSolutionStructure } = require('../utils/judge')
 const languageExtension = require('../config/lang-ext')
 const fs = require('fs-extra')
 
+const examing = (uid) => {
+  let query = 'SELECT COUNT(*) FROM "problemset" INNER JOIN "problemset_user" ON "problemset"."psid" = "problemset_user"."psid" WHERE "problemset_user"."uid" = $1 AND NOW()::TIMESTAMPTZ <@ "problemset"."during" AND "problemset"."type" <> \'assignment\''
+  let ret = (await db.query(query, [uid])).rows[0].count
+  return (ret > 0)
+}
+
+const problemExaming = (pid) => {
+  let query = 'SELECT COUNT(*) FROM "problemset" INNER JOIN "problem" ON "problemset"."psid" = "problem"."psid" WHERE "problem"."pid" = $1 AND NOW()::TIMESTAMPTZ <@ "problemset"."during" AND "problemset"."type" <> \'assignment\''
+  let ret = (await db.query(query, [pid])).rows[0].count
+  return (ret > 0)
+}
+
 router.get('/id/:sid(\\d+)', lc,
   async (req, res, next) => {
     if (parseInt(req.params.sid) > 0) return pc(req.tokenAcc.uid, ['getJudgeInfo'])(req, res, next)
@@ -27,9 +39,10 @@ router.get('/id/:sid(\\d+)', lc,
     delete ret.secret
     delete ret.before
     delete ret.open
-    if (ret.uid === uid || permission >= 1) return res.status(hsc.ok).json(ret)
+    let userExaming = examing(uid)
+    if (ret.uid === uid && (userExaming && problemExaming(ret.pid) || !userExaming) || permission >= 1) return res.status(hsc.ok).json(ret)
     let blockList = []
-    if (before || !ret.share || open || secret) {
+    if (before || !ret.share || open || secret || userExaming) {
       blockList.push('code', 'detail', 'compileInfo', 'codeSize')
       if (before || secret) blockList.push('runTime', 'runMemory', 'score')
     }
