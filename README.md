@@ -21,7 +21,7 @@ NankaiACM Online Judge 原后端 [NKOJ-Back-End](https://github.com/NankaiACM/NK
 ## 启动
 
 ```sh
-pm2 start bin/www --name api --watch --log /var/log/ArcOJ-BackEnd/api.log
+pm2 start bin/www.mjs --name api --watch --log /var/log/ArcOJ-BackEnd/api.log
 ```
 
 ## 维护

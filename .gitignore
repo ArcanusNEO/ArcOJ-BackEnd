@@ -13,7 +13,7 @@ yarn-error.log*
 *.njsproj
 *.sln
 
-/config/postgres.js
-/config/*private-key.js
-/config/email.js
+/config/postgres.mjs
+/config/*private-key.mjs
+/config/email.mjs
 # /routes/test.js
