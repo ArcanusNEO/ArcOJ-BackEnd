@@ -39,12 +39,13 @@ router.get('/id/:sid(\\d+)', lc,
     delete ret.secret
     delete ret.before
     delete ret.open
-    let userExaming = examing(uid)
-    console.log(userExaming)
-    console.log(problemExaming(ret.pid))
-    if (ret.uid === uid && (userExaming && problemExaming(ret.pid) || !userExaming) || permission >= 1) return res.status(hsc.ok).json(ret)
+    let uExaming = await examing(uid)
+    let pExaming = await problemExaming(ret.pid)
+    console.log(uExaming)
+    console.log(pExaming)
+    if (ret.uid === uid && (uExaming && pExaming || !uExaming) || permission >= 1) return res.status(hsc.ok).json(ret)
     let blockList = []
-    if (before || !ret.share || open || secret || userExaming) {
+    if (before || !ret.share || open || secret || uExaming) {
       blockList.push('code', 'detail', 'compileInfo', 'codeSize')
       if (before || secret) blockList.push('runTime', 'runMemory', 'score')
     }
