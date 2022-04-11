@@ -6,7 +6,10 @@ NankaiACM Online Judge 原后端 [NKOJ-Back-End](https://github.com/NankaiACM/NK
 
 1. 环境：
    - 项目：`drwxrwsr-x ojmaster www-data /var/www/ArcOJ-BackEnd`
-   - 日志：`-rw-rw-r-- ojmaster www-data /var/log/ArcOJ-BackEnd/api.log`
+   - 日志：
+       - `-rw-rw-r-- ojmaster www-data /var/log/ArcOJ-BackEnd/api.log`
+       - `-rw-rw-r-- ojmaster www-data /var/log/ArcOJ-BackEnd/api-error.log`
+       - `-rw-rw-r-- ojmaster www-data /var/log/ArcOJ-BackEnd/api-out.log`
    - PostgreSQL 10.3+
    - Node.js 10.0.0+, npm, node-pm2
    - Docker (judgecore)
@@ -21,10 +24,9 @@ NankaiACM Online Judge 原后端 [NKOJ-Back-End](https://github.com/NankaiACM/NK
 ## 启动
 
 ```sh
-pm2 start bin/www.mjs --name api --watch --log /var/log/ArcOJ-BackEnd/api.log
+pm2 start bin/www.mjs --name api --watch --log /var/log/ArcOJ-BackEnd/api.log --error /var/log/ArcOJ-BackEnd/api-error.log --output /var/log/ArcOJ-BackEnd/api-out.log
 ```
 
 ## 维护
 
 查看日志：`pm2 monit` 或 `pm2 log api`
-
