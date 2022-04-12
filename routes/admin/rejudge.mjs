@@ -6,7 +6,7 @@ import db from '../../utils/database.mjs'
 import mtc from '../midwares/maintainer-check.mjs'
 import pc from '../midwares/permission-check.mjs'
 import judgecore from '../../utils/judge.mjs'
-const { getProblemStructure, getSolutionStructure } = judgecore
+const { judge, getSolutionStructure } = judgecore
 import languageExtension from '../../config/lang-ext.mjs'
 import jsc from '../../config/judge-status-code.mjs'
 import fs from 'fs-extra'
