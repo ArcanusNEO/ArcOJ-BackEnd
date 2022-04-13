@@ -4,6 +4,7 @@ import hsc from '../../config/http-status-code.mjs'
 import lc from '../midwares/login-check.mjs'
 import db from '../../utils/database.mjs'
 import mtc from '../midwares/maintainer-check.mjs'
+import pcrb from '../midwares/permission-check-ret-bool.mjs'
 import pc from '../midwares/permission-check.mjs'
 import judgecore from '../../utils/judge.mjs'
 const { getProblemStructure, getSolutionStructure } = judgecore
@@ -95,26 +96,31 @@ const forkProblem = async (req, res) => {
 
 router.get('/fork/:pid(\\d+)/into/:psid(\\d+)', lc,
   async (req, res, next) => {
+    req.master = await pcrb(req.tokenAcc.uid)
     let pid = parseInt(req.params.pid)
     let psid = parseInt(req.params.psid)
     if (pid > 0 && psid > 0) return preCheck(pid, 'fork', psid)(req, res, next)
     return res.sendStatus(hsc.badReq)
   },
   async (req, res, next) => {
+    if (req.master) return next()
     return pc(req.tokenAcc.uid, req.reqPerms)(req, res, next)
   },
   async (req, res, next) => {
+    if (req.master) return next()
     return mtc.problemset(req.tokenAcc.uid, req.to.psid)(req, res, next)
   }, forkProblem
 )
 
 router.get('/fork/:pid(\\d+)/global', lc,
   async (req, res, next) => {
+    req.master = await pcrb(req.tokenAcc.uid)
     let pid = parseInt(req.params.pid)
     if (pid > 0) return preCheck(pid, 'fork', null)(req, res, next)
     return res.sendStatus(hsc.badReq)
   },
   async (req, res, next) => {
+    if (req.master) return next()
     return pc(req.tokenAcc.uid, req.reqPerms)(req, res, next)
   }, forkProblem
 )
@@ -141,31 +147,37 @@ const createProblem = async (req, res) => {
 
 router.post('/create/global', lc,
   async (req, res, next) => {
+    req.master = await pcrb(req.tokenAcc.uid)
     req.body.title = req.body.title || req.body.name
     return preCheck(null, 'create', null)(req, res, next)
   },
   async (req, res, next) => {
+    if (req.master) return next()
     return pc(req.tokenAcc.uid, req.reqPerms)(req, res, next)
   }, createProblem
 )
 
 router.post('/create/into/:psid(\\d+)', lc,
   async (req, res, next) => {
+    req.master = await pcrb(req.tokenAcc.uid)
     req.body.title = req.body.title || req.body.name
     let psid = parseInt(req.params.psid)
     if (psid > 0) return preCheck(null, 'create', psid)(req, res, next)
     return res.sendStatus(hsc.badReq)
   },
   async (req, res, next) => {
+    if (req.master) return next()
     return pc(req.tokenAcc.uid, req.reqPerms)(req, res, next)
   },
   async (req, res, next) => {
+    if (req.master) return next()
     return mtc.problemset(req.tokenAcc.uid, req.to.psid)(req, res, next)
   }, createProblem
 )
 
 router.post('/update/:pid(\\d+)', lc,
   async (req, res, next) => {
+    req.master = await pcrb(req.tokenAcc.uid)
     req.body.title = req.body.title || req.body.name
     let pid = parseInt(req.params.pid)
     if (!(pid > 0)) return res.sendStatus(hsc.badReq)
@@ -176,9 +188,11 @@ router.post('/update/:pid(\\d+)', lc,
     return preCheck(pid, 'update', psid)(req, res, next)
   },
   async (req, res, next) => {
+    if (req.master) return next()
     return pc(req.tokenAcc.uid, req.reqPerms)(req, res, next)
   },
   async (req, res, next) => {
+    if (req.master) return next()
     return mtc.problem(req.tokenAcc.uid, parseInt(req.params.pid))(req, res, next)
   },
   async (req, res) => {
@@ -315,6 +329,7 @@ router.use(fileUpload({
 
 router.post('/id/:pid(\\d+)/upload/io', lc,
   async (req, res, next) => {
+    req.master = await pcrb(req.tokenAcc.uid)
     let pid = parseInt(req.params.pid)
     if (!(pid > 0)) return res.sendStatus(hsc.badReq)
     let query = 'SELECT "pid", "psid" FROM "problem" WHERE "pid" = $1'
@@ -324,9 +339,11 @@ router.post('/id/:pid(\\d+)/upload/io', lc,
     return preCheck(pid, 'update', psid)(req, res, next)
   },
   async (req, res, next) => {
+    if (req.master) return next()
     return pc(req.tokenAcc.uid, req.reqPerms)(req, res, next)
   },
   async (req, res, next) => {
+    if (req.master) return next()
     return mtc.problem(req.tokenAcc.uid, parseInt(req.params.pid))(req, res, next)
   },
   async (req, res) => {
