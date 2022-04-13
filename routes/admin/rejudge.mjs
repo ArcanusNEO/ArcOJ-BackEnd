@@ -13,6 +13,7 @@ import fs from 'fs-extra'
 
 router.get('/sid/:sid(\\d+)', lc,
   async (req, res, next) => {
+    req.master = await pcrb(req.tokenAcc.uid, ['master'])
     let query = 'SELECT "solution"."lang_id" AS "langId", "solution"."pid", "problem"."psid", "problem"."special_judge" AS "specialJudge", "problem"."detail_judge" AS "detailJudge", "problem"."cases", "problem"."time_limit" AS "timeLimit", "problem"."memory_limit" AS "memoryLimit" FROM "solution" INNER JOIN "problem" ON "solution"."pid" = "problem"."pid" WHERE "solution"."sid" = $1'
     let sid = parseInt(req.params.sid)
     if (!(sid > 0)) return res.sendStatus(hsc.badReq)
@@ -27,6 +28,7 @@ router.get('/sid/:sid(\\d+)', lc,
     return pc(req.tokenAcc.uid, ['rejudgeGlobalProblem'])(req, res, next)
   },
   async (req, res, next) => {
+    if (req.master) return next()
     if (req.params.psid) return mtc.problemset(req.tokenAcc.uid, req.params.psid)(req, res, next)
     return mtc.problem(req.tokenAcc.uid, req.params.pid)(req, res, next)
   },
