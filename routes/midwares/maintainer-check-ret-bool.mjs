@@ -1,6 +1,6 @@
 import db from '../../utils/database.mjs'
 
-const problem = (uid, pid) => {
+const problem = async (uid, pid) => {
   let query = 'SELECT "owner_id" = $1 AS "own" FROM "problem" WHERE "pid" = $2'
   let ret = (await db.query(query, [uid, pid])).rows[0]
   if (!ret) return false
@@ -10,7 +10,7 @@ const problem = (uid, pid) => {
   return (ret ? true : false)
 }
 
-const problemset = (uid, psid) => {
+const problemset = async (uid, psid) => {
   let query = 'SELECT "owner_id" = $1 AS "own" FROM "problemset" WHERE "psid" = $2'
   let ret = (await db.query(query, [uid, psid])).rows[0]
   if (!ret) return false
@@ -20,7 +20,7 @@ const problemset = (uid, psid) => {
   return (ret ? true : false)
 }
 
-const course = (uid, cid) => {
+const course = async (uid, cid) => {
   let query = 'SELECT "owner_id" = $1 AS "own" FROM "course" WHERE "cid" = $2'
   let ret = (await db.query(query, [uid, cid])).rows[0]
   if (!ret) return false
