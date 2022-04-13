@@ -3,6 +3,8 @@ import hsc from '../../config/http-status-code.mjs'
 
 const problem = (uid, pid) => {
   return async (req, res, next) => {
+    let ret = mtcrb.problem(uid, pid)
+    console.log(ret)
     if (mtcrb.problem(uid, pid)) return next()
     return res.sendStatus(hsc.forbidden)
   }
