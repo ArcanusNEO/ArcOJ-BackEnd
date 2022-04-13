@@ -3,23 +3,21 @@ import hsc from '../../config/http-status-code.mjs'
 
 const problem = (uid, pid) => {
   return async (req, res, next) => {
-    let ret = mtcrb.problem(uid, pid)
-    console.log(ret)
-    if (mtcrb.problem(uid, pid)) return next()
+    if (await mtcrb.problem(uid, pid)) return next()
     return res.sendStatus(hsc.forbidden)
   }
 }
 
 const problemset = (uid, psid) => {
   return async (req, res, next) => {
-    if (mtcrb.problemset(uid, psid)) return next()
+    if (await mtcrb.problemset(uid, psid)) return next()
     return res.sendStatus(hsc.forbidden)
   }
 }
 
 const course = (uid, cid) => {
   return async (req, res, next) => {
-    if (mtcrb.course(uid, cid)) return next()
+    if (await mtcrb.course(uid, cid)) return next()
     return res.sendStatus(hsc.forbidden)
   }
 }
