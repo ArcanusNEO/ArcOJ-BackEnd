@@ -128,7 +128,8 @@ CREATE TABLE "public"."problem" (
   "cases" int4 NOT NULL,
   "time_limit" int4 NOT NULL,
   "memory_limit" int8 NOT NULL,
-  "owner_id" int4 NOT NULL
+  "owner_id" int4 NOT NULL,
+  "extension" text COLLATE "pg_catalog"."default" NOT NULL
 );
 ALTER TABLE "public"."problem" OWNER TO "OJMaster";
 -- ----------------------------
