@@ -96,7 +96,7 @@ const forkProblem = async (req, res) => {
 
 router.get('/fork/:pid(\\d+)/into/:psid(\\d+)', lc,
   async (req, res, next) => {
-    req.master = await pcrb(req.tokenAcc.uid)
+    req.master = await pcrb(req.tokenAcc.uid, ['master'])
     let pid = parseInt(req.params.pid)
     let psid = parseInt(req.params.psid)
     if (pid > 0 && psid > 0) return preCheck(pid, 'fork', psid)(req, res, next)
@@ -114,7 +114,7 @@ router.get('/fork/:pid(\\d+)/into/:psid(\\d+)', lc,
 
 router.get('/fork/:pid(\\d+)/global', lc,
   async (req, res, next) => {
-    req.master = await pcrb(req.tokenAcc.uid)
+    req.master = await pcrb(req.tokenAcc.uid, ['master'])
     let pid = parseInt(req.params.pid)
     if (pid > 0) return preCheck(pid, 'fork', null)(req, res, next)
     return res.sendStatus(hsc.badReq)
@@ -147,7 +147,7 @@ const createProblem = async (req, res) => {
 
 router.post('/create/global', lc,
   async (req, res, next) => {
-    req.master = await pcrb(req.tokenAcc.uid)
+    req.master = await pcrb(req.tokenAcc.uid, ['master'])
     req.body.title = req.body.title || req.body.name
     return preCheck(null, 'create', null)(req, res, next)
   },
@@ -159,7 +159,7 @@ router.post('/create/global', lc,
 
 router.post('/create/into/:psid(\\d+)', lc,
   async (req, res, next) => {
-    req.master = await pcrb(req.tokenAcc.uid)
+    req.master = await pcrb(req.tokenAcc.uid, ['master'])
     req.body.title = req.body.title || req.body.name
     let psid = parseInt(req.params.psid)
     if (psid > 0) return preCheck(null, 'create', psid)(req, res, next)
@@ -177,7 +177,7 @@ router.post('/create/into/:psid(\\d+)', lc,
 
 router.post('/update/:pid(\\d+)', lc,
   async (req, res, next) => {
-    req.master = await pcrb(req.tokenAcc.uid)
+    req.master = await pcrb(req.tokenAcc.uid, ['master'])
     req.body.title = req.body.title || req.body.name
     let pid = parseInt(req.params.pid)
     if (!(pid > 0)) return res.sendStatus(hsc.badReq)
@@ -329,7 +329,7 @@ router.use(fileUpload({
 
 router.post('/id/:pid(\\d+)/upload/io', lc,
   async (req, res, next) => {
-    req.master = await pcrb(req.tokenAcc.uid)
+    req.master = await pcrb(req.tokenAcc.uid, ['master'])
     let pid = parseInt(req.params.pid)
     if (!(pid > 0)) return res.sendStatus(hsc.badReq)
     let query = 'SELECT "pid", "psid" FROM "problem" WHERE "pid" = $1'
