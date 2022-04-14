@@ -24,4 +24,55 @@ router.get('/id/:mid(\\d+)', lc,
   }
 )
 
+router.post('/create/global', lc,
+  async (req, res, next) => {
+    req.master = await pcrb(req.tokenAcc.uid, ['master'])
+    if (req.master) return next()
+    return res.sendStatus(hsc.forbidden)
+  },
+  async (req, res) => {
+    let { title, content } = req.body
+    let query = 'INSERT INTO "message" ("from", "to", "title", "content", "when", "from_del", "to_del", "cid", "psid") VALUES ($1, NULL, $2, $3, NOW()::TIMESTAMPTZ, FALSE, FALSE, NULL, NULL) RETURNING "mid"'
+    let ret = (await db.query(query, [req.tokenAcc.uid, title, content])).rows[0]
+    if (!ret) return res.sendStatus(hsc.internalSrvErr)
+    return res.status(hsc.ok).json(ret.mid)
+  }
+)
+
+router.post('/create/course/:cid(\\d+)', lc,
+  async (req, res, next) => {
+    req.master = await pcrb(req.tokenAcc.uid, ['master'])
+    let cid = parseInt(req.params.cid)
+    if (!(cid > 0)) return res.sendStatus(hsc.badReq)
+    if (req.master) return next()
+    return res.sendStatus(hsc.forbidden)
+  },
+  async (req, res) => {
+    let { title, content } = req.body
+    let cid = parseInt(req.params.cid)
+    let query = 'INSERT INTO "message" ("from", "to", "title", "content", "when", "from_del", "to_del", "cid", "psid") VALUES ($1, NULL, $2, $3, NOW()::TIMESTAMPTZ, FALSE, FALSE, $4, NULL) RETURNING "mid"'
+    let ret = (await db.query(query, [req.tokenAcc.uid, title, content, cid])).rows[0]
+    if (!ret) return res.sendStatus(hsc.internalSrvErr)
+    return res.status(hsc.ok).json(ret.mid)
+  }
+)
+
+router.post('/create/problemset/:psid(\\d+)', lc,
+  async (req, res, next) => {
+    req.master = await pcrb(req.tokenAcc.uid, ['master'])
+    let psid = parseInt(req.params.psid)
+    if (!(psid > 0)) return res.sendStatus(hsc.badReq)
+    if (req.master) return next()
+    return res.sendStatus(hsc.forbidden)
+  },
+  async (req, res) => {
+    let { title, content } = req.body
+    let psid = parseInt(req.params.psid)
+    let query = 'INSERT INTO "message" ("from", "to", "title", "content", "when", "from_del", "to_del", "cid", "psid") VALUES ($1, NULL, $2, $3, NOW()::TIMESTAMPTZ, FALSE, FALSE, NULL, $4) RETURNING "mid"'
+    let ret = (await db.query(query, [req.tokenAcc.uid, title, content, psid])).rows[0]
+    if (!ret) return res.sendStatus(hsc.internalSrvErr)
+    return res.status(hsc.ok).json(ret.mid)
+  }
+)
+
 export default router
