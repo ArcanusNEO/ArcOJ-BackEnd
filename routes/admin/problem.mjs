@@ -127,6 +127,7 @@ router.get('/fork/:pid(\\d+)/global', lc,
 
 const createProblem = async (req, res) => {
   let { title, extra, specialJudge, detailJudge, cases, timeLimit, memoryLimit, content, extension } = req.body
+  if (!getProblemStructure(0).file[extension]) return res.sendStatus(hsc.badReq)
   let psid = req.to.psid, ownerId = req.tokenAcc.uid
   let params = { psid, title, extra, specialJudge, detailJudge, cases, timeLimit, memoryLimit, ownerId, extension }
   let pid = await insertProblem(params)
