@@ -18,10 +18,10 @@ import langMap from '../../config/lang-ext.mjs'
 import filenamify from 'filenamify'
 
 const insertProblem = async (params) => {
-  let { psid, title, extra, specialJudge, detailJudge, cases, timeLimit, memoryLimit, ownerId } = params
-  let pid, query = 'INSERT INTO "problem" ("psid", "title", "extra", "submit_ac", "submit_all", "special_judge", "detail_judge", "cases", "time_limit", "memory_limit", "owner_id") VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11) RETURNING "pid"'
+  let { psid, title, extra, specialJudge, detailJudge, cases, timeLimit, memoryLimit, ownerId, extension } = params
+  let pid, query = 'INSERT INTO "problem" ("psid", "title", "extra", "submit_ac", "submit_all", "special_judge", "detail_judge", "cases", "time_limit", "memory_limit", "owner_id", "extension") VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12) RETURNING "pid"'
   try {
-    pid = (await db.query(query, [psid, title, extra, 0, 0, specialJudge, detailJudge, cases, timeLimit, memoryLimit, ownerId])).rows[0].pid
+    pid = (await db.query(query, [psid, title, extra, 0, 0, specialJudge, detailJudge, cases, timeLimit, memoryLimit, ownerId, extension])).rows[0].pid
     pid = parseInt(pid)
   } catch (err) {
     console.error(err)
@@ -72,13 +72,13 @@ const forkProblem = async (req, res) => {
   let query = 'SELECT * FROM "problem" WHERE "pid" = $1'
   let ret = (await db.query(query, [fromPid])).rows[0]
   if (!ret) return res.sendStatus(hsc.internalSrvErr)
-  let { title, extra, cases } = ret
+  let { title, extra, cases, extension } = ret
   let specialJudge = ret.special_judge
   let detailJudge = ret.detail_judge
   let timeLimit = ret.time_limit
   let memoryLimit = ret.memory_limit
   let ownerId = req.tokenAcc.uid, psid = req.to.psid
-  let params = { psid, title, extra, specialJudge, detailJudge, cases, timeLimit, memoryLimit, ownerId }
+  let params = { psid, title, extra, specialJudge, detailJudge, cases, timeLimit, memoryLimit, ownerId, extension }
   let toPid = await insertProblem(params)
   if (toPid === 0) return res.sendStatus(hsc.internalSrvErr)
   let fromStruct = getProblemStructure(fromPid)
@@ -88,7 +88,7 @@ const forkProblem = async (req, res) => {
   await fs.ensureDir(toStruct.path.problem)
   await fs.copy(fromStruct.path.data, toStruct.path.data)
   await fs.copy(fromStruct.path.spj, toStruct.path.spj)
-  await fs.copy(fromStruct.file.md, toStruct.file.md)
+  await fs.copy(fromStruct.file[extension], toStruct.file[extension])
   query = 'INSERT INTO "problem_maintainer" ("pid", "uid") VALUES ($1, $2)'
   await db.query(query, [toPid, ownerId])
   return res.status(hsc.ok).json(toPid)
@@ -126,19 +126,21 @@ router.get('/fork/:pid(\\d+)/global', lc,
 )
 
 const createProblem = async (req, res) => {
-  let { title, extra, specialJudge, detailJudge, cases, timeLimit, memoryLimit, content } = req.body
+  let { title, extra, specialJudge, detailJudge, cases, timeLimit, memoryLimit, content, extension } = req.body
   let psid = req.to.psid, ownerId = req.tokenAcc.uid
-  let params = { psid, title, extra, specialJudge, detailJudge, cases, timeLimit, memoryLimit, ownerId }
+  let params = { psid, title, extra, specialJudge, detailJudge, cases, timeLimit, memoryLimit, ownerId, extension }
   let pid = await insertProblem(params)
   if (pid === 0) return res.sendStatus(hsc.internalSrvErr)
   let struct = getProblemStructure(pid)
+  let problem = struct.file[extension]
+  if (!problem) return res.sendStatus(hsc.badReq)
   await fs.ensureDir(struct.path.problem)
   await fs.remove(struct.path.data)
   await fs.remove(struct.path.spj)
-  await fs.remove(struct.file.md)
+  await fs.remove(problem)
   await fs.ensureDir(struct.path.data)
   await fs.ensureDir(struct.path.spj)
-  await fs.writeFile(struct.file.md, content)
+  await fs.writeFile(problem, content)
   let query = 'INSERT INTO "problem_maintainer" ("pid", "uid") VALUES ($1, $2)'
   await db.query(query, [pid, ownerId])
   return res.status(hsc.ok).json(pid)
@@ -196,20 +198,22 @@ router.post('/update/:pid(\\d+)', lc,
     return mtc.problem(req.tokenAcc.uid, parseInt(req.params.pid))(req, res, next)
   },
   async (req, res) => {
-    let { title, extra, specialJudge, detailJudge, cases, timeLimit, memoryLimit, content } = req.body
+    let { title, extra, specialJudge, detailJudge, cases, timeLimit, memoryLimit, content, extension } = req.body
     let psid = req.to.psid, param = [psid]
     let pid = req.from.pid
-    let items = { title, extra, specialJudge, detailJudge, cases, timeLimit, memoryLimit }
-    let itemsMap = { title: 'title', extra: 'extra', specialJudge: 'special_judge', detailJudge: 'detail_judge', cases: 'cases', timeLimit: 'time_limit', memoryLimit: 'memory_limit' }
+    let struct = getProblemStructure(pid)
+    let problem = struct.file[extension]
+    if (!problem) return res.sendStatus(hsc.badReq)
+    let items = { title, extra, specialJudge, detailJudge, cases, timeLimit, memoryLimit, extension }
+    let itemsMap = { title: 'title', extra: 'extra', specialJudge: 'special_judge', detailJudge: 'detail_judge', cases: 'cases', timeLimit: 'time_limit', memoryLimit: 'memory_limit', extension: 'extension' }
     let query = 'UPDATE "problem" SET "psid" = $1'
     for (let key in items)
       if (items[key]) query += `, "${itemsMap[key]}" = $${param.push(items[key])}`
     query += ` WHERE "pid" = $${param.push(pid)} RETURNING "pid", "psid", "title" AS "name", "extra", "submit_ac" AS "submitAc", "submit_all" AS "submitAll", "special_judge" AS "speciaJudge", "detail_judge" AS "detailJudge", "cases", "time_limit" AS "timeLimit", "memory_limit" AS "memoryLimit", "owner_id" AS "ownerId"`
     let ret = (await db.query(query, param)).rows[0]
     if (content) {
-      let struct = getProblemStructure(pid)
-      await fs.remove(struct.file.md)
-      await fs.writeFile(struct.file.md, content)
+      await fs.remove(problem)
+      await fs.writeFile(problem, content)
     }
     return res.status(hsc.ok).json(ret)
   }
@@ -247,11 +251,12 @@ const pidPermChk = async (req, res, next) => {
 router.get('/id/:pid(\\d+)', lc, pidPermChk,
   async (req, res) => {
     let pid = parseInt(req.params.pid)
-    let query = 'SELECT "problem"."pid", "problem"."psid", "problem"."title" AS "name", "problem"."extra", "problem"."submit_ac" AS "submitAc", "problem"."submit_all" AS "submitAll", "problem"."special_judge" AS "specialJudge", "problem"."detail_judge" AS "detailJudge", "problem"."cases", "problem"."time_limit" AS "timeLimit", "problem"."memory_limit" AS "memoryLimit", "problem"."owner_id" AS "ownerId" FROM "problem" WHERE "problem"."pid" = $1 LIMIT 1'
+    let query = 'SELECT "problem"."pid", "problem"."psid", "problem"."title" AS "name", "problem"."extra", "problem"."submit_ac" AS "submitAc", "problem"."submit_all" AS "submitAll", "problem"."special_judge" AS "specialJudge", "problem"."detail_judge" AS "detailJudge", "problem"."cases", "problem"."time_limit" AS "timeLimit", "problem"."memory_limit" AS "memoryLimit", "problem"."owner_id" AS "ownerId", "problem"."extension" FROM "problem" WHERE "problem"."pid" = $1 LIMIT 1'
     let ret = (await db.query(query, [pid])).rows[0]
     if (!ret) return res.sendStatus(hsc.unauthorized)
     try {
-      let problem = getProblemStructure(pid).file.md
+      let { extension } = ret
+      let problem = getProblemStructure(pid).file[extension]
       ret.content = await fs.readFile(problem)
     } catch (err) {
       console.error(err)
