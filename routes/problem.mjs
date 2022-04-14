@@ -107,7 +107,7 @@ router.get('/id/:pid(\\d+)', lc,
   async (req, res) => {
     let pid = req.params.pid
     let uid = req.tokenAcc.uid
-    let query = 'SELECT "problem"."pid", "problem"."psid", "problem"."title" AS "name", "problem"."extra", "problem"."submit_ac" AS "submitAc", "problem"."submit_all" AS "submitAll", "problem"."special_judge" AS "specialJudge", "problem"."detail_judge" AS "detailJudge", "problem"."cases", "problem"."time_limit" AS "timeLimit", "problem"."memory_limit" AS "memoryLimit", "problem"."owner_id" AS "ownerId" FROM "problem" WHERE "problem"."pid" = $1'
+    let query = 'SELECT "problem"."pid", "problem"."psid", "problem"."title" AS "name", "problem"."extra", "problem"."submit_ac" AS "submitAc", "problem"."submit_all" AS "submitAll", "problem"."special_judge" AS "specialJudge", "problem"."detail_judge" AS "detailJudge", "problem"."cases", "problem"."time_limit" AS "timeLimit", "problem"."memory_limit" AS "memoryLimit", "problem"."owner_id" AS "ownerId", "problem"."extension" FROM "problem" WHERE "problem"."pid" = $1'
     let ret = (await db.query(query, [pid])).rows[0]
     if (!ret) return res.sendStatus(hsc.unauthorized)
     let psid = ret.psid
@@ -117,10 +117,11 @@ router.get('/id/:pid(\\d+)', lc,
     if (score >= 100) ret.status = 2 // 已通过
     else if (score >= 0) ret.status = 1 // 已提交
     else ret.status = 0 // 未提交
+    let { extension } = ret
     try {
-      let problemMd = getProblemStructure(pid).file.md
-      // let problemPdf = getProblemStructure(pid).file.pdf
-      ret.content = await fs.readFile(problemMd)
+      let problem = getProblemStructure(pid).file[extension]
+      if (!problem) throw Error('Unkown file extension')
+      ret.content = await fs.readFile(problem)
     } catch (err) {
       console.error(err)
       return res.sendStatus(hsc.unauthorized)
