@@ -131,7 +131,7 @@ const createProblem = async (req, res) => {
   let psid = req.to.psid, ownerId = req.tokenAcc.uid
   let params = { psid, title, extra, specialJudge, detailJudge, cases, timeLimit, memoryLimit, ownerId, extension }
   let pid = await insertProblem(params)
-  if (pid === 0) return res.sendStatus(hsc.internalSrvErr)
+  if (pid === 0) return res.sendStatus(hsc.badReq)
   let struct = getProblemStructure(pid)
   let problem = struct.file[extension]
   if (!problem) return res.sendStatus(hsc.badReq)
@@ -204,7 +204,7 @@ router.post('/update/:pid(\\d+)', lc,
     let pid = req.from.pid
     let struct = getProblemStructure(pid)
     let problem = struct.file[extension]
-    if (!problem) return res.sendStatus(hsc.badReq)
+    if (extension && !problem) return res.sendStatus(hsc.badReq)
     let items = { title, extra, specialJudge, detailJudge, cases, timeLimit, memoryLimit, extension }
     let itemsMap = { title: 'title', extra: 'extra', specialJudge: 'special_judge', detailJudge: 'detail_judge', cases: 'cases', timeLimit: 'time_limit', memoryLimit: 'memory_limit', extension: 'extension' }
     let query = 'UPDATE "problem" SET "psid" = $1'
@@ -212,7 +212,7 @@ router.post('/update/:pid(\\d+)', lc,
       if (items[key]) query += `, "${itemsMap[key]}" = $${param.push(items[key])}`
     query += ` WHERE "pid" = $${param.push(pid)} RETURNING "pid", "psid", "title" AS "name", "extra", "submit_ac" AS "submitAc", "submit_all" AS "submitAll", "special_judge" AS "speciaJudge", "detail_judge" AS "detailJudge", "cases", "time_limit" AS "timeLimit", "memory_limit" AS "memoryLimit", "owner_id" AS "ownerId"`
     let ret = (await db.query(query, param)).rows[0]
-    if (content) {
+    if (problem && content) {
       await fs.remove(problem)
       await fs.writeFile(problem, content)
     }
