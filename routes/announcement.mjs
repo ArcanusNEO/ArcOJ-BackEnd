@@ -14,7 +14,7 @@ router.get('/id/:id(\\d+)', lc,
       req.ann = ret
       return next()
     }
-    return res.sendStatus(hsc.unauthorized)
+    return res.sendStatus(hsc.forbidden)
   },
   async (req, res, next) => {
     if (req.ann.cid) return (mc['course'](req.tokenAcc.uid, ret.ann.cid)(req, res, next))
