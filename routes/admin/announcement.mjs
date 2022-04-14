@@ -16,7 +16,7 @@ router.get('/id/:mid(\\d+)', lc,
     return res.sendStatus(hsc.forbidden)
   },
   async (req, res) => {
-    let query = 'SELECT "cid", "psid", "mid", "title", "content", "when" AS "time" FROM "message" WHERE NOT "from_del" AND "to" IS NULL AND "mid" = $1'
+    let query = 'SELECT "cid", "psid", "mid", "title", "content", "when" AS "time", "from_del" AS "del" FROM "message" WHERE "to" IS NULL AND "mid" = $1'
     let mid = parseInt(req.params.mid)
     let ret = (await db.query(query, [mid])).rows[0]
     if (!ret) return res.sendStatus(hsc.badReq)
@@ -72,6 +72,24 @@ router.post('/create/problemset/:psid(\\d+)', lc,
     let ret = (await db.query(query, [req.tokenAcc.uid, title, content, psid])).rows[0]
     if (!ret) return res.sendStatus(hsc.internalSrvErr)
     return res.status(hsc.ok).json(ret.mid)
+  }
+)
+
+router.post('/update/:mid(\\d+)', lc,
+  async (req, res, next) => {
+    req.master = await pcrb(req.tokenAcc.uid, ['master'])
+    let mid = parseInt(req.params.mid)
+    if (!(mid > 0)) return res.sendStatus(hsc.badReq)
+    if (req.master) return next()
+    return res.sendStatus(hsc.forbidden)
+  },
+  async (req, res) => {
+    let { title, content, del } = req.body
+    let mid = parseInt(req.params.mid)
+    let query = 'UPDATE "message" SET "when" = NOW()::TIMESTAMPTZ, "title" = $1, "content" = $2, "from_del" = $3 WHERE "mid" = $4 RETURNING "cid", "psid", "mid", "title", "content", "when" AS "time", "from_del" AS "del"'
+    let ret = (await db.query(query, [title, content, del, mid])).rows[0]
+    if (!ret) return res.sendStatus(hsc.badReq)
+    return res.status(hsc.ok).json(ret)
   }
 )
 
