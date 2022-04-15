@@ -133,7 +133,7 @@ router.get('/', lc,
   async (req, res) => {
     let page = parseInt(req.query.page), item = parseInt(req.query.item)
     let limit = item, offset = (page - 1) * item
-    let query = 'SELECT "cid", "psid", "mid", "title", "content", "when" AS "time", "from_del" AS "del" WHERE "to" IS NULL ORDER BY "mid" DESC'
+    let query = 'SELECT "cid", "psid", "mid", "title", "content", "when" AS "time", "from_del" AS "del" FROM "message" WHERE "to" IS NULL ORDER BY "mid" DESC'
     let param = []
     if (limit > 0) {
       query += ` LIMIT $${param.push(limit)}`
