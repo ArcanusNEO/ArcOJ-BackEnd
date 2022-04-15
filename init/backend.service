@@ -1,0 +1,15 @@
+[Unit]
+Description=ArcOJ BackEnd service
+After=network.target postgresql.service rc-local.service
+Requires=rc-local.service
+
+[Service]
+Type=simple
+WorkingDirectory=/var/www/ArcOJ-BackEnd
+User=ojmaster
+Group=www-data
+ExecStart=/usr/bin/pm2 start bin/www.mjs --name api --watch --log /var/log/ArcOJ-BackEnd/api.log --error /var/log/ArcOJ-BackEnd/api-error.log --output /var/log/ArcOJ-BackEnd/api-out.log
+RemainAfterExit=yes
+
+[Install]
+WantedBy=multi-user.target
