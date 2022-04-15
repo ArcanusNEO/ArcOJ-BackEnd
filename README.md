@@ -19,12 +19,19 @@ NankaiACM Online Judge 原后端 [NKOJ-Back-End](https://github.com/NankaiACM/NK
    - 在项目目录下执行 `npm install`；
    - 配置 PostgreSQL 数据库，建立 OJMaster 用户和 NKOJ-BackEnd-Database 数据库（UTF8），使用Navicat 等工具导入数据表；
    - 配置 NKOJ-OnlineJudge-JudgeCore，项目位于 `https://github.com/NankaiACM/NKOJ-OnlineJudge-JudgeCore`，若存在 `ArcOJ-BackEnd/init/judgecore-default.json`，则需替换judgecore 的相应配置文件；
+   - 安装 `backend.service` 并设为自启动；
    - Nginx 是默认使用的可选项，默认服务器配置位于 `ArcOJ-BackEnd/init/site.conf`，可能需要修改地址：前端默认后端位于 `http://acm.nankai.edu.cn/api`。如不使用 Nginx，请注意修改 express 框架的trust proxy 和 express-fileupload 上传文件限制等配置。
 
 ## 启动
 
 ```sh
 pm2 start bin/www.mjs --name api --watch --log /var/log/ArcOJ-BackEnd/api.log --error /var/log/ArcOJ-BackEnd/api-error.log --output /var/log/ArcOJ-BackEnd/api-out.log
+```
+
+若配置了 `backend.service`，则改成
+
+```sh
+systemctl start backend.service
 ```
 
 ## 维护
