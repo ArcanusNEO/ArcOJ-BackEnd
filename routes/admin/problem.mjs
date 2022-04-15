@@ -16,7 +16,8 @@ import dataPath from '../../config/basic.mjs'
 import jsc from '../../config/judge-status-code.mjs'
 import langMap from '../../config/lang-ext.mjs'
 import filenamify from 'filenamify'
-import { json2csv, json2csvAsync } from 'json-2-csv'
+import j2cPkg from 'json-2-csv';
+const { json2csvAsync } = j2cPkg;
 
 const insertProblem = async (params) => {
   let { psid, title, extra, specialJudge, detailJudge, cases, timeLimit, memoryLimit, ownerId, extension } = params
