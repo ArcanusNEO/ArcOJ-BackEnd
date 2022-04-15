@@ -111,4 +111,37 @@ router.post('/update/:mid(\\d+)', lc,
   }
 )
 
+router.get('/total', lc,
+  async (req, res, next) => {
+    if (!(req.tokenAcc.permission >= 1)) return res.sendStatus(hsc.forbidden)
+    return next()
+  },
+  async (req, res) => {
+    let query = 'SELECT COUNT(*) FROM "message" WHERE "to" IS NULL'
+    let ret = (await db.query(query, [mid])).rows[0]
+    if (!ret) return res.sendStatus(hsc.badReq)
+    let { count } = ret
+    return res.status(hsc.ok).json(count)
+  }
+)
+
+router.get('/', lc,
+  async (req, res, next) => {
+    if (!(req.tokenAcc.permission >= 1)) return res.sendStatus(hsc.forbidden)
+    return next()
+  },
+  async (req, res) => {
+    let page = parseInt(req.query.page), item = parseInt(req.query.item)
+    let limit = item, offset = (page - 1) * item
+    let query = 'SELECT "cid", "psid", "mid", "title", "content", "when" AS "time", "from_del" AS "del" WHERE "to" IS NULL ORDER BY "mid" DESC'
+    let param = []
+    if (limit > 0) {
+      query += ` LIMIT $${param.push(limit)}`
+      if (offset >= 0) query += ` OFFSET $${param.push(offset)}`
+    }
+    let ret = (await db.query(query, param)).rows
+    return res.status(hsc.ok).json(ret)
+  }
+)
+
 export default router
