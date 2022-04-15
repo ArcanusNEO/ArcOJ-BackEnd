@@ -298,8 +298,9 @@ router.get('/id/:pid(\\d+)/statistics', lc, pidPermChk,
       row.lang = langMap.idLang[row.lang]
     }
     let csv = await json2csvAsync(ret)
-    ret.csv = csv
-    res.status(hsc.ok).json(ret)
+    let response = { csv }
+    response.json = ret
+    res.status(hsc.ok).json(response)
   }
 )
 
