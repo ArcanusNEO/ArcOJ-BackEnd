@@ -44,7 +44,7 @@ router.post('/create/course/:cid(\\d+)', lc,
     if (!(cid > 0)) return res.sendStatus(hsc.badReq)
     req.master = await pcrb(req.tokenAcc.uid, ['master'])
     if (req.master) return next()
-    return pc(req.tokenAcc.uid, ['postAnnouncement'])
+    return pc(req.tokenAcc.uid, ['postAnnouncement'])(req, res, next)
   },
   async (req, res, next) => {
     if (req.master) return next()
@@ -66,7 +66,7 @@ router.post('/create/problemset/:psid(\\d+)', lc,
     if (!(psid > 0)) return res.sendStatus(hsc.badReq)
     req.master = await pcrb(req.tokenAcc.uid, ['master'])
     if (req.master) return next()
-    return pc(req.tokenAcc.uid, ['postAnnouncement'])
+    return pc(req.tokenAcc.uid, ['postAnnouncement'])(req, res, next)
   },
   async (req, res, next) => {
     if (req.master) return next()
@@ -88,7 +88,7 @@ router.post('/update/:mid(\\d+)', lc,
     if (!(mid > 0)) return res.sendStatus(hsc.badReq)
     req.master = await pcrb(req.tokenAcc.uid, ['master'])
     if (req.master) return next()
-    return pc(req.tokenAcc.uid, ['postAnnouncement'])
+    return pc(req.tokenAcc.uid, ['postAnnouncement'])(req, res, next)
   },
   async (req, res, next) => {
     if (req.master) return next()
@@ -97,8 +97,8 @@ router.post('/update/:mid(\\d+)', lc,
     let ret = (await db.query(query, [mid])).rows[0]
     if (!ret) return res.sendStatus(hsc.badReq)
     let { cid, psid } = ret
-    if (cid) return mtc.course(req.tokenAcc.uid, cid)
-    if (psid) return mtc.problemset(req.tokenAcc.uid, psid)
+    if (cid) return mtc.course(req.tokenAcc.uid, cid)(req, res, next)
+    if (psid) return mtc.problemset(req.tokenAcc.uid, psid)(req, res, next)
     return res.sendStatus(hsc.forbidden)
   },
   async (req, res) => {

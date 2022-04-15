@@ -1,6 +1,6 @@
 export default {
   'master': 1,                      // 最高权限位，一些奇奇怪怪的权限会检查，也可以跳过集合管理员检查，实现时若为1则假设所有权限位都为1
-  'editGroup': 2,
+  'editGroup': 2,                   // 还未实现
   'getShareCode': 3,                // 还未实现，允不允许普通用户查看别人的公开代码，尚在讨论必要性
   'changeProfile': 4,
   'submitCode': 5,                  // 评测权限
@@ -11,8 +11,8 @@ export default {
   'editCourse': 10,
   'rejudgeGlobalProblem': 11,
   'rejudgeLocalProblem': 12,
-  'postMessage': 13,
-  'postAnnouncement': 14,           // Local announcement
+  'postMessage': 13,                // message功能可能不会启用
+  'postAnnouncement': 14,           // 指local announcement
   'getGlobalCode': 15,              // 已废弃
   'getLocalCode': 16,               // 已废弃
   'getGlobalJudgeInfo': 17,         // 已废弃
