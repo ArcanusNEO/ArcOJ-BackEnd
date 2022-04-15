@@ -9,14 +9,13 @@ import pc from '../midwares/permission-check.mjs'
 
 router.get('/id/:mid(\\d+)', lc,
   async (req, res, next) => {
-    req.master = await pcrb(req.tokenAcc.uid, ['master'])
     let mid = parseInt(req.params.mid)
     if (!(mid > 0)) return res.sendStatus(hsc.badReq)
-    if (req.master) return next()
-    return res.sendStatus(hsc.forbidden)
+    if (!(req.tokenAcc.permission >= 1)) return res.sendStatus(hsc.forbidden)
+    return next()
   },
   async (req, res) => {
-    let query = 'SELECT "cid", "psid", "mid", "title", "content", "when" AS "time", "from_del" AS "del" FROM "message" WHERE "to" IS NULL AND "mid" = $1'
+    let query = 'SELECT "cid", "psid", "mid", "title", "content", "when" AS "time", "from_del" AS "del" FROM "message" WHERE "mid" = $1 AND "to" IS NULL'
     let mid = parseInt(req.params.mid)
     let ret = (await db.query(query, [mid])).rows[0]
     if (!ret) return res.sendStatus(hsc.badReq)
@@ -41,11 +40,15 @@ router.post('/create/global', lc,
 
 router.post('/create/course/:cid(\\d+)', lc,
   async (req, res, next) => {
-    req.master = await pcrb(req.tokenAcc.uid, ['master'])
     let cid = parseInt(req.params.cid)
     if (!(cid > 0)) return res.sendStatus(hsc.badReq)
+    req.master = await pcrb(req.tokenAcc.uid, ['master'])
     if (req.master) return next()
-    return res.sendStatus(hsc.forbidden)
+    return pc(req.tokenAcc.uid, ['postAnnouncement'])
+  },
+  async (req, res, next) => {
+    if (req.master) return next()
+    return mtc.course(req.tokenAcc.uid, req.params.cid)(req, res, next)
   },
   async (req, res) => {
     let { title, content } = req.body
@@ -59,11 +62,15 @@ router.post('/create/course/:cid(\\d+)', lc,
 
 router.post('/create/problemset/:psid(\\d+)', lc,
   async (req, res, next) => {
-    req.master = await pcrb(req.tokenAcc.uid, ['master'])
     let psid = parseInt(req.params.psid)
     if (!(psid > 0)) return res.sendStatus(hsc.badReq)
+    req.master = await pcrb(req.tokenAcc.uid, ['master'])
     if (req.master) return next()
-    return res.sendStatus(hsc.forbidden)
+    return pc(req.tokenAcc.uid, ['postAnnouncement'])
+  },
+  async (req, res, next) => {
+    if (req.master) return next()
+    return mtc.problemset(req.tokenAcc.uid, req.params.psid)(req, res, next)
   },
   async (req, res) => {
     let { title, content } = req.body
@@ -77,16 +84,27 @@ router.post('/create/problemset/:psid(\\d+)', lc,
 
 router.post('/update/:mid(\\d+)', lc,
   async (req, res, next) => {
-    req.master = await pcrb(req.tokenAcc.uid, ['master'])
     let mid = parseInt(req.params.mid)
     if (!(mid > 0)) return res.sendStatus(hsc.badReq)
+    req.master = await pcrb(req.tokenAcc.uid, ['master'])
     if (req.master) return next()
+    return pc(req.tokenAcc.uid, ['postAnnouncement'])
+  },
+  async (req, res, next) => {
+    if (req.master) return next()
+    let mid = parseInt(req.params.mid)
+    let query = 'SELECT "cid", "psid" FROM "message" WHERE "mid" = $1 AND "to" IS NULL'
+    let ret = (await db.query(query, [mid])).rows[0]
+    if (!ret) return res.sendStatus(hsc.badReq)
+    let { cid, psid } = ret
+    if (cid) return mtc.course(req.tokenAcc.uid, cid)
+    if (psid) return mtc.problemset(req.tokenAcc.uid, psid)
     return res.sendStatus(hsc.forbidden)
   },
   async (req, res) => {
     let { title, content, del } = req.body
     let mid = parseInt(req.params.mid)
-    let query = 'UPDATE "message" SET "when" = NOW()::TIMESTAMPTZ, "title" = $1, "content" = $2, "from_del" = $3 WHERE "mid" = $4 RETURNING "cid", "psid", "mid", "title", "content", "when" AS "time", "from_del" AS "del"'
+    let query = 'UPDATE "message" SET "when" = NOW()::TIMESTAMPTZ, "title" = $1, "content" = $2, "from_del" = $3 WHERE "mid" = $4 AND "to" IS NULL RETURNING "cid", "psid", "mid", "title", "content", "when" AS "time", "from_del" AS "del"'
     let ret = (await db.query(query, [title, content, del, mid])).rows[0]
     if (!ret) return res.sendStatus(hsc.badReq)
     return res.status(hsc.ok).json(ret)

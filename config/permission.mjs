@@ -12,7 +12,7 @@ export default {
   'rejudgeGlobalProblem': 11,
   'rejudgeLocalProblem': 12,
   'postMessage': 13,
-  'postAnnouncement': 14,
+  'postAnnouncement': 14,           // Local announcement
   'getGlobalCode': 15,              // 已废弃
   'getLocalCode': 16,               // 已废弃
   'getGlobalJudgeInfo': 17,         // 已废弃
