@@ -118,7 +118,7 @@ router.get('/total', lc,
   },
   async (req, res) => {
     let query = 'SELECT COUNT(*) FROM "message" WHERE "to" IS NULL'
-    let ret = (await db.query(query, [mid])).rows[0]
+    let ret = (await db.query(query)).rows[0]
     if (!ret) return res.sendStatus(hsc.badReq)
     let { count } = ret
     return res.status(hsc.ok).json(count)
