@@ -16,6 +16,7 @@ import dataPath from '../../config/basic.mjs'
 import jsc from '../../config/judge-status-code.mjs'
 import langMap from '../../config/lang-ext.mjs'
 import filenamify from 'filenamify'
+import { json2csv, json2csvAsync } from 'json-2-csv'
 
 const insertProblem = async (params) => {
   let { psid, title, extra, specialJudge, detailJudge, cases, timeLimit, memoryLimit, ownerId, extension } = params
@@ -295,6 +296,8 @@ router.get('/id/:pid(\\d+)/statistics', lc, pidPermChk,
       row.status = jsc.codeMsg[row.status]
       row.lang = langMap.idLang[row.lang]
     }
+    let csv = await json2csvAsync(ret)
+    ret.csv = csv
     res.status(hsc.ok).json(ret)
   }
 )
