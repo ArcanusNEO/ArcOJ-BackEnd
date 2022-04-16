@@ -143,8 +143,8 @@ const createProblem = async (req, res) => {
   await fs.remove(problem)
   await fs.ensureDir(struct.path.data)
   await fs.ensureDir(struct.path.spj)
-  console.log(content)
-  await fs.writeFile(problem, content)
+  let buf = Buffer.from(content)
+  await fs.writeFile(problem, buf)
   let query = 'INSERT INTO "problem_maintainer" ("pid", "uid") VALUES ($1, $2)'
   await db.query(query, [pid, ownerId])
   return res.status(hsc.ok).json(pid)
@@ -217,7 +217,8 @@ router.post('/update/:pid(\\d+)', lc,
     let ret = (await db.query(query, param)).rows[0]
     if (problem && content) {
       await fs.remove(problem)
-      await fs.writeFile(problem, content)
+      let buf = Buffer.from(content)
+      await fs.writeFile(problem, buf)
     }
     return res.status(hsc.ok).json(ret)
   }
