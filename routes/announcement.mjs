@@ -50,15 +50,7 @@ router.get('/course(s)?/:id(\\d+)', lc,
   },
   getMsgInSection('cid'))
 
-router.get('/contest(s)?/:id(\\d+)', lc,
-  async (req, res, next) => {
-    let psid = parseInt(req.params.id)
-    if (!(psid > 0)) return res.sendStatus(hsc.badReq)
-    return (mc['problemset'](req.tokenAcc.uid, psid)(req, res, next))
-  },
-  getMsgInSection('psid'))
-
-router.get('/assignment(s)?/:id(\\d+)', lc,
+router.get('/problemset(s)?/:id(\\d+)', lc,
   async (req, res, next) => {
     let psid = parseInt(req.params.id)
     if (!(psid > 0)) return res.sendStatus(hsc.badReq)
