@@ -222,6 +222,80 @@ router.post('/update/:pid(\\d+)', lc,
   }
 )
 
+const move2Ps = async (req, res) => {
+  let query = 'UPDATE "problem" SET "psid" = $1 WHERE "pid" = $2'
+  await db.query(query, [req.dstid, req.pid])
+  res.sendStatus(hsc.ok)
+}
+
+router.get('/move/:pid(\\d+)/from/:srcid(\\d+)/to/:dstid(\\d+)', lc,
+  async (req, res, next) => {
+    req.master = await pcrb(req.tokenAcc.uid, ['master'])
+    let pid = parseInt(req.params.pid)
+    let srcid = parseInt(req.params.srcid)
+    let dstid = parseInt(req.params.dstid)
+    req.pid = pid
+    req.srcid = srcid
+    req.dstid = dstid
+    if (pid > 0 && srcid > 0 && dstid > 0 && srcid !== dstid) return next()
+    return res.sendStatus(hsc.badReq)
+  },
+  async (req, res, next) => {
+    if (req.master) return next()
+    return pc(req.tokenAcc.uid, ['editLocalProblem'])(req, res, next)
+  },
+  async (req, res, next) => {
+    if (req.master) return next()
+    mtc.problemset(req.tokenAcc.uid, req.srcid)(req, res, next)
+  },
+  async (req, res, next) => {
+    if (req.master) return next()
+    mtc.problemset(req.tokenAcc.uid, req.dstid)(req, res, next)
+  }, move2Ps
+)
+
+const chkEditAllP = async (req, res, next) => {
+  if (req.master) return next()
+  return pc(req.tokenAcc.uid, ['editLocalProblem', 'editGlobalProblem'])(req, res, next)
+}
+
+router.get('/move/:pid(\\d+)/from/global/to/:dstid(\\d+)', lc,
+  async (req, res, next) => {
+    req.master = await pcrb(req.tokenAcc.uid, ['master'])
+    let pid = parseInt(req.params.pid)
+    let dstid = parseInt(req.params.dstid)
+    req.pid = pid
+    req.dstid = dstid
+    if (pid > 0 && dstid > 0) return next()
+    return res.sendStatus(hsc.badReq)
+  }, chkEditAllP,
+  async (req, res, next) => {
+    if (req.master) return next()
+    mtc.problemset(req.tokenAcc.uid, req.dstid)(req, res, next)
+  }, move2Ps
+)
+
+router.get('/move/:pid(\\d+)/from/:srcid(\\d+)/to/global', lc,
+  async (req, res, next) => {
+    req.master = await pcrb(req.tokenAcc.uid, ['master'])
+    let pid = parseInt(req.params.pid)
+    let srcid = parseInt(req.params.srcid)
+    req.pid = pid
+    req.srcid = srcid
+    if (pid > 0 && srcid > 0) return next()
+    return res.sendStatus(hsc.badReq)
+  }, chkEditAllP,
+  async (req, res, next) => {
+    if (req.master) return next()
+    mtc.problemset(req.tokenAcc.uid, req.srcid)(req, res, next)
+  },
+  async (req, res) => {
+    let query = 'UPDATE "problem" SET "psid" = NULL WHERE "pid" = $1'
+    await db.query(query, [req.pid])
+    res.sendStatus(hsc.ok)
+  }
+)
+
 router.get('/', lc, async (req, res) => {
   let { page, item } = req.query
   page = parseInt(page)
