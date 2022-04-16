@@ -143,6 +143,7 @@ const createProblem = async (req, res) => {
   await fs.remove(problem)
   await fs.ensureDir(struct.path.data)
   await fs.ensureDir(struct.path.spj)
+  console.log(content)
   await fs.writeFile(problem, content)
   let query = 'INSERT INTO "problem_maintainer" ("pid", "uid") VALUES ($1, $2)'
   await db.query(query, [pid, ownerId])
