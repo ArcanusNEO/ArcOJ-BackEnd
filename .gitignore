@@ -16,4 +16,6 @@ yarn-error.log*
 /config/postgres.mjs
 /config/*private-key.mjs
 /config/email.mjs
+/config/secret.mjs
+/config/salt.mjs
 # /routes/test.js
