@@ -327,20 +327,31 @@ const pidPermChk = async (req, res, next) => {
   return next()
 }
 
-router.get('/id/:pid(\\d+)', lc, pidPermChk,
+router.get('/id/:pid(\\d+)/content', lc, pidPermChk,
   async (req, res) => {
     let pid = parseInt(req.params.pid)
-    let query = 'SELECT "problem"."pid", "problem"."psid", "problem"."title" AS "name", "problem"."extra", "problem"."submit_ac" AS "submitAc", "problem"."submit_all" AS "submitAll", "problem"."special_judge" AS "specialJudge", "problem"."detail_judge" AS "detailJudge", "problem"."cases", "problem"."time_limit" AS "timeLimit", "problem"."memory_limit" AS "memoryLimit", "problem"."owner_id" AS "ownerId", "problem"."extension" FROM "problem" WHERE "problem"."pid" = $1 LIMIT 1'
+    let query = 'SELECT "problem"."extension" FROM "problem" WHERE "problem"."pid" = $1'
     let ret = (await db.query(query, [pid])).rows[0]
-    if (!ret) return res.sendStatus(hsc.unauthorized)
+    if (!ret) return res.sendStatus(hsc.forbidden)
     try {
       let { extension } = ret
       let problem = getProblemStructure(pid).file[extension]
       ret.content = await fs.readFile(problem)
     } catch (err) {
       console.error(err)
-      return res.sendStatus(hsc.unauthorized)
+      ret.content = null
+      return res.status(hsc.badReq).json(ret)
     }
+    return res.status(hsc.ok).json(ret)
+  }
+)
+
+router.get('/id/:pid(\\d+)', lc, pidPermChk,
+  async (req, res) => {
+    let pid = parseInt(req.params.pid)
+    let query = 'SELECT "problem"."pid", "problem"."psid", "problem"."title" AS "name", "problem"."extra", "problem"."submit_ac" AS "submitAc", "problem"."submit_all" AS "submitAll", "problem"."special_judge" AS "specialJudge", "problem"."detail_judge" AS "detailJudge", "problem"."cases", "problem"."time_limit" AS "timeLimit", "problem"."memory_limit" AS "memoryLimit", "problem"."owner_id" AS "ownerId", "problem"."extension" FROM "problem" WHERE "problem"."pid" = $1'
+    let ret = (await db.query(query, [pid])).rows[0]
+    if (!ret) return res.sendStatus(hsc.forbidden)
     return res.status(hsc.ok).json(ret)
   }
 )
@@ -414,25 +425,55 @@ router.use(fileUpload({
   tempFileDir: '/tmp/'
 }))
 
-router.post('/id/:pid(\\d+)/upload/io', lc,
-  async (req, res, next) => {
-    req.master = await pcrb(req.tokenAcc.uid, ['master'])
+const uploadProblemDataPreChk = async (req, res, next) => {
+  req.master = await pcrb(req.tokenAcc.uid, ['master'])
+  let pid = parseInt(req.params.pid)
+  if (!(pid > 0)) return res.sendStatus(hsc.badReq)
+  let query = 'SELECT "pid", "psid" FROM "problem" WHERE "pid" = $1'
+  let ret = (await db.query(query, [pid])).rows[0]
+  if (!ret) return res.sendStatus(hsc.unauthorized)
+  let psid = ret.psid
+  return preCheck(pid, 'update', psid)(req, res, next)
+}
+
+const uploadProblemDataPermChk = async (req, res, next) => {
+  if (req.master) return next()
+  return pc(req.tokenAcc.uid, req.reqPerms)(req, res, next)
+}
+
+const uploadProblemDataMTC = async (req, res, next) => {
+  if (req.master) return next()
+  return mtc.problem(req.tokenAcc.uid, parseInt(req.params.pid))(req, res, next)
+}
+
+router.post('/id/:pid(\\d+)/upload/content', lc,
+  uploadProblemDataPreChk,
+  uploadProblemDataPermChk,
+  uploadProblemDataMTC,
+  async (req, res) => {
+    if (!req.files || Object.keys(req.files).length === 0) return res.sendStatus(hsc.badReq)
     let pid = parseInt(req.params.pid)
-    if (!(pid > 0)) return res.sendStatus(hsc.badReq)
-    let query = 'SELECT "pid", "psid" FROM "problem" WHERE "pid" = $1'
+    let struct = getProblemStructure(pid)
+    await fs.ensureDir(struct.path.problem)
+    let query = 'SELECT "problem"."extension" FROM "problem" WHERE "problem"."pid" = $1'
     let ret = (await db.query(query, [pid])).rows[0]
-    if (!ret) return res.sendStatus(hsc.unauthorized)
-    let psid = ret.psid
-    return preCheck(pid, 'update', psid)(req, res, next)
-  },
-  async (req, res, next) => {
-    if (req.master) return next()
-    return pc(req.tokenAcc.uid, req.reqPerms)(req, res, next)
-  },
-  async (req, res, next) => {
-    if (req.master) return next()
-    return mtc.problem(req.tokenAcc.uid, parseInt(req.params.pid))(req, res, next)
-  },
+    if (!ret) return res.sendStatus(hsc.forbidden)
+    let { extension } = ret
+    try {
+      let content = req.files.content
+      let problem = getProblemStructure(pid).file[extension]
+      await content.mv(problem)
+    } catch (err) {
+      console.error(err)
+      return res.sendStatus(hsc.badReq)
+    }
+    return res.sendStatus(hsc.ok)
+  })
+
+router.post('/id/:pid(\\d+)/upload/io', lc,
+  uploadProblemDataPreChk,
+  uploadProblemDataPermChk,
+  uploadProblemDataMTC,
   async (req, res) => {
     if (!req.files || Object.keys(req.files).length === 0) return res.sendStatus(hsc.badReq)
     let pid = parseInt(req.params.pid)
@@ -440,7 +481,7 @@ router.post('/id/:pid(\\d+)/upload/io', lc,
     await fs.ensureDir(struct.path.data)
     let query = 'SELECT "cases" FROM "problem" WHERE "pid" = $1'
     let ret = (await db.query(query, [pid])).rows[0]
-    if (!ret || !(parseInt(ret.cases) > 0)) return res.sendStatus(hsc.internalSrvErr)
+    if (!ret || !(parseInt(ret.cases) > 0)) return res.sendStatus(hsc.badReq)
     let cases = parseInt(ret.cases)
     for (let i = 1; i <= cases; ++i) {
       let fileIn = req.files[i + ".in"]
