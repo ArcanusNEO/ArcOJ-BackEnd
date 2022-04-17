@@ -17,4 +17,8 @@ router.get('/', async (req, res) => {
   return res.end('Powered by Lucas and Wans.')
 })
 
+router.get('/mem', async (req, res) => {
+  return res.end(process.memoryUsage())
+})
+
 export default router
