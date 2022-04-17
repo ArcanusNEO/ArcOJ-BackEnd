@@ -18,7 +18,7 @@ router.get('/', async (req, res) => {
 })
 
 router.get('/mem', async (req, res) => {
-  return res.end(process.memoryUsage())
+  return res.json(process.memoryUsage())
 })
 
 export default router
