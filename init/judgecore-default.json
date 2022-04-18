@@ -28,7 +28,9 @@
       "$filename"
     ],
     "log": [
-      "$temp"
+      "$base",
+      "solutions",
+      "$sid"
     ],
     "output": [
       "$base",
