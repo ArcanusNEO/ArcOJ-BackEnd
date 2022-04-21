@@ -11,6 +11,9 @@ import compressing from "compressing"
 import dataPath from '../config/basic.mjs'
 import jsc from '../config/judge-status-code.mjs'
 import langMap from '../config/lang-ext.mjs'
+import { dirname } from 'path';
+import { fileURLToPath } from 'url';
+const __dirname = dirname(fileURLToPath(import.meta.url));
 
 
 router.get('/', async (req, res) => {
@@ -22,7 +25,7 @@ router.get('/mem', async (req, res) => {
 })
 
 router.get('/fortune', async (req, res) => {
-  return res.sendFile('../public/fortune.html')
+  return res.sendFile(path.join(__dirname, '../public/fortune.html'))
 })
 
 export default router
