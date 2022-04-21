@@ -25,7 +25,8 @@ router.get('/mem', async (req, res) => {
 })
 
 router.get('/fortune', async (req, res) => {
-  return res.sendFile(path.join(__dirname, '../public/fortune.html'))
+  res.writeHead(200, { "Content-Type": "text/html" })
+  return res.end(await fs.readFile(path.join(__dirname, '../public/fortune.html')))
 })
 
 export default router
