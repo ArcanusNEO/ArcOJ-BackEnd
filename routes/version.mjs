@@ -21,4 +21,8 @@ router.get('/mem', async (req, res) => {
   return res.json(process.memoryUsage())
 })
 
+router.get('/fortune', async (req, res) => {
+  return res.sendFile('../public/fortune.html')
+})
+
 export default router
