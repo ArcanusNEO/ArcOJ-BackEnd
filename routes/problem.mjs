@@ -4,7 +4,7 @@ import hsc from '../config/http-status-code.mjs'
 import lc from './midwares/login-check.mjs'
 import db from '../utils/database.mjs'
 import mc from './midwares/member-check.mjs'
-import judgecore from '../utils/judge.mjs'
+import judgecore from '../utils/nku-judgecore.mjs'
 const { getProblemStructure } = judgecore
 import fs from 'fs-extra'
 

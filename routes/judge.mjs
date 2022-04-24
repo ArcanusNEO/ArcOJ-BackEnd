@@ -6,7 +6,7 @@ import lc from './midwares/login-check.mjs'
 import pc from './midwares/permission-check.mjs'
 import languageExtension from '../config/lang-ext.mjs'
 import jsc from '../config/judge-status-code.mjs'
-import judgecore from '../utils/judge.mjs'
+import judgecore from '../utils/nku-judgecore.mjs'
 const { judge } = judgecore
 
 router.post('/', lc,

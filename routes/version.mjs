@@ -2,7 +2,7 @@ import express from 'express'
 const router = express.Router()
 import hsc from '../config/http-status-code.mjs'
 import db from '../utils/database.mjs'
-import judgecore from '../utils/judge.mjs'
+import judgecore from '../utils/nku-judgecore.mjs'
 const { getProblemStructure } = judgecore
 import fs from 'fs-extra'
 import fileUpload from 'express-fileupload'

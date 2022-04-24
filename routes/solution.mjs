@@ -5,7 +5,7 @@ import db from '../utils/database.mjs'
 import lc from './midwares/login-check.mjs'
 import pc from './midwares/permission-check.mjs'
 import jsc from '../config/judge-status-code.mjs'
-import judgecore from '../utils/judge.mjs'
+import judgecore from '../utils/nku-judgecore.mjs'
 const { getSolutionStructure } = judgecore
 import languageExtension from '../config/lang-ext.mjs'
 import fs from 'fs-extra'

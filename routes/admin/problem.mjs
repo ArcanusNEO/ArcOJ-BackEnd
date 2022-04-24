@@ -6,7 +6,7 @@ import db from '../../utils/database.mjs'
 import mtc from '../midwares/maintainer-check.mjs'
 import pcrb from '../midwares/permission-check-ret-bool.mjs'
 import pc from '../midwares/permission-check.mjs'
-import judgecore from '../../utils/judge.mjs'
+import judgecore from '../../utils/nku-judgecore.mjs'
 const { getProblemStructure, getSolutionStructure } = judgecore
 import fs from 'fs-extra'
 import fileUpload from 'express-fileupload'
