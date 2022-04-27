@@ -232,7 +232,7 @@ router.post('/update/:pid(\\d+)/spj', lc,
     let query = 'SELECT "pid", "psid", "special_judge" AS "specialJudge" FROM "problem" WHERE "pid" = $1'
     let ret = (await db.query(query, [pid])).rows[0]
     if (!ret) return res.sendStatus(hsc.unauthorized)
-    if (!(req.specialJudge > 0 && req.specialJudge <= 2)) return res.sendStatus(hsc.badReq)
+    if (!(ret.specialJudge > 0 && ret.specialJudge <= 2)) return res.sendStatus(hsc.badReq)
     return preCheck(pid, 'update', ret.psid)(req, res, next)
   },
   async (req, res, next) => {
