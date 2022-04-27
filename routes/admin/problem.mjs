@@ -246,7 +246,7 @@ router.post('/update/:pid(\\d+)/spj', lc,
   },
   async (req, res) => {
     let { code: spjCode, lang: spjLang } = req.body
-    let spjLangExt = langExt.langExt[spjLang]
+    let spjLangExt = langMap.langExt[spjLang]
     if (!spjLangExt) return res.sendStatus(hsc.badReq)
     let pid = parseInt(req.params.pid)
     let ret = await spj({ pid, spjCode, spjLang, spjLangExt })
