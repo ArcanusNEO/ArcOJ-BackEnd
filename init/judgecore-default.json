@@ -22,7 +22,7 @@
     "stdout": ["$stdin"],
     "temp": ["/tmp", ["judge-", "$pid", "-", "$sid"]],
     "exec": ["$temp", "main"],
-    "spj": ["$base", "problems-spj", "$pid"]
+    "spj": ["$base", "problems-spj", "$pid", "main"]
   },
   "spj": {
     "code": ["$spj", ".", "$lang_ext"],
