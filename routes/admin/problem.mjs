@@ -406,6 +406,24 @@ router.get('/id/:pid(\\d+)/io', lc, pidPermChk,
   }
 )
 
+router.get('/id/:pid(\\d+)/spj', lc, pidPermChk,
+  async (req, res) => {
+    let pid = parseInt(req.params.pid)
+    try {
+      let struct = getProblemStructure(pid)
+      let config = JSON.parse(await fs.readFile(struct.file.spjBase + 'config', 'utf8'))
+      let { lang } = config
+      let langExt = langMap.langExt[lang]
+      let spjFile = struct.file.spjBase + langExt
+      let code = await fs.readFile(spjFile, 'utf8')
+      return res.status(hsc.ok).json({ code, lang })
+    } catch (err) {
+      console.error(err)
+      return res.sendStatus(hsc.badReq)
+    }
+  }
+)
+
 router.get('/id/:pid(\\d+)/statistics', lc, pidPermChk,
   async (req, res) => {
     let pid = parseInt(req.params.pid)
