@@ -123,7 +123,7 @@ const spj = async (params) => {
   let config = { 'lang': spjLang, 'pid': `${pid}` }
   let configFile = struct.file.spjBase + 'config'
   await fs.writeFile(configFile, JSON.stringify(config))
-  let { exitCode, stdout, stderr } = await spawn('docker', ['exec', '-i', 'judgecore', './compiler', configFile]).catch(err => {
+  let { code: exitCode, stdout, stderr } = await spawn('docker', ['exec', '-i', 'judgecore', './compiler', configFile]).catch(err => {
     console.error(err)
     return { ok: false }
   })
