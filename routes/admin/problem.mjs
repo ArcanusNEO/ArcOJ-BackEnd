@@ -89,7 +89,7 @@ const forkProblem = async (req, res) => {
   await fs.ensureDir(toStruct.path.spj)
   await fs.ensureDir(toStruct.path.problem)
   await fs.copy(fromStruct.path.data, toStruct.path.data)
-  await fs.copy(fromStruct.path.spj, toStruct.path.spj)
+  // await fs.copy(fromStruct.path.spj, toStruct.path.spj)
   await fs.copy(fromStruct.file[extension], toStruct.file[extension])
   query = 'INSERT INTO "problem_maintainer" ("pid", "uid") VALUES ($1, $2)'
   await db.query(query, [toPid, ownerId])
