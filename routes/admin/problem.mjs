@@ -228,11 +228,11 @@ router.post('/update/:pid(\\d+)/spj', lc,
   async (req, res, next) => {
     req.master = await pcrb(req.tokenAcc.uid, ['master'])
     let pid = parseInt(req.params.pid)
-    if (!(pid > 0) || !req.body.code || !req.body.lang) return res.sendStatus(hsc.badReq)
+    if (!(pid > 0) || !req.body.code || !req.body.lang) return res.sendStatus(hsc.forbidden)
     let query = 'SELECT "pid", "psid", "special_judge" AS "specialJudge" FROM "problem" WHERE "pid" = $1'
     let ret = (await db.query(query, [pid])).rows[0]
     if (!ret) return res.sendStatus(hsc.unauthorized)
-    if (!(ret.specialJudge > 0 && ret.specialJudge <= 2)) return res.sendStatus(hsc.badReq)
+    if (!(ret.specialJudge > 0 && ret.specialJudge <= 2)) return res.sendStatus(hsc.illegal)
     return preCheck(pid, 'update', ret.psid)(req, res, next)
   },
   async (req, res, next) => {
