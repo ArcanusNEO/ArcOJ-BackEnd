@@ -5,6 +5,7 @@ export default {
   noContent: 204,
   resetContent: 205,
 
+  compileErr: 292,
   userNotExaming: 293,
   userExaming: 294,
   alreadyExist: 295, //资源已经存在

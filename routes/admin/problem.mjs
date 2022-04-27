@@ -7,7 +7,7 @@ import mtc from '../midwares/maintainer-check.mjs'
 import pcrb from '../midwares/permission-check-ret-bool.mjs'
 import pc from '../midwares/permission-check.mjs'
 import judgecore from '../../utils/nku-judgecore.mjs'
-const { getProblemStructure, getSolutionStructure } = judgecore
+const { getProblemStructure, getSolutionStructure, spj } = judgecore
 import fs from 'fs-extra'
 import fileUpload from 'express-fileupload'
 import path from 'path'
@@ -221,6 +221,36 @@ router.post('/update/:pid(\\d+)', lc,
       await fs.writeFile(problem, buf)
     }
     return res.status(hsc.ok).json(ret)
+  }
+)
+
+router.post('/update/:pid(\\d+)/spj', lc,
+  async (req, res, next) => {
+    req.master = await pcrb(req.tokenAcc.uid, ['master'])
+    let pid = parseInt(req.params.pid)
+    if (!(pid > 0) || !req.body.code || !req.body.lang) return res.sendStatus(hsc.badReq)
+    let query = 'SELECT "pid", "psid", "special_judge" AS "specialJudge" FROM "problem" WHERE "pid" = $1'
+    let ret = (await db.query(query, [pid])).rows[0]
+    if (!ret) return res.sendStatus(hsc.unauthorized)
+    if (!(req.specialJudge > 0 && req.specialJudge <= 2)) return res.sendStatus(hsc.badReq)
+    return preCheck(pid, 'update', ret.psid)(req, res, next)
+  },
+  async (req, res, next) => {
+    if (req.master) return next()
+    return pc(req.tokenAcc.uid, req.reqPerms)(req, res, next)
+  },
+  async (req, res, next) => {
+    if (req.master) return next()
+    return mtc.problem(req.tokenAcc.uid, parseInt(req.params.pid))(req, res, next)
+  },
+  async (req, res) => {
+    let { code: spjCode, lang: spjLang } = req.body
+    let spjLangExt = langExt.langExt[spjLang]
+    if (!spjLangExt) return res.sendStatus(hsc.badReq)
+    let pid = parseInt(req.params.pid)
+    let ret = await spj({ pid, spjCode, spjLang, spjLangExt })
+    if (ret.ok) return res.status(hsc.ok).json(ret)
+    return res.status(hsc.compileErr).json(ret)
   }
 )
 

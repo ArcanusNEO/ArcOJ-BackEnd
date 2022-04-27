@@ -115,23 +115,24 @@ const judge = async (params) => {
   return true
 }
 
-// const spj = async (params) => {
-//   let { pid, spjLang, spjLangExt, spjCode } = params
-//   let struct = getProblemStructure(pid)
-//   let spjFile = struct.file.spjBase + spjLangExt
-//   await fs.writeFile(spjFile, spjCode)
-//   let config = { 'lang': spjLang, 'pid': `${pid}` }
-//   let configFile = struct.file.spjBase + 'config'
-//   await fs.writeFile(configFile, JSON.stringify(config))
-//   let { exitCode, stdout, stderr } = await spawn('docker', ['exec', '-i', 'judgecore', './compiler', configFile]).catch(err => {
-//     console.error(err)
-//     return { ok: false }
-//   })
-//   return { ok: (exitCode === 0), exitCode, stdout, stderr }
-// }
+const spj = async (params) => {
+  let { pid, spjLang, spjLangExt, spjCode } = params
+  let struct = getProblemStructure(pid)
+  let spjFile = struct.file.spjBase + spjLangExt
+  await fs.writeFile(spjFile, spjCode)
+  let config = { 'lang': spjLang, 'pid': `${pid}` }
+  let configFile = struct.file.spjBase + 'config'
+  await fs.writeFile(configFile, JSON.stringify(config))
+  let { exitCode, stdout, stderr } = await spawn('docker', ['exec', '-i', 'judgecore', './compiler', configFile]).catch(err => {
+    console.error(err)
+    return { ok: false }
+  })
+  return { ok: (exitCode === 0), exitCode, stdout, stderr }
+}
 
 export default {
   getSolutionStructure,
   getProblemStructure,
-  judge
+  judge,
+  spj
 }
