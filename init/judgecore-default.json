@@ -2,10 +2,7 @@
   "debug": false,
   "pid": null,
   "sid": null,
-  "filename": [
-    "main.",
-    "$lang_ext"
-  ],
+  "filename": ["main.", "$lang_ext"],
   "lang": "c",
   "max_time": 1000,
   "max_real_time": 2000,
@@ -13,64 +10,22 @@
   "max_memory": 65530,
   "max_output": 10000000,
   "max_thread": 4,
-  "continue_on": [
-    "accepted",
-    "presentation error"
-  ],
+  "continue_on": ["accepted", "presentation error"],
   "test_case_count": 1,
   "spj_mode": "no",
   "path": {
     "base": "/var/www/data",
-    "code": [
-      "$base",
-      "solutions",
-      "$sid",
-      "$filename"
-    ],
-    "log": [
-      "$base",
-      "solutions",
-      "$sid"
-    ],
-    "output": [
-      "$base",
-      "solutions",
-      "$sid",
-      "execout"
-    ],
-    "stdin": [
-      "$base",
-      "problems-data",
-      "$pid"
-    ],
-    "stdout": [
-      "$stdin"
-    ],
-    "temp": [
-      "/tmp",
-      [
-        "judge-",
-        "$pid",
-        "-",
-        "$sid"
-      ]
-    ],
-    "exec": [
-      "$temp",
-      "main"
-    ],
-    "spj": [
-      "$base",
-      "problems-spj",
-      "$pid"
-    ]
+    "code": ["$base", "solutions", "$sid", "$filename"],
+    "log": ["$base", "solutions", "$sid"],
+    "output": ["$base", "solutions", "$sid", "execout"],
+    "stdin": ["$base", "problems-data", "$pid"],
+    "stdout": ["$stdin"],
+    "temp": ["/tmp", ["judge-", "$pid", "-", "$sid"]],
+    "exec": ["$temp", "main"],
+    "spj": ["$base", "problems-spj", "$pid"]
   },
   "spj": {
-    "code": [
-      "$spj",
-      ".",
-      "$lang_ext"
-    ],
+    "code": ["$spj", ".", "$lang_ext"],
     "target": "$spj"
   }
 }
