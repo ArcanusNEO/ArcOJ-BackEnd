@@ -5,6 +5,7 @@ const router = express.Router()
 import lc from './midwares/login-check.mjs'
 import mc from './midwares/member-check.mjs'
 import db from '../utils/database.mjs'
+import hsc from '../config/http-status-code.mjs'
 
 router.get('/', lc,
   async (req, res, next) => {
