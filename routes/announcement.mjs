@@ -8,7 +8,7 @@ import mc from './midwares/member-check.mjs'
 router.get('/id/:id(\\d+)', lc,
   async (req, res, next) => {
     let mid = req.params.id
-    let query = `SELECT "cid", "psid", "mid" AS "id", "title", "content", "when" AS "time" FROM "message" WHERE NOT "from_del" AND "to" IS NULL AND "mid" = $1`
+    let query = `SELECT "cid", "psid", "mid" AS "id", "title", "content", "when" AS "time", (NOW()::TIMESTAMPTZ < "when") AS "top" FROM "message" WHERE NOT "from_del" AND "to" IS NULL AND "mid" = $1`
     let ret = (await db.query(query, [mid])).rows[0]
     if (ret) {
       req.ann = ret
@@ -32,10 +32,10 @@ const getMsgInSection = (idName) => {
     let ret, limit = parseInt(req.query.limit), id = parseInt(req.params.id)
     if (!(id > 0)) return res.sendStatus(hsc.badReq)
     if (limit > 0) {
-      let query = `SELECT "mid" AS "id", "title", "content", "when" AS "time" FROM "message" WHERE "from_del" = FALSE AND "to" IS NULL AND "${idName}" = $1 ORDER BY "when" DESC LIMIT $2`
+      let query = `SELECT "mid" AS "id", "title", "content", "when" AS "time", (NOW()::TIMESTAMPTZ < "when") AS "top" FROM "message" WHERE "from_del" = FALSE AND "to" IS NULL AND "${idName}" = $1 ORDER BY "when" DESC LIMIT $2`
       ret = (await db.query(query, [id, limit])).rows
     } else {
-      let query = `SELECT "mid" AS "id", "title", "content", "when" AS "time" FROM "message" WHERE "from_del" = FALSE AND "to" IS NULL AND "${idName}" = $1 ORDER BY "when" DESC`
+      let query = `SELECT "mid" AS "id", "title", "content", "when" AS "time", (NOW()::TIMESTAMPTZ < "when") AS "top" FROM "message" WHERE "from_del" = FALSE AND "to" IS NULL AND "${idName}" = $1 ORDER BY "when" DESC`
       ret = (await db.query(query, [id])).rows
     }
     return res.status(hsc.ok).json(ret)
@@ -61,10 +61,10 @@ router.get('/problemset(s)?/:id(\\d+)', lc,
 router.get('/global', lc, async (req, res) => {
   let ret, limit = parseInt(req.query.limit)
   if (limit > 0) {
-    let query = `SELECT "mid" AS "id", "title", "content", "when" AS "time" FROM "message" WHERE "from_del" = FALSE AND "to" IS NULL AND "cid" IS NULL AND "psid" IS NULL ORDER BY "when" DESC LIMIT $1`
+    let query = `SELECT "mid" AS "id", "title", "content", "when" AS "time", (NOW()::TIMESTAMPTZ < "when") AS "top" FROM "message" WHERE "from_del" = FALSE AND "to" IS NULL AND "cid" IS NULL AND "psid" IS NULL ORDER BY "when" DESC LIMIT $1`
     ret = (await db.query(query, [limit])).rows
   } else {
-    let query = `SELECT "mid" AS "id", "title", "content", "when" AS "time" FROM "message" WHERE "from_del" = FALSE AND "to" IS NULL AND "cid" IS NULL AND "psid" IS NULL ORDER BY "when" DESC`
+    let query = `SELECT "mid" AS "id", "title", "content", "when" AS "time", (NOW()::TIMESTAMPTZ < "when") AS "top" FROM "message" WHERE "from_del" = FALSE AND "to" IS NULL AND "cid" IS NULL AND "psid" IS NULL ORDER BY "when" DESC`
     ret = (await db.query(query)).rows
   }
   return res.status(hsc.ok).json(ret)
