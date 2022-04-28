@@ -57,7 +57,7 @@ router.get('/id/:psid(\\d+)/rank', lc,
           'detail': []
         })
       let urow = tab[tab.length - 1]
-      urow.totScore += row.totScore
+      urow.totScore += row.score
       urow.detail.push({
         'pid': row.pid,
         'score': row.score,
