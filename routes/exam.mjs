@@ -74,6 +74,13 @@ router.get('/id/:psid(\\d+)/rank', lc,
         'when': row.when
       })
     }
+    tab.sort((a, b) => {
+      if (a.totScore !== b.totScore) return b.totScore - a.totScore
+      if (a.totTime !== b.totTime) return a.totTime - b.totTime
+      if (a.totMem !== b.totMem) return a.totMem - b.totMem
+      if (a.lastPassTime === b.lastPassTime) return a.uid - b.uid
+      return (a.lastPassTime < b.lastPassTime ? -1 : 1)
+    })
     return res.status(hsc.ok).json({ meta, tab })
   }
 )
