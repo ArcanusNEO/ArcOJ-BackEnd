@@ -63,6 +63,7 @@ router.get('/id/:psid(\\d+)/rank', lc,
           'detail': []
         })
       let urow = tab[tab.length - 1]
+      row.tryCount = parseInt(row.tryCount)
       if (row.pass) {
         urow.passCount += 1
         urow.failCount += row.tryCount
