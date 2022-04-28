@@ -59,7 +59,7 @@ router.get('/id/:psid(\\d+)/rank', lc,
           'nickname': row.nickname,
           'passCount': 0,
           'failCount': 0,
-          'virtTime': new Date(0),
+          'virtTime': 0,
           'detail': []
         })
       let urow = tab[tab.length - 1]
