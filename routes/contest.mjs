@@ -63,8 +63,8 @@ router.get('/id/:psid(\\d+)/rank', lc,
       let urow = tab[tab.length - 1]
       if (row.pass) {
         urow.passCount += 1
-        uraw.failCount += row.tryCount
-        uraw.virtTime += (20 * 60 * 1000) * row.tryCount + row.realTime
+        urow.failCount += row.tryCount
+        urow.virtTime += (20 * 60 * 1000) * row.tryCount + row.realTime
       }
       urow.detail.push({
         'pid': row.pid,
