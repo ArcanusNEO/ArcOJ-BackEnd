@@ -45,6 +45,11 @@ router.get('/id/:psid(\\d+)/rank', lc,
     let psid = parseInt(req.params.psid)
     let query = 'SELECT "pid", "title" FROM "problem" WHERE "psid" = $1 ORDER BY "title" ASC'
     let meta = (await db.query(query, [psid])).rows
+    let firstTag = {}
+    // for (let each of meta) {
+    //   firstTag[`${each.pid}`].uid = null
+    //   firstTag[`${each.pid}`].when = null
+    // }
     query = 'SELECT LOWER("problemset"."during")::TIMESTAMPTZ AS "begin", ("problemset"."secret_time" NOTNULL AND NOW()::TIMESTAMPTZ <@ "problemset"."secret_time") AS "secret" FROM "problemset" WHERE "problemset"."psid" = $1'
     let setInfo = (await db.query(query, [psid])).rows[0]
     let begin = new Date(setInfo.begin)
@@ -74,6 +79,11 @@ router.get('/id/:psid(\\d+)/rank', lc,
         urow.passCount += 1
         urow.failCount += row.tryCount
         urow.virtTime += new Date(row.when) - begin + (20 * 60 * 1000) * row.tryCount
+        if (!firstTag[`${row.pid}`].when || new Date(firstTag[`${row.pid}`].when) > new Date(row.when)) {
+          firstTag[`${row.pid}`].when = row.when
+          firstTag[`${row.pid}`].uid = row.uid
+          firstTag[`${row.pid}`].sid = row.sid
+        }
       }
       urow.detail.push({
         'pid': row.pid,
@@ -88,6 +98,11 @@ router.get('/id/:psid(\\d+)/rank', lc,
       if (a.virtTime !== b.virtTime) return a.virtTime - b.virtTime
       return a.uid - b.uid
     })
+    for (let each of meta) {
+      each.firstUser = firstTag[each.pid].uid || null
+      each.firstSol = firstTag[each.pid].sid || null
+      each.firstTime = firstTag[each.pid].when || null
+    }
     return res.status(hsc.ok).json({ meta, tab })
   }
 )
