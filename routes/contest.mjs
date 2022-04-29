@@ -46,10 +46,12 @@ router.get('/id/:psid(\\d+)/rank', lc,
     let query = 'SELECT "pid", "title" FROM "problem" WHERE "psid" = $1 ORDER BY "title" ASC'
     let meta = (await db.query(query, [psid])).rows
     let firstTag = {}
-    // for (let each of meta) {
-    //   firstTag[`${each.pid}`].uid = null
-    //   firstTag[`${each.pid}`].when = null
-    // }
+    for (let each of meta) {
+      firstTag[`${each.pid}`] = {}
+      firstTag[`${each.pid}`].uid = null
+      firstTag[`${each.pid}`].sid = null
+      firstTag[`${each.pid}`].when = null
+    }
     query = 'SELECT LOWER("problemset"."during")::TIMESTAMPTZ AS "begin", ("problemset"."secret_time" NOTNULL AND NOW()::TIMESTAMPTZ <@ "problemset"."secret_time") AS "secret" FROM "problemset" WHERE "problemset"."psid" = $1'
     let setInfo = (await db.query(query, [psid])).rows[0]
     let begin = new Date(setInfo.begin)
