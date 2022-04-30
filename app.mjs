@@ -2,7 +2,6 @@ import express from 'express'
 import path from 'path'
 import cookieParser from 'cookie-parser'
 import logger from 'morgan'
-import csrf from 'csurf'
 import hsc from './config/http-status-code.mjs'
 
 import api from './routes/api.mjs'
@@ -31,7 +30,6 @@ app.use(logger(':date[iso] :remote-addr :method :url :status'))
 app.use(express.json())
 app.use(express.urlencoded({ extended: true }))
 app.use(cookieParser())
-app.use(csrf({ cookie: true }))
 // app.use(express.static(path.join(__dirname, 'public')))
 
 app.use('/', api)
