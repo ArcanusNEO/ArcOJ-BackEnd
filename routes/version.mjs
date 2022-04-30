@@ -24,6 +24,10 @@ router.get('/mem', async (req, res) => {
   return res.json(process.memoryUsage())
 })
 
+router.get('/ip', async (req, res) => {
+  return res.end(req.ip)
+})
+
 router.get('/fortune', async (req, res) => {
   res.writeHead(200, { "Content-Type": "text/html" })
   return res.end(await fs.readFile(path.join(__dirname, '../public/fortune.html')))
