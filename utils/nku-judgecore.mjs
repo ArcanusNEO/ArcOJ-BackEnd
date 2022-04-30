@@ -1,10 +1,14 @@
 import dataPath from '../config/basic.mjs'
 import fs from 'fs-extra'
+import PQueue from 'p-queue'
 import defalutConfig from '../config/judge-config-default.mjs'
 import db from './database.mjs'
 import jsc from '../config/judge-status-code.mjs'
 import spawnPkg from './spawn.mjs'
+import pqConcurrency from '../config/judgecore-concurrency.mjs'
+
 const { spawn } = spawnPkg
+const queue = new PQueue(pqConcurrency)
 
 const getSolutionStructure = (sid) => {
   const pathSolution = `${dataPath.solution}/${sid}`
@@ -69,6 +73,10 @@ const genConfig = (params) => {
 }
 
 const judge = async (params) => {
+  return queue.add(() => { judgecore(params) })
+}
+
+const judgecore = async (params) => {
   let { sid, pid, langExt, lang, code, cases, specialJudge, detailJudge, timeLimit, memoryLimit } = params
   let struct = getSolutionStructure(sid)
   await fs.ensureDir(struct.path.solution)
