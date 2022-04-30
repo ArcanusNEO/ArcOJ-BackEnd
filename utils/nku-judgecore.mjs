@@ -73,7 +73,7 @@ const genConfig = (params) => {
 }
 
 const judge = async (params) => {
-  return queue.add(() => { judgecore(params) })
+  return queue.add(async () => { return judgecore(params) })
 }
 
 const judgecore = async (params) => {
