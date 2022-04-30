@@ -14,7 +14,7 @@ app.all('*', (req, res, next) => {
   res.header("Server", "Microsoft-IIS/7.0")
   res.header("X-AspNet-Version", "4.0.30319")
   res.header("X-Powered-By", ["ASP.NET", "ARR/2.5"]) //:)
-  //res.header("Access-Control-Allow-Credentials", true)
+  // res.header("Access-Control-Allow-Credentials", true)
   // res.header("Access-Control-Allow-Origin", "*")
   res.header("Access-Control-Allow-Headers", "X-Requested-With")
   res.header("Access-Control-Allow-Methods", "PUT,POST,GET,DELETE,OPTIONS")
