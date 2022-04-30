@@ -228,7 +228,6 @@ router.post('/update/:pid(\\d+)/spj', lc,
   async (req, res, next) => {
     req.master = await pcrb(req.tokenAcc.uid, ['master'])
     let pid = parseInt(req.params.pid)
-    console.log(req.body.code, req.body.lang)
     if (!(pid > 0) || !req.body.code || !req.body.lang) return res.sendStatus(hsc.forbidden)
     let query = 'SELECT "pid", "psid", "special_judge" AS "specialJudge" FROM "problem" WHERE "pid" = $1'
     let ret = (await db.query(query, [pid])).rows[0]
