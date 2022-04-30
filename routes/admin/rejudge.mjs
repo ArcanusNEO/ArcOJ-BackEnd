@@ -37,7 +37,8 @@ router.get('/sid/:sid(\\d+)', lc,
     try {
       let { pid, sid, ret: def } = req.params
       let uid = req.tokenAcc.uid
-      let struct = await getSolutionStructure(sid)
+      let struct = getSolutionStructure(sid)
+      await fs.ensureDir(struct.path.solution)
       let { cases, specialJudge, detailJudge, timeLimit, langId } = def
       let memoryLimit = parseInt(def.memoryLimit)
       let lang = languageExtension.idLang[langId]

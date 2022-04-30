@@ -6,9 +6,8 @@ import jsc from '../config/judge-status-code.mjs'
 import spawnPkg from './spawn.mjs'
 const { spawn } = spawnPkg
 
-const getSolutionStructure = async (sid) => {
+const getSolutionStructure = (sid) => {
   const pathSolution = `${dataPath.solution}/${sid}`
-  await fs.ensureDir(pathSolution)
   const pathTemp = `${pathSolution}/temp`
   const pathExecOut = `${pathSolution}/execout`
 
@@ -71,7 +70,8 @@ const genConfig = (params) => {
 
 const judge = async (params) => {
   let { sid, pid, langExt, lang, code, cases, specialJudge, detailJudge, timeLimit, memoryLimit } = params
-  let struct = await getSolutionStructure(sid)
+  let struct = getSolutionStructure(sid)
+  await fs.ensureDir(struct.path.solution)
   let filename = `main.${langExt}`
   let config = genConfig({ sid, filename, lang, pid, timeLimit, memoryLimit, detailJudge, cases, specialJudge })
   await fs.writeFile(`${struct.path.solution}/main.${langExt}`, code)

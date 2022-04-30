@@ -452,7 +452,7 @@ router.get('/id/:pid(\\d+)/statistics/code(s)?', lc, pidPermChk,
       let ext = langMap.idExt[row.lang]
       row.lang = langMap.idLang[row.lang]
       let sid = parseInt(row.sid)
-      let solCodeFile = (await getSolutionStructure(sid)).file.codeBase + ext
+      let solCodeFile = getSolutionStructure(sid).file.codeBase + ext
       let nick = filenamify(row.nickname)
       await fs.link(solCodeFile, path.resolve(solTmpDir, `uid-${row.uid}-sid-${sid}-nick-${nick}.${ext}`))
     }

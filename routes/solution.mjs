@@ -27,7 +27,7 @@ router.get('/id/:sid(\\d+)', lc,
     let query = `SELECT "solution"."sid", "solution"."uid", "solution"."pid", "solution"."status_id" AS "statusId", "solution"."lang_id" AS "langId", "solution"."code_size" AS "codeSize", "solution"."share", "solution"."run_time" AS "runTime", "solution"."run_memory" AS "runMemory", "solution"."when", "solution"."detail", "solution"."compile_info" AS "compileInfo", "solution"."score", "problem"."title" AS "name", "user"."nickname", ("solution"."uid" <> $1 AND "problemset"."secret_time" NOTNULL AND NOW()::TIMESTAMPTZ <@ "problemset"."secret_time") AS "secret", ("solution"."uid" <> $1 AND NOW()::TIMESTAMPTZ <@ "problemset"."during") AS "open", ("solution"."uid" <> $1 AND NOW()::TIMESTAMPTZ < LOWER("problemset"."during")) AS "before" FROM "solution" INNER JOIN "problem" ON "solution"."pid" = "problem"."pid" INNER JOIN "user" ON "solution"."uid" = "user"."uid" LEFT JOIN "problemset" ON "problem"."psid" = "problemset"."psid" WHERE "sid" = $2`
     let ret = (await db.query(query, [uid, sid])).rows[0]
     if (!ret) return res.sendStatus(hsc.unauthorized)
-    let struct = await getSolutionStructure(sid)
+    let struct = getSolutionStructure(sid)
     let fileCode = struct.file.codeBase + languageExtension.idExt[ret.langId]
     let code = await fs.readFile(fileCode, 'utf8')
     ret.code = code
