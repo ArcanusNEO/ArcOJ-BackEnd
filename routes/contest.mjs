@@ -92,6 +92,7 @@ router.get('/id/:psid(\\d+)/rank', lc,
         'pass': row.pass,
         'sid': row.sid,
         'when': row.when,
+        'elapse': new Date(row.when) - begin,
         'tryCount': row.tryCount + (row.pass ? 0 : 1)
       })
     }
