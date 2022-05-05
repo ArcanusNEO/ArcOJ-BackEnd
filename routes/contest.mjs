@@ -88,7 +88,7 @@ router.get('/id/:psid(\\d+)/rank', lc,
           if (pass) {
             cur.passCount += 1
             passTime = new Date(row.when)
-            cur.virtTime = passTime - begin
+            cur.virtTime += passTime - begin
             if (!firstTag[`${row.pid}`].when || new Date(firstTag[`${row.pid}`].when) > new Date(row.when)) {
               firstTag[`${row.pid}`].when = row.when
               firstTag[`${row.pid}`].uid = player
