@@ -58,9 +58,10 @@ router.get('/id/:psid(\\d+)/rank', lc,
     let uid = req.tokenAcc.uid
     query = 'SELECT "problemset_user"."uid" AS "player", "user"."nickname" FROM "problemset_user" INNER JOIN "user" ON "problemset_user"."uid" = "user"."uid" WHERE "problemset_user"."psid" = $1 ORDER BY "problemset_user"."uid" ASC'
     let userInfo = (await db.query(query, [psid])).rows
-    let tab = []
+    let tab = [], i = 0
+    query = 'SELECT "solution"."sid", "solution"."uid", ("solution"."score" >= 100) AS "pass", "solution"."pid", "solution"."when", ("solution"."uid" <> $1 AND "problemset"."secret_time" NOTNULL AND "solution"."when" <@"problemset"."secret_time") AS "secret" FROM "solution" INNER JOIN "problem" ON "solution"."pid" = "problem"."pid" INNER JOIN "problemset" ON "problem"."psid" = "problemset"."psid" WHERE "problemset"."psid" = $2 AND ("problemset"."during" ISNULL OR "solution"."when" <@"problemset"."during") ORDER BY "solution"."uid" ASC, "problem"."title" ASC, "pass" DESC, "secret" ASC, "solution"."when" ASC'
+    let ret = (await db.query(query, [uid, psid])).rows
     for (let { player, nickname } of userInfo) {
-      query = 'SELECT "solution"."sid", ("solution"."score" >= 100) AS "pass", "solution"."pid", "solution"."when", ("solution"."uid" <> $3 AND "problemset"."secret_time" NOTNULL AND "solution"."when" <@"problemset"."secret_time") AS "secret" FROM "solution" INNER JOIN "problem" ON "solution"."pid" = "problem"."pid" INNER JOIN "problemset" ON "problem"."psid" = "problemset"."psid" WHERE "solution"."uid" = $1 AND "problemset"."psid" = $2 AND ("problemset"."during" ISNULL OR "solution"."when" <@ "problemset"."during") ORDER BY "problem"."title" ASC, "pass" DESC, "secret" ASC, "solution"."when" ASC'
       let cur = {
         'uid': player,
         'nickname': nickname,
@@ -68,10 +69,11 @@ router.get('/id/:psid(\\d+)/rank', lc,
         'virtTime': 0,
         'detail': []
       }
-      let ret = (await db.query(query, [player, psid, uid])).rows
       let curPass = false, passTime
 
-      for (let row of ret) {
+      while (i < ret.length && ret[i].uid < player) ++i;
+      for (; i < ret.length && ret[i].uid === player; ++i) {
+        let row = ret[i]
         let pass = (row.secret ? false : row.pass)
         if (cur.detail.length === 0 || cur.detail[cur.detail.length - 1].pid !== row.pid) {
           if (cur.detail.length !== 0 && curPass) 
