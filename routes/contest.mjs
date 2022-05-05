@@ -74,7 +74,7 @@ router.get('/id/:psid(\\d+)/rank', lc,
       while (i < ret.length && ret[i].uid < player) ++i;
       for (; i < ret.length && ret[i].uid === player; ++i) {
         let row = ret[i]
-        let pass = (row.secret ? false : row.pass)
+        let pass = (row.secret && setInfo.secret ? false : row.pass)
         if (cur.detail.length === 0 || cur.detail[cur.detail.length - 1].pid !== row.pid) {
           if (cur.detail.length !== 0 && curPass) 
             cur.virtTime += (20 * 60 * 1000) * cur.detail[cur.detail.length - 1].tryCount
