@@ -55,46 +55,52 @@ router.get('/id/:psid(\\d+)/rank', lc,
     query = 'SELECT LOWER("problemset"."during")::TIMESTAMPTZ AS "begin", ("problemset"."secret_time" NOTNULL AND NOW()::TIMESTAMPTZ <@ "problemset"."secret_time") AS "secret" FROM "problemset" WHERE "problemset"."psid" = $1'
     let setInfo = (await db.query(query, [psid])).rows[0]
     let begin = new Date(setInfo.begin)
-    let ret
     let uid = req.tokenAcc.uid
-    if (setInfo.secret) {
-      query = 'SELECT DISTINCT ON ("solution"."uid", "problem"."title") "solution"."sid", ("solution"."score" >= 100) AS "pass", "solution"."uid", "user"."nickname", "solution"."pid", "solution"."when", (SELECT COUNT(*) FROM "solution" AS "inner_sol" WHERE "inner_sol"."uid" = "solution"."uid" AND "solution"."pid" = "inner_sol"."pid" AND "inner_sol"."when" < "solution"."when" AND ("solution"."uid" = $2 OR "problemset"."secret_time" ISNULL OR NOT "inner_sol"."when" <@ "problemset"."secret_time")) AS "tryCount" FROM "solution" INNER JOIN "user" ON "solution"."uid" = "user"."uid" INNER JOIN "problem" ON "solution"."pid" = "problem"."pid" INNER JOIN "problemset" ON "problem"."psid" = "problemset"."psid" WHERE "problem"."psid" = $1 AND "solution"."when" <@ "problemset"."during" AND ("solution"."uid" = $2 OR "problemset"."secret_time" ISNULL OR NOT "solution"."when" <@ "problemset"."secret_time") ORDER BY "solution"."uid" ASC, "problem"."title" ASC, "solution"."score" DESC, "solution"."when" ASC'
-      ret = (await db.query(query, [psid, uid])).rows
-    } else {
-      query = 'SELECT DISTINCT ON ("solution"."uid", "problem"."title") "solution"."sid", ("solution"."score" >= 100) AS "pass", "solution"."uid", "user"."nickname", "solution"."pid", "solution"."when", (SELECT COUNT(*) FROM "solution" AS "inner_sol" WHERE "inner_sol"."uid" = "solution"."uid" AND "solution"."pid" = "inner_sol"."pid" AND "inner_sol"."when" < "solution"."when") AS "tryCount" FROM "solution" INNER JOIN "user" ON "solution"."uid" = "user"."uid" INNER JOIN "problem" ON "solution"."pid" = "problem"."pid" INNER JOIN "problemset" ON "problem"."psid" = "problemset"."psid" WHERE "problem"."psid" = $1 AND "solution"."when" <@ "problemset"."during" ORDER BY "solution"."uid" ASC, "problem"."title" ASC, "solution"."score" DESC, "solution"."when" ASC'
-      ret = (await db.query(query, [psid])).rows
-    }
+    query = 'SELECT "problemset_user"."uid" AS "player", "user"."nickname" FROM "problemset_user" INNER JOIN "user" ON "problemset_user"."uid" = "user"."uid" WHERE "problemset_user"."psid" = $1 ORDER BY "problemset_user"."uid" ASC'
+    let userInfo = (await db.query(query, [psid])).rows
     let tab = []
-    for (let row of ret) {
-      if (tab.length === 0 || row.uid !== tab[tab.length - 1].uid)
-        tab.push({
-          'uid': row.uid,
-          'nickname': row.nickname,
-          'passCount': 0,
-          'failCount': 0,
-          'virtTime': 0,
-          'detail': []
-        })
-      let urow = tab[tab.length - 1]
-      row.tryCount = parseInt(row.tryCount)
-      if (row.pass) {
-        urow.passCount += 1
-        urow.failCount += row.tryCount
-        urow.virtTime += new Date(row.when) - begin + (20 * 60 * 1000) * row.tryCount
-        if (!firstTag[`${row.pid}`].when || new Date(firstTag[`${row.pid}`].when) > new Date(row.when)) {
-          firstTag[`${row.pid}`].when = row.when
-          firstTag[`${row.pid}`].uid = row.uid
-          firstTag[`${row.pid}`].sid = row.sid
-        }
+    for (let { player, nickname } of userInfo) {
+      query = 'SELECT "solution"."sid", ("solution"."score" >= 100) AS "pass", "solution"."pid", "solution"."when", ("solution"."uid" <> $3 AND "problemset"."secret_time" NOTNULL AND "solution"."when" <@"problemset"."secret_time") AS "secret" FROM "solution" INNER JOIN "problem" ON "solution"."pid" = "problem"."pid" INNER JOIN "problemset" ON "problem"."psid" = "problemset"."psid" WHERE "solution"."uid" = $1 AND "problemset"."psid" = $2 AND ("problemset"."during" ISNULL OR "solution"."when" <@ "problemset"."during") ORDER BY "problem"."title" ASC, "pass" DESC, "secret" ASC, "solution"."when" ASC'
+      let cur = {
+        'uid': player,
+        'nickname': nickname,
+        'passCount': 0,
+        'virtTime': 0,
+        'detail': []
       }
-      urow.detail.push({
-        'pid': row.pid,
-        'pass': row.pass,
-        'sid': row.sid,
-        'when': row.when,
-        'elapse': new Date(row.when) - begin,
-        'tryCount': row.tryCount + (row.pass ? 0 : 1)
-      })
+      let ret = (await db.query(query, [player, psid, uid])).rows
+      let curPass = false, passTime
+
+      for (let row of ret) {
+        let pass = (row.secret ? false : row.pass)
+        if (cur.detail.length === 0 || cur.detail[cur.detail.length - 1].pid !== row.pid) {
+          if (cur.detail.length !== 0 && curPass) 
+            cur.virtTime += (20 * 60 * 1000) * cur.detail[cur.detail.length - 1].tryCount
+          cur.detail.push({
+            'pid': row.pid,
+            'pass': pass,
+            'sid': (pass ? row.sid : null),
+            'when': (pass ? row.when : null),
+            'elapse': (pass ? new Date(row.when) - begin : null),
+            'tryCount': 0
+          })
+          curPass = pass
+          if (pass) {
+            cur.passCount += 1
+            passTime = new Date(row.when)
+            cur.virtTime = passTime - begin
+            if (!firstTag[`${row.pid}`].when || new Date(firstTag[`${row.pid}`].when) > new Date(row.when)) {
+              firstTag[`${row.pid}`].when = row.when
+              firstTag[`${row.pid}`].uid = player
+              firstTag[`${row.pid}`].sid = row.sid
+            }
+          }
+        }
+        if (!pass && (!curPass || new Date(row.when) <= passTime)) cur.detail[cur.detail.length - 1].tryCount += 1
+      }
+      if (cur.detail.length !== 0 && curPass) 
+        cur.virtTime += (20 * 60 * 1000) * cur.detail[cur.detail.length - 1].tryCount
+      tab.push(cur)
     }
     tab.sort((a, b) => {
       if (a.passCount !== b.passCount) return b.passCount - a.passCount
