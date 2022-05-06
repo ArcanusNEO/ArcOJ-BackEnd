@@ -6,6 +6,14 @@ import lc from './midwares/login-check.mjs'
 import mc from './midwares/member-check.mjs'
 import pc from './midwares/permission-check.mjs'
 
+const getPublicNotEnd = () => {
+  return async (req, res) => {
+    let query = 'SELECT "psid", "title", "type", LOWER("during")::TIMESTAMPTZ AS "begin", UPPER("during")::TIMESTAMPTZ AS "end" FROM "problemset" WHERE NOT "private" AND NOW()::TIMESTAMPTZ < UPPER("during")::TIMESTAMPTZ AND "cid" ISNULL'
+    let ret = (await db.query(query)).rows
+    return res.status(hsc.ok).json(ret)
+  }
+}
+
 const get = (property) => {
   return async (req, res) => {
     let uid = req.tokenAcc.uid
@@ -44,6 +52,8 @@ const getDetail = async (req, res) => {
   return res.status(hsc.ok).json(ret)
 }
 
+router.get('/public', lc, getPublicNotEnd)
+
 router.get('/id/:psid(\\d+)', lc,
   async (req, res, next) => {
     return (mc['problemset'](req.tokenAcc.uid, req.params.psid)(req, res, next))
@@ -72,4 +82,4 @@ router.get('/subscribe/:psid(\\d+)', lc,
   }
 )
 
-export default { get, getOpen, getDetail, router }
+export default { get, getOpen, getDetail, getPublicNotEnd, router }
