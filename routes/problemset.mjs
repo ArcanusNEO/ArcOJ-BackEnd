@@ -7,7 +7,7 @@ import mc from './midwares/member-check.mjs'
 import pc from './midwares/permission-check.mjs'
 
 const getPublicNotEnd = async (req, res) => {
-  let query = 'SELECT "psid", "title", "type", LOWER("during")::TIMESTAMPTZ AS "begin", UPPER("during")::TIMESTAMPTZ AS "end" FROM "problemset" WHERE NOT "private" AND NOW()::TIMESTAMPTZ < "end" AND "cid" ISNULL'
+  let query = 'SELECT "psid", "title", "type", LOWER("during")::TIMESTAMPTZ AS "begin", UPPER("during")::TIMESTAMPTZ AS "end" FROM "problemset" WHERE NOT "private" AND NOW()::TIMESTAMPTZ < UPPER("during")::TIMESTAMPTZ AND "cid" ISNULL'
   let ret = (await db.query(query)).rows
   return res.status(hsc.ok).json(ret)
 }
