@@ -38,13 +38,11 @@ router.get('/id/:psid(\\d+)', lc,
   }, getDetail)
 
 router.get('/id/:psid(\\d+)/rank', lc,
-  async (req, res, next) => {
-    return (mc['problemset'](req.tokenAcc.uid, req.params.psid)(req, res, next))
-  },
   async (req, res) => {
     let psid = parseInt(req.params.psid)
     let query = 'SELECT "pid", "title" FROM "problem" WHERE "psid" = $1 ORDER BY "title" ASC'
     let meta = (await db.query(query, [psid])).rows
+    if (!meta) return res.sendStatus(hsc.badReq)
     let firstTag = {}
     for (let each of meta) {
       firstTag[`${each.pid}`] = {}
