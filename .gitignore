@@ -18,4 +18,5 @@ yarn-error.log*
 /config/email.mjs
 /config/secret.mjs
 /config/salt.mjs
+/config/exam-code.json
 # /routes/test.js
