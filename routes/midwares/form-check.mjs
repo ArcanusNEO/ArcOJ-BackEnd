@@ -116,6 +116,10 @@ export default (poss, items, errCode = hsc.parseErr, errMsg = { ok: false }) => 
           case 'password':
             rep &= password(req, pos, item)
             break
+          
+          case 'passcode':
+            rep &= password(req, pos, item)
+            break
 
           case 'nickname':
             rep &= nickname(req, pos, item)

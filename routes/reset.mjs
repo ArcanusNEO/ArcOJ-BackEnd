@@ -9,6 +9,10 @@ import salt from '../config/salt.mjs'
 import lc from './midwares/login-check.mjs'
 import pc from './midwares/permission-check.mjs'
 import permMap from '../config/permission-map.mjs'
+import smco from './midwares/strict-mode-check-obj.mjs'
+
+router.use(smco.passcodeFormChk)
+router.use(smco.passcodeChk)
 
 router.post('/password', fc(['body'], ['username', 'password']), async (req, res) => {
   try {

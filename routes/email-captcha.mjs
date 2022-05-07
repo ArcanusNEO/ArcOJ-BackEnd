@@ -7,6 +7,10 @@ import tokenUtils from '../utils/token.mjs'
 import email from '../utils/email.mjs'
 import md5 from '../utils/md5.mjs'
 import salt from '../config/salt.mjs'
+import smco from './midwares/strict-mode-check-obj.mjs'
+
+router.use(smco.passcodeFormChk)
+router.use(smco.passcodeChk)
 
 router.post('/', fc(['body'], ['email']), async (req, res) => {
   let captcha = sr(5)

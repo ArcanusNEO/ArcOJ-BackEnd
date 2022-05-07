@@ -3,7 +3,6 @@ const router = express.Router()
 import hsc from '../config/http-status-code.mjs'
 import lc from './midwares/login-check.mjs'
 import db from '../utils/database.mjs'
-import examing from './midwares/examing-check-ret-bool.mjs'
 
 router.get('/', lc, (req, res) => {
   try {
@@ -20,12 +19,6 @@ router.get('/', lc, (req, res) => {
     console.error(err)
     return res.sendStatus(hsc.unauthorized)
   }
-})
-
-router.get('/examing', lc, async (req, res) => {
-  let uid = req.tokenAcc.uid
-  let uExaming = await examing(uid)
-  return res.sendStatus(uExaming ? hsc.userExaming : hsc.userNotExaming)
 })
 
 router.get('/id/:uid(\\d+)', lc,

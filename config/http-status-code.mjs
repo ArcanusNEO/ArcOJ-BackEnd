@@ -6,8 +6,8 @@ export default {
   resetContent: 205,
 
   compileErr: 292,
-  userNotExaming: 293,
-  userExaming: 294,
+  userNotExaming: 293, //已废弃
+  userExaming: 294, //已废弃
   alreadyExist: 295, //资源已经存在
   resOccupied: 296, //资源被占用
   captchaMismatch: 297,

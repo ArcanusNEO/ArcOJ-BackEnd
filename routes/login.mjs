@@ -5,6 +5,10 @@ import tokenUtils from '../utils/token.mjs'
 import fc from './midwares/form-check.mjs'
 import db from '../utils/database.mjs'
 import permMap from '../config/permission-map.mjs'
+import smco from './midwares/strict-mode-check-obj.mjs'
+
+router.use(smco.passcodeFormChk)
+router.use(smco.passcodeChk)
 
 router.post('/', fc(['body'], ['username', 'password'], hsc.parseErr, { ok: false }), async (req, res) => {
   try {
