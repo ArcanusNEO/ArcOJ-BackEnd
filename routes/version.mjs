@@ -11,10 +11,15 @@ import compressing from "compressing"
 import dataPath from '../config/basic.mjs'
 import jsc from '../config/judge-status-code.mjs'
 import langMap from '../config/lang-ext.mjs'
+import smcr from './strict-mode-check-ret.mjs'
 import { dirname } from 'path';
 import { fileURLToPath } from 'url';
 const __dirname = dirname(fileURLToPath(import.meta.url));
 
+router.get('/strict-mode', async (req, res) => {
+  let code = await smcr()
+  return res.status(hsc.ok).json({enable: (code ? true : false)})
+})
 
 router.get('/', async (req, res) => {
   return res.end('Powered by Lucas and Wans.')
