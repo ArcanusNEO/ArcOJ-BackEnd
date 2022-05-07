@@ -17,6 +17,10 @@ const o = {
     let examing = await ecrb(req.tokenAcc.uid)
     if (examing) return next()
     return res.sendStatus(hsc.forbidden)
+  },
+  passcodeForbid: (req, res, next) => {
+    if (smcr()) return res.sendStatus(hsc.forbidden)
+    return next()
   }
 }
 export default o
