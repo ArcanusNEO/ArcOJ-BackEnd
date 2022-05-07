@@ -19,6 +19,7 @@ router.get('/kick-all', lc, async (req, res) => {
 router.post('/strict-mode', lc, fc(['body'], ['passcode']),
   async (req, res) => {
     let { enable, passcode } = req.body
+    console.log(req.body)
     let conf = {
       enable: enable,
       code: passcode
