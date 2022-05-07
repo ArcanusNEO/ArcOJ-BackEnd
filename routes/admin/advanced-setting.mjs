@@ -19,14 +19,11 @@ router.get('/kick-all', lc, async (req, res) => {
 router.post('/strict-mode', lc, fc(['body'], ['passcode']),
   async (req, res) => {
     let { enable, passcode } = req.body
-    console.log(req.body)
     let conf = {
       enable: enable,
       code: passcode
     }
-    console.log(conf)
     let content = `export default ${JSON.stringify(conf)}`
-    console.log(content)
     await fs.writeFile(path.resolve(__dirname, '../../config/strict-mode.mjs'), content)
     return res.sendStatus(hsc.ok)
   })
