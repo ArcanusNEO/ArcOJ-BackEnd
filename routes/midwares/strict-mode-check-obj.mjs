@@ -4,8 +4,8 @@ import ecrb from './examing-check-ret-bool.mjs'
 import hsc from '../../config/http-status-code.mjs'
 
 const o = {
-  passcodeFormChk: async (req, res, next) => {
-    req.passcode = await smcr()
+  passcodeFormChk: (req, res, next) => {
+    req.passcode = smcr()
     if (!req.passcode) return next()
     return fc(['body'], ['passcode'])(req, res, next)
   },

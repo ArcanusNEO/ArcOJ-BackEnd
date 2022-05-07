@@ -16,20 +16,20 @@ import { dirname } from 'path';
 import { fileURLToPath } from 'url';
 const __dirname = dirname(fileURLToPath(import.meta.url));
 
-router.get('/strict-mode', async (req, res) => {
-  let code = await smcr()
+router.get('/strict-mode', (req, res) => {
+  let code = smcr()
   return res.status(hsc.ok).json({enable: (code ? true : false)})
 })
 
-router.get('/', async (req, res) => {
+router.get('/', (req, res) => {
   return res.end('Powered by Lucas and Wans.')
 })
 
-router.get('/mem', async (req, res) => {
+router.get('/mem', (req, res) => {
   return res.json(process.memoryUsage())
 })
 
-router.get('/ip', async (req, res) => {
+router.get('/ip', (req, res) => {
   return res.end(req.ip)
 })
 

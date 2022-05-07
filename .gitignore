@@ -18,4 +18,4 @@ yarn-error.log*
 /config/email.mjs
 /config/secret.mjs
 /config/salt.mjs
-/config/strict-mode.json
+/config/strict-mode.mjs
