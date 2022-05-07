@@ -23,7 +23,7 @@ router.post('/strict-mode', lc, fc(['body'], ['passcode']),
       enable: enable,
       code: passcode
     }
-    let content = 'export default ' + JSON.stringify(conf)
+    let content = `export default ${JSON.stringify(conf)}`
     await fs.writeFile(path.resolve(__dirname, '../../config/strict-mode.mjs'), content)
     return res.sendStatus(hsc.ok)
   })
