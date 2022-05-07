@@ -15,8 +15,9 @@ import smcr from './midwares/strict-mode-check-ret.mjs'
 const dirname = path.dirname
 import { fileURLToPath } from 'url'
 const __dirname = dirname(fileURLToPath(import.meta.url))
+import lc from './midwares/login-check.mjs'
 
-router.get('/strict-mode', (req, res) => {
+router.get('/strict-mode', lc, (req, res) => {
   let code = smcr()
   return res.status(hsc.ok).json({enable: (code ? true : false)})
 })
@@ -25,11 +26,11 @@ router.get('/', (req, res) => {
   return res.end('Powered by Lucas and Wans.')
 })
 
-router.get('/mem', (req, res) => {
+router.get('/mem', lc, (req, res) => {
   return res.json(process.memoryUsage())
 })
 
-router.get('/ip', (req, res) => {
+router.get('/ip', lc, (req, res) => {
   return res.end(req.ip)
 })
 
