@@ -20,8 +20,8 @@ router.post('/strict-mode', lc, fc(['body'], ['passcode']),
   async (req, res) => {
     let { enable, passcode } = req.body
     let conf = {
-      'enable': enable,
-      'code': passcode
+      enable: enable,
+      code: passcode
     }
     let content = 'export default ' + JSON.stringify(conf)
     await fs.writeFile(path.resolve(__dirname, '../../config/strict-mode.mjs'), content)
