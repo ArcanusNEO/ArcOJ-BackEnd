@@ -8,6 +8,7 @@ const dirname = path.dirname
 import { fileURLToPath } from 'url'
 const __dirname = dirname(fileURLToPath(import.meta.url))
 import fc from '../midwares/form-check.mjs'
+import lc from '../midwares/login-check.mjs'
 
 router.get('/kick-all', lc, async (req, res) => {
   let content = `export default '${sr(20)}'`
