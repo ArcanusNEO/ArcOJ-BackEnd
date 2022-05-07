@@ -69,7 +69,7 @@ router.get('/id/:psid(\\d+)/rank', lc,
       }
       let curPass = false, passTime
 
-      while (i < ret.length && ret[i].uid < player) ++i;
+      while (i < ret.length && ret[i].uid < player) ++i
       for (; i < ret.length && ret[i].uid === player; ++i) {
         let row = ret[i]
         let pass = (row.secret && setInfo.secret ? false : row.pass)

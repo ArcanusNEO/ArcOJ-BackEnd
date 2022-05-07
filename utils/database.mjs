@@ -1,5 +1,5 @@
 import pgPkg from 'pg'
-const { Pool } = pgPkg;
+const { Pool } = pgPkg
 import config from '../config/postgres.mjs'
 const db = {}
 const pool = new Pool(config)

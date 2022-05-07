@@ -12,9 +12,9 @@ import dataPath from '../config/basic.mjs'
 import jsc from '../config/judge-status-code.mjs'
 import langMap from '../config/lang-ext.mjs'
 import smcr from './midwares/strict-mode-check-ret.mjs'
-import { dirname } from 'path';
-import { fileURLToPath } from 'url';
-const __dirname = dirname(fileURLToPath(import.meta.url));
+const dirname = path.dirname
+import { fileURLToPath } from 'url'
+const __dirname = dirname(fileURLToPath(import.meta.url))
 
 router.get('/strict-mode', (req, res) => {
   let code = smcr()
