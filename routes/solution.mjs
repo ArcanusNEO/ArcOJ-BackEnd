@@ -56,7 +56,7 @@ router.get('/id/:sid(\\d+)/status', lc,
     return res.sendStatus(hsc.badReq)
   },
   async (req, res) => {
-    let query = 'SELECT "solution"."status_id" AS "statusId", ("solution"."uid" <> $1 AND "problemset"."secret_time" NOTNULL AND NOW()::TIMESTAMPTZ <@ "problemset"."secret_time") AS "hide" FROM "solution" INNER JOIN "problem" ON "solution"."pid" = "problem"."pid" LEFT JOIN "problemset" ON "problem"."psid" = "problemset"."psid" WHERE "sid" = $2'
+    let query = 'SELECT "solution"."status_id" AS "statusId", ("solution"."uid" <> $1 AND "problemset"."secret_time" NOTNULL AND NOW()::TIMESTAMPTZ <@ "problemset"."secret_time" AND "solution"."when" <@ "problemset"."secret_time") AS "hide" FROM "solution" INNER JOIN "problem" ON "solution"."pid" = "problem"."pid" LEFT JOIN "problemset" ON "problem"."psid" = "problemset"."psid" WHERE "sid" = $2'
     let ret = (await db.query(query, [req.tokenAcc.uid, req.params.sid])).rows[0]
     if (!ret) return res.sendStatus(hsc.unauthorized)
     let status = (ret.hide && req.tokenAcc.permission < 1 ? jsc.msgCode.HD : ret.statusId)
@@ -82,7 +82,7 @@ router.get('/', lc,
     return pc(req.tokenAcc.uid, ['getJudgeInfo'])(req, res, next)
   },
   async (req, res) => {
-    let query = 'SELECT "solution"."sid", "solution"."uid", "solution"."pid", "solution"."status_id" AS "statusId", "problem"."title" AS "name", "user"."nickname", ("solution"."uid" <> $1 AND "problemset"."secret_time" NOTNULL AND NOW()::TIMESTAMPTZ <@ "problemset"."secret_time") AS "hide" FROM "solution" INNER JOIN "problem" ON "solution"."pid" = "problem"."pid" INNER JOIN "user" ON "solution"."uid" = "user"."uid" LEFT JOIN "problemset" ON "problem"."psid" = "problemset"."psid" WHERE TRUE'
+    let query = 'SELECT "solution"."sid", "solution"."uid", "solution"."pid", "solution"."status_id" AS "statusId", "problem"."title" AS "name", "user"."nickname", ("solution"."uid" <> $1 AND "problemset"."secret_time" NOTNULL AND NOW()::TIMESTAMPTZ <@ "problemset"."secret_time" AND "solution"."when" <@ "problemset"."secret_time") AS "hide" FROM "solution" INNER JOIN "problem" ON "solution"."pid" = "problem"."pid" INNER JOIN "user" ON "solution"."uid" = "user"."uid" LEFT JOIN "problemset" ON "problem"."psid" = "problemset"."psid" WHERE TRUE'
     let queryUid = parseInt(req.query.uid), queryPid = parseInt(req.query.pid)
     let queryNick = req.query.nickname
     let param = [req.tokenAcc.uid]
