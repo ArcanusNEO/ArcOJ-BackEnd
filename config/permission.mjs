@@ -13,8 +13,8 @@ export default {
   'rejudgeLocalProblem': 12,        // 已实现
   'postMessage': 13,                // 还未实现，message 功能可能不会启用
   'postAnnouncement': 14,           // 已实现，指 local announcement
-  'getGlobalCode': 15,              // 已废弃
-  'getLocalCode': 16,               // 已废弃
+  'toggleStrictMode': 15,           // 已实现，开关 strict mode
+  'kick': 16,                       // 已实现，踢人下线
   'getGlobalJudgeInfo': 17,         // 已废弃
   'getLocalJudgeInfo': 18,          // 已废弃
   'getJudgeInfo': 19,               // 已实现，指所有的 judge info，普通用户使用
@@ -41,8 +41,8 @@ export default {
 // rejudgeLocalProblem           0              1            
 // postMessage                   1              1            
 // postAnnouncement              0              1            
-// getGlobalCode                 0              0            
-// getLocalCode                  0              1            
+// toggleStrictMode              0              0            
+// kick                          0              1            
 // getGlobalJudgeInfo            0              0            
 // getLocalJudgeInfo             0              1            
 // getJudgeInfo                  1              1            
