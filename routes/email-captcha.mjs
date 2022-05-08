@@ -15,7 +15,7 @@ router.post('/', fc(['body'], ['email']), async (req, res) => {
   let captcha = sr(5)
   let md5C = md5(captcha + salt)
   tokenUtils.write(res, 'ec', { md5C: md5C })
-  let ret = await email(req.body['email'], `您的验证码是：\n${captcha}`)
+  let ret = await email(req.body['email'], `您的 Captcha 是：\n${captcha}`)
   if (ret) return res.sendStatus(hsc.ok)
   return res.sendStatus(hsc.internalSrvErr)
 })
