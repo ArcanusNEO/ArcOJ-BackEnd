@@ -17,10 +17,10 @@ const get = (property) => {
     let uid = req.tokenAcc.uid
     let cid = parseInt(req.params.cid)
     let param = []
-    let query = `SELECT "problemset"."psid" AS "id", "title" AS "name", LOWER("during")::TIMESTAMPTZ AS "begin", UPPER("during")::TIMESTAMPTZ AS "end" FROM "problemset_user" INNER JOIN "problemset" ON "problemset"."psid" = "problemset_user"."psid" WHERE "uid" = $${param.push(uid)} AND "type" = '${property}'`
-    if (cid > 0) query += ` AND "cid" = $${param.push(cid)}` // 返回 course = cid
+    let query = `SELECT "problemset"."psid" AS "id", "problemset"."title" AS "name", LOWER("problemset"."during")::TIMESTAMPTZ AS "begin", UPPER("problemset"."during")::TIMESTAMPTZ AS "end", "course"."title" AS "courseName" FROM "problemset_user" INNER JOIN "problemset" ON "problemset"."psid" = "problemset_user"."psid" LEFT JOIN "course" ON "problemset"."cid" = "course"."cid" WHERE "problemset_user"."uid" = $${param.push(uid)} AND "problemset"."type" = '${property}'`
+    if (cid > 0) query += ` AND "problemset"."cid" = $${param.push(cid)}` // 返回 course = cid
     else if (cid === 0) { /* 返回所有的 */ }
-    else query += ' AND "cid" ISNULL' // 返回 global
+    else query += ' AND "problemset"."cid" ISNULL' // 返回 global
     query += ' ORDER BY "problemset"."psid" DESC'
     let ret = (await db.query(query, param)).rows
     return res.status(hsc.ok).json(ret)
