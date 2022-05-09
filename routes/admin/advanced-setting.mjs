@@ -34,7 +34,7 @@ router.post('/strict-mode', lc,
   async (req, res) => {
     let { enable, passcode } = req.body
     let conf = {
-      enable: enable,
+      enable: (enable ? true : false),
       code: passcode
     }
     let content = `export default ${JSON.stringify(conf)}`
