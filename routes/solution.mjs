@@ -13,8 +13,8 @@ import examing from './midwares/examing-check-ret-bool.mjs'
 
 const problemExaming = async (pid) => {
   let query = `SELECT ("problemset"."type" <> 'assignment') AS "block", ("problemset"."type" = 'contest') AS "contesting" FROM "problemset" INNER JOIN "problem" ON "problemset"."psid" = "problem"."psid" WHERE "problem"."pid" = $1 AND NOW()::TIMESTAMPTZ <@ "problemset"."during"`
-  let ret = (await db.query(query, [pid])).rows[0]
-  let { block, contesting } = (ret ? ret : {block: false, contesting: false})
+  let ret = (await db.query(query, [pid])).rows[0] || { block: false, contesting: false }
+  let { block, contesting } = ret 
   return {
     block: (block ? true : false),
     contesting: (contesting ? true : false)
