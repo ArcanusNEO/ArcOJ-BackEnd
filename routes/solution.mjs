@@ -12,9 +12,12 @@ import fs from 'fs-extra'
 import examing from './midwares/examing-check-ret-bool.mjs'
 
 const problemExaming = async (pid) => {
-  let query = `SELECT COUNT(*) FROM "problemset" INNER JOIN "problem" ON "problemset"."psid" = "problem"."psid" WHERE "problem"."pid" = $1 AND NOW()::TIMESTAMPTZ <@ "problemset"."during" AND "problemset"."type" <> 'assignment'`
-  let ret = (await db.query(query, [pid])).rows[0].count
-  return (ret > 0)
+  let query = `SELECT ("problemset"."type" <> 'assignment') AS "block", ("problemset"."type" = 'contest') AS "contesting" FROM "problemset" INNER JOIN "problem" ON "problemset"."psid" = "problem"."psid" WHERE "problem"."pid" = $1 AND NOW()::TIMESTAMPTZ <@ "problemset"."during"`
+  let { block, contesting } = (await db.query(query, [pid])).rows[0]
+  return {
+    block: (block > 0),
+    contesting: (contesting > 0)
+  }
 }
 
 router.get('/id/:sid(\\d+)', lc,
@@ -35,9 +38,11 @@ router.get('/id/:sid(\\d+)', lc,
     delete ret.secret
     delete ret.before
     delete ret.open
+    if (permission >= 1) return res.status(hsc.ok).json(ret)
     let uExaming = await examing(uid)
-    let pExaming = await problemExaming(ret.pid)
-    if (ret.uid === uid && (uExaming && pExaming || !uExaming) || permission >= 1) return res.status(hsc.ok).json(ret)
+    let { block: pExaming, contesting } = await problemExaming(ret.pid)
+    if (contesting) ret.detail = null
+    if (ret.uid === uid && (uExaming && pExaming || !uExaming)) return res.status(hsc.ok).json(ret)
     let blockList = []
     if (before || !ret.share || open || secret || uExaming) {
       blockList.push('code', 'detail', 'compileInfo', 'codeSize')
