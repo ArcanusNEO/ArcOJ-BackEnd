@@ -3,7 +3,6 @@ const router = express.Router()
 import hsc from '../config/http-status-code.mjs'
 import db from '../utils/database.mjs'
 import lc from './midwares/login-check.mjs'
-import mc from './midwares/member-check.mjs'
 import pc from './midwares/permission-check.mjs'
 
 router.get('/', lc, async (req, res) => {
@@ -13,16 +12,12 @@ router.get('/', lc, async (req, res) => {
   return res.status(hsc.ok).json(ret)
 })
 
-router.get('/id/:cid(\\d+)', lc,
-  async (req, res, next) => {
-    return (mc['course'](req.tokenAcc.uid, req.params.cid)(req, res, next))
-  },
-  async (req, res) => {
-    let query = 'SELECT "title" AS "name", "teacher" AS "teachers", "number", "description", "semester" FROM "course" WHERE "cid" = $1 AND "visiable"'
-    let ret = (await db.query(query, [req.params.cid])).rows[0]
-    if (ret) return res.status(hsc.ok).json(ret)
-    return res.sendStatus(hsc.unauthorized)
-  })
+router.get('/id/:cid(\\d+)', lc, async (req, res) => {
+  let query = 'SELECT "title" AS "name", "teacher" AS "teachers", "number", "description", "semester" FROM "course" WHERE "cid" = $1 AND "visiable"'
+  let ret = (await db.query(query, [req.params.cid])).rows[0]
+  if (ret) return res.status(hsc.ok).json(ret)
+  return res.sendStatus(hsc.unauthorized)
+})
 
 router.get('/all', lc, async (req, res) => {
   let query = 'SELECT "cid" AS "id", "title" AS "name", ("passcode" ISNULL) AS "public", "number" FROM "course" WHERE "visiable" ORDER BY "cid" DESC'
