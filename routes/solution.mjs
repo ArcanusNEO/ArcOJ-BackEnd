@@ -12,7 +12,7 @@ import fs from 'fs-extra'
 import examing from './midwares/examing-check-ret-bool.mjs'
 
 const problemExaming = async (pid) => {
-  let query = `SELECT ("problemset"."type" NOTNULL AND "problemset"."type" <> 'assignment') AS "block", ("problemset"."type" NOTNULL AND "problemset"."type" = 'contest') AS "contesting" FROM "problemset" INNER JOIN "problem" ON "problemset"."psid" = "problem"."psid" WHERE "problem"."pid" = $1 AND NOW()::TIMESTAMPTZ <@ "problemset"."during"`
+  let query = `SELECT ("problemset"."type" NOTNULL AND "problemset"."type" <> 'assignment') AS "block", ("problemset"."type" NOTNULL AND "problemset"."type" = 'contest') AS "contesting" FROM "problemset" RIGHT JOIN "problem" ON "problemset"."psid" = "problem"."psid" WHERE "problem"."pid" = $1 AND NOW()::TIMESTAMPTZ <@ "problemset"."during"`
   let { block, contesting } = (await db.query(query, [pid])).rows[0]
   return {
     block: (block ? true : false),
