@@ -41,7 +41,7 @@ router.get('/id/:sid(\\d+)', lc,
     if (permission >= 1) return res.status(hsc.ok).json(ret)
     let uExaming = await examing(uid)
     let { block: pExaming, contesting } = await problemExaming(ret.pid)
-    if (contesting) ret.detail = null
+    if (contesting) ret.detail = ret.score = null
     if (ret.uid === uid && (uExaming && pExaming || !uExaming)) return res.status(hsc.ok).json(ret)
     let blockList = []
     if (before || !ret.share || open || secret || uExaming) {
