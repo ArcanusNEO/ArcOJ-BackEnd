@@ -8,7 +8,7 @@ import md5 from '../utils/md5.mjs'
 import salt from '../config/salt.mjs'
 import smco from './midwares/strict-mode-check-obj.mjs'
 
-router.use(smco.passcodeForbid)
+router.all('*', smco.passcodeForbid)
 
 router.post('/', fc(['body'], ['password', 'username', 'nickname'], hsc.parseErr, { ok: false }), async (req, res) => {
   try {
