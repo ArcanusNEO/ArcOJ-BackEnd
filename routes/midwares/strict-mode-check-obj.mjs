@@ -6,11 +6,13 @@ import hsc from '../../config/http-status-code.mjs'
 const o = {
   passcodeFormChk: (req, res, next) => {
     req.passcode = smcr()
+    console.log(req.passcode)
     if (!req.passcode) return next()
     return fc(['body'], ['passcode'])(req, res, next)
   },
   passcodeChk: (req, res, next) => {
     if (!req.passcode) return next()
+    console.log(req.body.passcode)
     return (req.passcode === req.body.passcode)
   },
   examingChk: async (req, res, next) => {
