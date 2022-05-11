@@ -17,7 +17,7 @@ import { fileURLToPath } from 'url'
 const __dirname = dirname(fileURLToPath(import.meta.url))
 import lc from './midwares/login-check.mjs'
 
-router.get('/strict-mode', lc, (req, res) => {
+router.get('/strict-mode', (req, res) => {
   let code = smcr()
   return res.status(hsc.ok).json({enable: (code ? true : false)})
 })
