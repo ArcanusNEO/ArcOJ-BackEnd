@@ -11,7 +11,7 @@ import pc from './midwares/permission-check.mjs'
 import permMap from '../config/permission-map.mjs'
 import smco from './midwares/strict-mode-check-obj.mjs'
 
-router.all('*', smco.passcodeForbid)
+router.use(smco.passcodeForbid)
 
 router.post('/password', fc(['body'], ['username', 'password']), async (req, res) => {
   try {

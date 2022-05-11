@@ -7,8 +7,8 @@ import db from '../utils/database.mjs'
 import permMap from '../config/permission-map.mjs'
 import smco from './midwares/strict-mode-check-obj.mjs'
 
-router.all('*', smco.passcodeFormChk)
-router.all('*', smco.passcodeChk)
+router.use(smco.passcodeFormChk)
+router.use(smco.passcodeChk)
 
 router.post('/', fc(['body'], ['username', 'password'], hsc.parseErr, { ok: false }), async (req, res) => {
   try {
