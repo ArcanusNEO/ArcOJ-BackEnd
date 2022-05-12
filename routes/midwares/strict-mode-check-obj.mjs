@@ -12,7 +12,7 @@ const o = {
   passcodeChk: (req, res, next) => {
     if (!req.passcode) return next()
     if (req.passcode === req.body.passcode) return next()
-    return res.sendStatus(hsc.forbidden)
+    return res.sendStatus(hsc.passwdMismatch)
   },
   examingChk: async (req, res, next) => {
     let examing = await ecrb(req.tokenAcc.uid)
