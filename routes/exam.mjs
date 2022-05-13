@@ -40,11 +40,14 @@ router.get('/id/:psid(\\d+)', lc,
 router.get('/id/:psid(\\d+)/rank', lc,
   async (req, res) => {
     let psid = parseInt(req.params.psid)
-    let query = 'SELECT "pid", "title" FROM "problem" WHERE "psid" = $1 ORDER BY "title" ASC'
+    let query = `SELECT COUNT(*) FROM "problemset" WHERE "psid" = $1 AND "type" <> 'contest'`
+    let ret = (await db.query(query, [psid])).rows[0]
+    if (!ret || !ret.count) return res.sendStatus(hsc.forbidden)
+    query = 'SELECT "pid", "title" FROM "problem" WHERE "psid" = $1 ORDER BY "title" ASC'
     let meta = (await db.query(query, [psid])).rows
     if (!meta) return res.sendStatus(hsc.badReq)
-    query = 'SELECT DISTINCT ON ("solution"."uid", "problem"."title") "solution"."sid", "solution"."score", ("solution"."score" >= 100) AS "pass", "solution"."uid", "user"."nickname", "solution"."pid", "solution"."run_time" AS "runTime", "solution"."run_memory" AS "runMemory", "solution"."when" FROM "solution" INNER JOIN "user" ON "solution"."uid" = "user"."uid" INNER JOIN "problem" ON "solution"."pid" = "problem"."pid" INNER JOIN "problemset" ON "problem"."psid" = "problemset"."psid" WHERE "problem"."psid" = $1 AND "solution"."when" <@ "problemset"."during" AND ("problemset"."secret_time" ISNULL OR NOT "solution"."when" <@ "problemset"."secret_time") ORDER BY "solution"."uid" ASC, "problem"."title" ASC, "solution"."score" DESC, "solution"."run_time" ASC, "solution"."run_memory" ASC, "solution"."when" ASC'
-    let ret = (await db.query(query, [psid])).rows
+    query = 'SELECT DISTINCT ON ("solution"."uid", "problem"."title") "solution"."sid", "solution"."score", ("solution"."score" >= 100) AS "pass", "solution"."uid", "user"."nickname", "solution"."pid", "solution"."run_time" AS "runTime", "solution"."run_memory" AS "runMemory", "solution"."when" FROM "solution" INNER JOIN "user" ON "solution"."uid" = "user"."uid" INNER JOIN "problem" ON "solution"."pid" = "problem"."pid" INNER JOIN "problemset" ON "problem"."psid" = "problemset"."psid" WHERE "problem"."psid" = $1 AND "solution"."when" <@ "problemset"."during" AND ("problemset"."secret_time" ISNULL OR NOT "solution"."when" <@ "problemset"."secret_time") ORDER BY "solution"."uid" ASC, "problem"."title" ASC, "solution"."pid" ASC, "solution"."score" DESC, "solution"."run_time" ASC, "solution"."run_memory" ASC, "solution"."when" ASC'
+    ret = (await db.query(query, [psid])).rows
     let tab = []
     for (let row of ret) {
       if (tab.length === 0 || row.uid !== tab[tab.length - 1].uid)
