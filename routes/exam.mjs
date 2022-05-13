@@ -42,6 +42,7 @@ router.get('/id/:psid(\\d+)/rank', lc,
     let psid = parseInt(req.params.psid)
     let query = `SELECT COUNT(*) FROM "problemset" WHERE "psid" = $1 AND "type" <> 'contest'`
     let ret = (await db.query(query, [psid])).rows[0]
+    console.log(ret)
     if (!ret || !ret.count || ret.count === 0) return res.sendStatus(hsc.forbidden)
     query = 'SELECT "pid", "title" FROM "problem" WHERE "psid" = $1 ORDER BY "title" ASC'
     let meta = (await db.query(query, [psid])).rows
