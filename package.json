@@ -31,7 +31,7 @@
     "@types/fs-extra": "^9.0.13",
     "@types/jsonwebtoken": "^8.5.8",
     "@types/morgan": "^1.9.3",
-    "@types/nodemailer": "^6.4.4",
+    "@types/nodemailer": "^6.4.5",
     "@types/pg": "^8.6.5"
   }
 }
