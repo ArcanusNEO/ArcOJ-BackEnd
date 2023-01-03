@@ -30,7 +30,7 @@
     "@types/express-fileupload": "^1.4.1",
     "@types/fs-extra": "^9.0.13",
     "@types/jsonwebtoken": "^9.0.0",
-    "@types/morgan": "^1.9.3",
+    "@types/morgan": "^1.9.4",
     "@types/nodemailer": "^6.4.7",
     "@types/pg": "^8.6.6"
   }
