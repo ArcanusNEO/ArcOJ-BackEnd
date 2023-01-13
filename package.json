@@ -7,7 +7,7 @@
   },
   "dependencies": {
     "child_process": "^1.0.2",
-    "compressing": "^1.6.3",
+    "compressing": "^1.7.0",
     "cookie-parser": "~1.4.6",
     "debug": "~4.3.4",
     "ejs": "~3.1.8",
