@@ -66,7 +66,7 @@ const password = (req, pos, item) => {
   if (!req[pos][item]) return false
   try {
     req[pos][item] = crypto.decrypt(req[pos][item])
-    if (!/^[\w-\.~!@#$\^&\*\+=:'",<>\?/]{6,20}$/g.test(req[pos][item])) throw Error('Invalid password')
+    if (!/^[\w-\.~!@#$\^&\*\+=:'",<>\?/]{2,64}$/g.test(req[pos][item])) throw Error('Invalid password')
     req[pos][item] = crypto.hashPassword(req[pos][item])
   } catch (err) {
     console.error(err)
@@ -116,7 +116,7 @@ export default (poss, items, errCode = hsc.parseErr, errMsg = { ok: false }) => 
           case 'password':
             rep &= password(req, pos, item)
             break
-          
+
           case 'passcode':
             rep &= password(req, pos, item)
             break
