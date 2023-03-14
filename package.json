@@ -10,7 +10,7 @@
     "compressing": "^1.8.0",
     "cookie-parser": "~1.4.6",
     "debug": "~4.3.4",
-    "ejs": "~3.1.8",
+    "ejs": "~3.1.9",
     "express": "~4.18.2",
     "express-fileupload": "^1.4.0",
     "filenamify": "^5.1.1",
