@@ -1,10 +1,9 @@
 [Unit]
 Description=ArcOJ BackEnd service
 After=network.target postgresql.service rc-local.service
-Requires=rc-local.service
 
 [Service]
-Type=simple
+Type=forking
 WorkingDirectory=/var/www/ArcOJ-BackEnd
 User=ojmaster
 Group=www-data
