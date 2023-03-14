@@ -1,16 +1,15 @@
 export default {
   transportInfo: {
-    host: "smtp.163.com",
-    secureConnection: true,
+    host: "mail.transcliff.top",
     port: 465,
     secure: true,
     auth: {
-      user: "require@require.require",
-      pass: "require"
+      user: "noreply@transcliff.top",
+      pass: ""
     }
   },
   mailInfo: {
-    from: "\"ArcOJ-BackEnd Team\" <require@require.require>",
+    from: "\"ArcOJ BackEnd Team\" <noreply@transcliff.top>",
     subject: "您的 NKU Online Judge 邮箱验证码"
   }
 }
