@@ -19,7 +19,7 @@
     "json-2-csv": "^4.1.0",
     "jsonwebtoken": "^9.0.2",
     "morgan": "~1.10.0",
-    "nodemailer": "^6.9.4",
+    "nodemailer": "^6.9.5",
     "p-queue": "^7.4.1",
     "pg": "^8.11.3",
     "string-random": "^0.1.3"
