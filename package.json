@@ -32,6 +32,6 @@
     "@types/jsonwebtoken": "^9.0.3",
     "@types/morgan": "^1.9.5",
     "@types/nodemailer": "^6.4.10",
-    "@types/pg": "^8.10.2"
+    "@types/pg": "^8.10.3"
   }
 }
