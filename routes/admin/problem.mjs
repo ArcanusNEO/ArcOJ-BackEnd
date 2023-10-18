@@ -17,7 +17,7 @@ import jsc from '../../config/judge-status-code.mjs'
 import langMap from '../../config/lang-ext.mjs'
 import filenamify from 'filenamify'
 import j2cPkg from 'json-2-csv'
-const { json2csvAsync } = j2cPkg
+const { json2csv } = j2cPkg
 
 const insertProblem = async (params) => {
   let { psid, title, extra, specialJudge, detailJudge, cases, timeLimit, memoryLimit, ownerId, extension } = params
@@ -432,7 +432,7 @@ router.get('/id/:pid(\\d+)/statistics', lc, pidPermChk,
       row.status = jsc.codeMsg[row.status]
       row.lang = langMap.idLang[row.lang]
     }
-    let csv = await json2csvAsync(ret)
+    let csv = await json2csv(ret)
     let response = { csv }
     response.json = ret
     res.status(hsc.ok).json(response)
