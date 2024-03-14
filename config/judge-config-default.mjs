@@ -4,6 +4,7 @@ export default {
   "lang": null,
   "pid": null,
   "max_time": null,
+  "max_real_time": 60000,
   "max_time_total": 30000,
   "max_memory": 262144,      // 256 * 1024 KiB
   "max_output": 10000000,
