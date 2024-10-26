@@ -12,10 +12,11 @@ import smco from './midwares/strict-mode-check-obj.mjs'
 router.use(smco.passcodeForbid)
 
 router.post('/', fc(['body'], ['email']), async (req, res) => {
+  let username = req.body['email']
   let captcha = sr(5)
-  let md5C = md5(captcha + salt)
+  let md5C = md5(salt + username + captcha)
   tokenUtils.write(res, 'ec', { md5C: md5C })
-  let ret = await email(req.body['email'], `您的邮箱验证码是：\n${captcha}`)
+  let ret = await email(username, `您的邮箱验证码是：\n${captcha}`)
   if (ret) return res.sendStatus(hsc.ok)
   return res.sendStatus(hsc.internalSrvErr)
 })

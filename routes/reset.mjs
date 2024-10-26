@@ -17,8 +17,8 @@ router.post('/password', fc(['body'], ['username', 'password']), async (req, res
   try {
     let md5C = tokenUtils.get(req, 'ec')['md5C']
     tokenUtils.remove(res, 'ec')
-    if (md5C !== md5(req.body['emailCaptcha'] + salt)) throw Error('Captcha is incorrect')
     let username = req.body['username'], password = req.body['password']
+    if (md5C !== md5(salt + username + req.body['emailCaptcha'])) throw Error('Captcha is incorrect')
     let sqlStr = 'SELECT "uid", "gid", "nickname" FROM "user" WHERE "email" = $1 AND NOT "removed" LIMIT 1'
     let sqlRes = await db.query(sqlStr, [username])
     if (!sqlRes.rows[0]) throw Error('No such user')

@@ -14,8 +14,9 @@ router.post('/', fc(['body'], ['password', 'username', 'nickname'], hsc.parseErr
   try {
     let md5C = tokenUtils.get(req, 'ec')['md5C']
     tokenUtils.remove(res, 'ec')
-    if (md5C !== md5(req.body['emailCaptcha'] + salt)) throw Error('Captcha is incorrect')
-    let uid, username = req.body['username'], nickname = req.body['nickname'], password = req.body['password']
+    let username = req.body['username']
+    if (md5C !== md5(salt + username + req.body['emailCaptcha'])) throw Error('Captcha is incorrect')
+    let uid, nickname = req.body['nickname'], password = req.body['password']
     let sqlStr = 'SELECT "uid" FROM "user" WHERE "email" = $1 LIMIT 1'
     let tot = await db.query(sqlStr, [username])
     if (tot.rows[0]) return res.status(hsc.resOccupied).json({ ok: false })
