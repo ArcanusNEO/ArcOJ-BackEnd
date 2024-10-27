@@ -4,7 +4,7 @@ import hsc from '../config/http-status-code.mjs'
 import fc from './midwares/form-check.mjs'
 import tokenUtils from '../utils/token.mjs'
 import db from '../utils/database.mjs'
-import md5 from '../utils/md5.mjs'
+import blake2 from '../utils/blake2.mjs'
 import salt from '../config/salt.mjs'
 import lc from './midwares/login-check.mjs'
 import pc from './midwares/permission-check.mjs'
@@ -15,10 +15,10 @@ router.use(smco.passcodeForbid)
 
 router.post('/password', fc(['body'], ['username', 'password']), async (req, res) => {
   try {
-    let md5C = tokenUtils.get(req, 'ec')['md5C']
+    let blake2C = tokenUtils.get(req, 'ec')['blake2C']
     tokenUtils.remove(res, 'ec')
     let username = req.body['username'], password = req.body['password']
-    if (md5C !== md5(salt + username + req.body['emailCaptcha'])) throw Error('Captcha is incorrect')
+    if (blake2C !== blake2(salt + username + blake2(req.body['emailCaptcha']))) throw Error('Captcha is incorrect')
     let sqlStr = 'SELECT "uid", "gid", "nickname" FROM "user" WHERE "email" = $1 AND NOT "removed" LIMIT 1'
     let sqlRes = await db.query(sqlStr, [username])
     if (!sqlRes.rows[0]) throw Error('No such user')

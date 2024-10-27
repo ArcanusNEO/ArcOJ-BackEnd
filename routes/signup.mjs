@@ -4,7 +4,7 @@ import hsc from '../config/http-status-code.mjs'
 import tokenUtils from '../utils/token.mjs'
 import fc from './midwares/form-check.mjs'
 import db from '../utils/database.mjs'
-import md5 from '../utils/md5.mjs'
+import blake2 from '../utils/blake2.mjs'
 import salt from '../config/salt.mjs'
 import smco from './midwares/strict-mode-check-obj.mjs'
 
@@ -12,10 +12,10 @@ router.use(smco.passcodeForbid)
 
 router.post('/', fc(['body'], ['password', 'username', 'nickname'], hsc.parseErr, { ok: false }), async (req, res) => {
   try {
-    let md5C = tokenUtils.get(req, 'ec')['md5C']
+    let blake2C = tokenUtils.get(req, 'ec')['blake2C']
     tokenUtils.remove(res, 'ec')
     let username = req.body['username']
-    if (md5C !== md5(salt + username + req.body['emailCaptcha'])) throw Error('Captcha is incorrect')
+    if (blake2C !== blake2(salt + username + blake2(req.body['emailCaptcha']))) throw Error('Captcha is incorrect')
     let uid, nickname = req.body['nickname'], password = req.body['password']
     let sqlStr = 'SELECT "uid" FROM "user" WHERE "email" = $1 LIMIT 1'
     let tot = await db.query(sqlStr, [username])
